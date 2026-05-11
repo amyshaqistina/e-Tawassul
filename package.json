@@ -1,0 +1,19 @@
+{
+    "private": true,
+    "name": "e-tawassul",
+    "description": "Frontend assets for the e-Tawassul system.",
+    "scripts": {
+        "dev": "echo 'No build step required — assets are pre-built in public/css and public/js. Open the app in your browser.'",
+        "build": "echo 'Static assets already in public/. Nothing to build.'"
+    },
+    "dependencies": {
+        "alpinejs": "^3.13.0",
+        "bootstrap": "^5.3.2",
+        "bootstrap-icons": "^1.11.1"
+    },
+    "browserslist": [
+        "> 0.5%",
+        "last 2 versions",
+        "not dead"
+    ]
+}
