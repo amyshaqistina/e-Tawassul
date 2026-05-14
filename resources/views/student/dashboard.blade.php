@@ -5,18 +5,26 @@
 
 @section('content')
 <style>
-.dashboard-wrap { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.dashboard-wrap {
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    /* Prevent this content from forcing horizontal overflow (which squeezes the sidebar) */
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+/* Ensure all grid children can shrink instead of forcing parent width */
+.dashboard-wrap > * { min-width: 0 !important; }
 
-/* ===== Hero Row: Welcome Banner + Privacy Notice (compact) ===== */
+/* ===== Hero Row ===== */
 .hero-row {
     display: grid !important;
-    grid-template-columns: 2fr 1fr !important;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important;
     gap: 16px !important;
     margin-bottom: 20px !important;
     align-items: stretch !important;
 }
 
-/* ===== Welcome Banner (SHRUNK) ===== */
+/* ===== Welcome Banner (compact) ===== */
 .welcome-banner {
     background: linear-gradient(135deg, #1a56db, #06b6d4) !important;
     border-radius: 14px !important;
@@ -27,13 +35,14 @@
     position: relative !important;
     overflow: hidden !important;
     color: #fff !important;
+    min-width: 0 !important;
 }
 .welcome-banner::before {
     content:''; position:absolute; right:-40px; top:-40px;
     width:140px; height:140px; border-radius:50%;
     background: rgba(255,255,255,0.06);
 }
-.welcome-text { position: relative; z-index: 1; flex: 1; }
+.welcome-text { position: relative; z-index: 1; flex: 1; min-width: 0; }
 .welcome-text h2 {
     color:#fff !important;
     font-size:17px !important;
@@ -63,6 +72,7 @@
     font-size:10.5px !important;
     font-weight:600 !important;
     color:#fff !important;
+    white-space: nowrap !important;
 }
 .welcome-icon {
     font-size:40px !important;
@@ -70,9 +80,10 @@
     position:relative !important;
     z-index:1 !important;
     line-height: 1 !important;
+    flex-shrink: 0 !important;
 }
 
-/* ===== Privacy Notice (SHRUNK) ===== */
+/* ===== Privacy Notice (compact) ===== */
 .privacy-notice {
     background: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
@@ -82,6 +93,7 @@
     gap: 10px !important;
     align-items: flex-start !important;
     box-shadow: 0 1px 3px rgba(0,0,0,0.03) !important;
+    min-width: 0 !important;
 }
 .privacy-notice-icon {
     width: 30px !important;
@@ -95,7 +107,7 @@
     font-size: 13px !important;
     flex-shrink: 0 !important;
 }
-.privacy-notice-body { flex: 1; }
+.privacy-notice-body { flex: 1; min-width: 0; }
 .privacy-notice-body h4 {
     font-size: 12px !important;
     font-weight: 700 !important;
@@ -123,47 +135,48 @@
     color: #94a3b8;
 }
 
-/* ===== Action Cards (HERO — bigger & more prominent) ===== */
+/* ===== Action Cards (HERO — horizontal, compact) ===== */
 .action-cards-row {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 22px !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 20px !important;
     margin-bottom: 28px !important;
 }
 .action-card {
     background: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
-    border-radius: 16px !important;
-    padding: 32px 28px !important;
-    transition: all 0.3s !important;
+    border-radius: 14px !important;
+    padding: 22px 24px !important;
+    transition: all 0.25s !important;
     display: flex !important;
-    gap: 22px !important;
+    gap: 18px !important;
     align-items: flex-start !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
     position: relative !important;
     overflow: hidden !important;
+    min-width: 0 !important;
 }
 .action-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 4px;
+    height: 3px;
 }
 .action-card.legacy::before { background: #1a56db; }
 .action-card.crisis::before { background: #ea580c; }
 .action-card:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 16px 36px rgba(0,0,0,0.1) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08) !important;
 }
 .action-card-icon {
-    width: 64px !important;
-    height: 64px !important;
-    border-radius: 14px !important;
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 12px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
-    font-size: 30px !important;
+    font-size: 24px !important;
 }
 .action-card.legacy .action-card-icon {
     background: #eff6ff !important;
@@ -173,25 +186,28 @@
     background: #fff7ed !important;
     color: #ea580c !important;
 }
-.action-card-body { flex: 1 !important; }
+.action-card-body {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
 .action-card-body h3 {
-    font-size: 18px !important;
-    font-weight: 800 !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
     color: #0f172a !important;
-    margin: 0 0 8px 0 !important;
+    margin: 0 0 6px 0 !important;
+    line-height: 1.3 !important;
 }
 .action-card-body p {
-    font-size: 13.5px !important;
+    font-size: 12.5px !important;
     color: #64748b !important;
-    line-height: 1.6 !important;
-    margin: 0 0 20px 0 !important;
+    line-height: 1.55 !important;
+    margin: 0 0 14px 0 !important;
 }
 .action-card-btn {
-    display: block !important;
-    width: 100% !important;
-    padding: 13px 16px !important;
-    border-radius: 10px !important;
-    font-size: 14.5px !important;
+    display: inline-block !important;
+    padding: 10px 28px !important;
+    border-radius: 8px !important;
+    font-size: 13.5px !important;
     font-weight: 700 !important;
     text-align: center !important;
     color: #fff !important;
@@ -207,7 +223,7 @@
 /* ===== Stats Row ===== */
 .stats-row {
     display: grid !important;
-    grid-template-columns: 1fr 1fr 1fr !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
     gap: 16px !important;
     margin-bottom: 24px !important;
 }
@@ -220,6 +236,7 @@
     align-items: center !important;
     gap: 14px !important;
     box-shadow: 0 1px 3px rgba(0,0,0,0.03) !important;
+    min-width: 0 !important;
 }
 .stat-tile-icon {
     width: 44px !important;
@@ -247,18 +264,18 @@
 }
 
 @media (max-width: 992px) {
-    .hero-row { grid-template-columns: 1fr !important; }
+    .hero-row { grid-template-columns: minmax(0, 1fr) !important; }
 }
 @media (max-width: 768px) {
-    .action-cards-row { grid-template-columns: 1fr !important; }
-    .stats-row { grid-template-columns: 1fr !important; }
+    .action-cards-row { grid-template-columns: minmax(0, 1fr) !important; }
+    .stats-row { grid-template-columns: minmax(0, 1fr) !important; }
     .welcome-icon { display: none !important; }
 }
 </style>
 
 <div class="dashboard-wrap container-fluid py-3">
 
-    {{-- ===== Hero Row: Welcome Banner + Privacy Notice (both compact) ===== --}}
+    {{-- ===== Hero Row: Welcome Banner + Privacy Notice ===== --}}
     <div class="hero-row">
         <div class="welcome-banner">
             <div class="welcome-text">
@@ -273,6 +290,9 @@
                     </span>
                     <span class="welcome-badge">
                         <i class="bi bi-calendar3"></i> Year {{ $student->year_of_study ?? '—' }}
+                    </span>
+                    <span class="welcome-badge">
+                        <i class="bi bi-clock"></i> {{ now()->format('D, d M') }} &bull; {{ now()->format('h:i a') }}
                     </span>
                 </div>
             </div>
@@ -296,7 +316,7 @@
         </div>
     </div>
 
-    {{-- ===== Action Cards (THE HERO) ===== --}}
+    {{-- ===== Action Cards (HERO) ===== --}}
     <div class="action-cards-row">
         <div class="action-card legacy">
             <div class="action-card-icon">
@@ -348,15 +368,12 @@
         </div>
     </div>
 
-    {{-- ===== Recent Reports + Notifications (existing) ===== --}}
+    {{-- ===== Recent Reports + Notifications ===== --}}
     <div class="row g-3">
         <div class="col-lg-7">
             <div class="content-card">
-                <div class="d-flex justify-content-between mb-3">
+                <div class="mb-3">
                     <h5 class="mb-0">My recent crisis reports</h5>
-                    <a href="{{ route('student.crisis.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle"></i> New Report
-                    </a>
                 </div>
                 @forelse($reports as $r)
                     <div class="list-row">
