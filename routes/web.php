@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BlockchainController;
 use App\Http\Controllers\CrisisController;
+use App\Http\Controllers\CrisisHelperController;
 use App\Http\Controllers\CrisisReportController;
 use App\Http\Controllers\DeathConfirmationController;
 use App\Http\Controllers\DonationController;
@@ -54,6 +55,10 @@ Route::middleware('role:student')->prefix('student')->name('student.')->group(fu
     Route::get('/crisis/create', [CrisisReportController::class, 'create'])->name('crisis.create');
     Route::post('/crisis', [CrisisReportController::class, 'store'])->name('crisis.store');
     Route::get('/crisis/{report}', [CrisisReportController::class, 'show'])->name('crisis.show');
+
+    // Live disaster helper endpoints (used by the crisis wizard JS)
+    Route::get('/crisis-helpers/disaster-context', [CrisisHelperController::class, 'disasterContext'])
+        ->name('crisis.helpers.disaster-context');
 
     Route::resource('ldms', LDMSController::class)->except(['show']);
 });
