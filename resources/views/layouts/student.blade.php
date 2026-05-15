@@ -1,5 +1,32 @@
 @extends('layouts.app', ['roleLabel' => 'Student', 'bodyClass' => 'theme-student'])
 
+@push('styles')
+<style>
+    /* ============================================================
+       Hide sidebar scrollbar — universal selectors so it works
+       regardless of what your sidebar class is actually named.
+       ============================================================ */
+    .theme-student aside,
+    .theme-student .sidebar,
+    .theme-student [class*="sidebar" i],
+    .theme-student [class*="side-nav" i],
+    .theme-student nav.app-nav {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+
+    .theme-student aside::-webkit-scrollbar,
+    .theme-student .sidebar::-webkit-scrollbar,
+    .theme-student [class*="sidebar" i]::-webkit-scrollbar,
+    .theme-student [class*="side-nav" i]::-webkit-scrollbar,
+    .theme-student nav.app-nav::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+</style>
+@endpush
+
 @section('sidebar')
     <a href="{{ route('student.dashboard') }}" class="nav-link {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
         <i class="bi bi-house-door"></i> Dashboard

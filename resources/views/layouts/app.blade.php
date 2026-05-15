@@ -11,6 +11,44 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
     @stack('head')
+    @stack('styles')
+
+    {{-- Global sidebar fixes for every page that uses this layout --}}
+    <style>
+        /* ===== 1. Fixed sidebar width — stops content from squeezing it ===== */
+        @media (min-width: 992px) {
+            .app-sidebar {
+                width: 240px !important;
+                min-width: 240px !important;
+                max-width: 240px !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* Make sure the main column takes whatever's left and can shrink internally */
+            .app-main {
+                flex: 1 1 0 !important;
+                min-width: 0 !important;
+                overflow-x: hidden !important;
+            }
+
+            /* The flex parent must actually be flex for the above to work */
+            .app-shell {
+                display: flex !important;
+                align-items: stretch !important;
+            }
+        }
+
+        /* ===== 2. Hide sidebar scrollbar in every browser ===== */
+        .app-sidebar {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        .app-sidebar::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+    </style>
 </head>
 
 <body class="auth-layout {{ $bodyClass ?? '' }}">
