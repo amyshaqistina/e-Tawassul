@@ -10,6 +10,21 @@ use App\Models\Donation;
 use App\Models\Ldms;
 use App\Models\Student;
 
+/**
+ * AdminController
+ *
+ * Handles admin overview / cross-cutting pages that aren't tied to one
+ * specific feature workflow:
+ *  - dashboard  : landing page with stat cards and recent activity
+ *  - students   : full list of students
+ *  - donations  : full list of donations
+ *
+ * Feature-specific admin pages live in their own controllers:
+ *  - AdminCrisisController     -> admin crisis report list
+ *  - CrisisReportController    -> admin view/verify/reject a single report
+ *  - DeathConfirmationController -> admin death confirmation list & actions
+ *  - BlockchainController      -> blockchain audit pages
+ */
 class AdminController extends Controller
 {
     public function dashboard()

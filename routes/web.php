@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminCrisisController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BlockchainController;
 use App\Http\Controllers\CrisisController;
@@ -72,7 +73,10 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/students', [AdminController::class, 'students'])->name('students.index');
 
-    Route::get('/crisis', [CrisisReportController::class, 'adminIndex'])->name('crisis.index');
+    // Crisis report list now lives on its own controller.
+    Route::get('/crisis', [AdminCrisisController::class, 'index'])->name('crisis.index');
+
+    // Single-report actions remain on CrisisReportController.
     Route::get('/crisis/{report}', [CrisisReportController::class, 'adminShow'])->name('crisis.show');
     Route::post('/crisis/{report}/verify', [CrisisReportController::class, 'verify'])->name('crisis.verify');
     Route::post('/crisis/{report}/reject', [CrisisReportController::class, 'reject'])->name('crisis.reject');

@@ -20,6 +20,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * CrisisReportController
+ *
+ * Owns the full crisis report lifecycle:
+ *  - Student: create, store, view own report
+ *  - Admin:   view one report (adminShow), verify, reject
+ *
+ * The admin LIST page (filterable index) is handled separately by
+ * AdminCrisisController to keep that read-only listing logic isolated.
+ */
 class CrisisReportController extends Controller
 {
     public function __construct(
@@ -180,30 +190,8 @@ class CrisisReportController extends Controller
     }
 
     // -----------------------------------------------------------
-    // ADMIN
+    // ADMIN (single-report actions only — listing lives in AdminCrisisController)
     // -----------------------------------------------------------
-
-    public function adminIndex(Request $request)
-    {
-        $tab = $request->query('tab', 'pending');
-
-        $pending = CrisisReport::with(['student', 'crisis'])
-            ->where('report_status', 'pending')
-            ->orderByDesc('date_reported')
-            ->paginate(15, ['*'], 'pending');
-
-        $verified = CrisisReport::with(['student', 'crisis'])
-            ->where('report_status', 'verified')
-            ->orderByDesc('verified_at')
-            ->paginate(15, ['*'], 'verified');
-
-        $rejected = CrisisReport::with(['student', 'crisis'])
-            ->where('report_status', 'rejected')
-            ->orderByDesc('updated_at')
-            ->paginate(15, ['*'], 'rejected');
-
-        return view('admin.crisis.index', compact('tab', 'pending', 'verified', 'rejected'));
-    }
 
     public function adminShow(CrisisReport $report)
     {
