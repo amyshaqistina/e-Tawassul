@@ -16,17 +16,17 @@
 
     <style>
         * { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; min-height: 100vh; }
+        html, body { margin: 0; padding: 0; height: 100vh; }
         body {
             font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #0f1b4c 0%, #1a3a6e 50%, #0c2d5a 100%);
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 24px 16px;
+            padding: 12px;
             position: relative;
-            overflow-x: hidden;
+            overflow: hidden;
             color: #0f172a;
         }
 
@@ -59,26 +59,27 @@
         .login-shell {
             display: flex;
             width: 100%;
-            max-width: 1040px;
+            max-width: 960px;
+            max-height: calc(100vh - 24px);
             background: #ffffff;
-            border-radius: 24px;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 32px 80px rgba(0,0,0,0.4);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.4);
             position: relative;
             z-index: 10;
         }
 
+        /* ===== LEFT ===== */
         .login-left {
             flex: 1;
             background: linear-gradient(160deg, rgba(26,86,219,0.95), rgba(6,182,212,0.75));
-            padding: 48px 40px;
+            padding: 24px 28px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             color: #fff;
             position: relative;
             overflow: hidden;
-            min-height: 640px;
         }
         .login-left::before {
             content: ''; position: absolute; inset: 0;
@@ -88,91 +89,101 @@
         .login-left > * { position: relative; z-index: 1; }
 
         .brand-logo {
-            width: 56px; height: 56px;
+            width: 42px; height: 42px;
             background: rgba(255,255,255,0.15);
-            border-radius: 14px;
+            border-radius: 11px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 24px; color: #fff;
-            margin-bottom: 20px;
+            font-size: 19px; color: #fff;
+            margin-bottom: 10px;
             border: 1px solid rgba(255,255,255,0.2);
         }
         .login-left h1 {
-            font-size: 28px; font-weight: 800;
-            color: #fff; margin: 0 0 8px 0;
+            font-size: 22px; font-weight: 800;
+            color: #fff; margin: 0 0 4px 0;
             letter-spacing: -0.02em;
         }
         .brand-tag {
-            font-size: 13px;
+            font-size: 11.5px;
             color: rgba(255,255,255,0.8);
-            line-height: 1.6;
-            max-width: 360px;
+            line-height: 1.5;
+            max-width: 320px;
             margin: 0;
         }
 
-        .feature-list { margin: 32px 0; }
+        .feature-list { margin: 16px 0; }
         .feature-item {
-            display: flex; align-items: flex-start; gap: 14px;
-            margin-bottom: 22px;
+            display: flex; align-items: flex-start; gap: 10px;
+            margin-bottom: 12px;
         }
         .feature-item:last-child { margin-bottom: 0; }
         .feature-item-icon {
-            width: 40px; height: 40px;
-            border-radius: 10px;
+            width: 32px; height: 32px;
+            border-radius: 8px;
             background: rgba(255,255,255,0.12);
             display: flex; align-items: center; justify-content: center;
-            font-size: 15px;
+            font-size: 13px;
             flex-shrink: 0;
             border: 1px solid rgba(255,255,255,0.15);
         }
         .feature-item-text h4 {
-            font-size: 14px; font-weight: 700;
-            color: #fff; margin: 0 0 3px 0;
+            font-size: 12.5px; font-weight: 700;
+            color: #fff; margin: 0 0 2px 0;
         }
         .feature-item-text p {
-            font-size: 12px;
+            font-size: 10.5px;
             color: rgba(255,255,255,0.7);
-            line-height: 1.5;
+            line-height: 1.4;
             margin: 0;
         }
 
         .left-footer {
-            display: flex; align-items: center; gap: 10px;
-            padding: 12px 16px;
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 12px;
             background: rgba(255,255,255,0.08);
-            border-radius: 10px;
+            border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .left-footer i { color: rgba(255,255,255,0.5); font-size: 16px; }
+        .left-footer i { color: rgba(255,255,255,0.5); font-size: 13px; }
         .left-footer p {
-            font-size: 12px;
+            font-size: 10.5px;
             color: rgba(255,255,255,0.75);
             margin: 0;
         }
 
+        /* ===== RIGHT ===== */
         .login-right {
-            width: 460px;
+            width: 420px;
             background: #ffffff;
-            padding: 48px 40px;
+            padding: 24px 28px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            overflow-y: auto;
         }
+        .login-right::-webkit-scrollbar { display: none; }
+        .login-right { scrollbar-width: none; }
+
         .login-right h2 {
-            font-size: 26px;
+            font-size: 20px;
             font-weight: 800;
             color: #0f172a;
             letter-spacing: -0.02em;
+            margin-bottom: 2px !important;
         }
 
-        .role-tabs { border-bottom: 1px solid #e2e8f0; }
+        .role-tabs {
+            border-bottom: 1px solid #e2e8f0;
+            margin-top: 12px !important;
+            margin-bottom: 12px !important;
+        }
         .role-tabs .nav-link {
             color: #64748b;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12.5px;
             border: none !important;
             background: transparent;
-            padding: 8px 4px;
-            margin-right: 18px;
+            padding: 6px 2px;
+            margin-right: 14px;
             border-bottom: 2px solid transparent !important;
             border-radius: 0;
         }
@@ -183,17 +194,18 @@
         }
 
         .login-right .form-label {
-            font-size: 11px;
+            font-size: 10px !important;
             font-weight: 700;
             color: #0f172a;
             letter-spacing: 0.5px;
+            margin-bottom: 4px !important;
         }
         .login-right .form-control-lg {
             background: #f8faff;
             border: 1.5px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 14px;
-            padding: 12px 14px;
+            border-radius: 9px;
+            font-size: 13.5px;
+            padding: 9px 12px;
             transition: all 0.2s;
         }
         .login-right .form-control-lg:focus {
@@ -202,13 +214,16 @@
             box-shadow: 0 0 0 3px rgba(26,86,219,0.08);
         }
 
+        .login-right .form-check-label.small { font-size: 12px; }
+        .login-right .mb-3 { margin-bottom: 10px !important; }
+
         .login-right .btn-primary {
             background: #1a56db;
             border-color: #1a56db;
-            border-radius: 10px;
+            border-radius: 9px;
             font-weight: 700;
-            padding: 13px;
-            font-size: 15px;
+            padding: 10px;
+            font-size: 14px;
             transition: all 0.2s;
         }
         .login-right .btn-primary:hover {
@@ -221,26 +236,35 @@
         .demo-credentials {
             background: #fffbeb;
             border: 1px solid #fde68a;
-            border-radius: 10px;
-            padding: 12px 14px;
+            border-radius: 9px;
+            padding: 8px 12px;
+            margin-top: 10px !important;
         }
         .demo-credentials h6 {
             color: #92400e !important;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 10px;
+            margin-bottom: 4px !important;
         }
         .demo-credentials code {
-            font-size: 11px;
+            font-size: 10.5px;
             color: #be185d;
             background: transparent;
         }
         .demo-credentials table { margin: 0; }
-        .demo-credentials td { padding: 4px 8px; border: none; font-size: 12px; }
+        .demo-credentials td { padding: 2px 6px; border: none; font-size: 11px; }
 
         @media (max-width: 900px) {
             .login-left { display: none; }
-            .login-right { width: 100%; padding: 40px 28px; }
-            .login-shell { max-width: 480px; }
+            .login-right { width: 100%; padding: 24px 22px; }
+            .login-shell { max-width: 440px; }
+        }
+
+        /* On short viewports, hide the feature paragraphs to save vertical space */
+        @media (max-height: 720px) {
+            .feature-item-text p { display: none; }
+            .feature-item { margin-bottom: 8px; }
+            .feature-list { margin: 12px 0; }
         }
     </style>
 </head>
@@ -311,12 +335,12 @@
     </div>
 
     <div class="login-right">
-        <div class="text-center mb-4">
+        <div class="text-center mb-2">
             <h2 class="mb-1">Welcome back</h2>
             <p class="text-muted small mb-0">Sign in to e-Tawassul to continue</p>
         </div>
 
-        <ul class="nav nav-tabs role-tabs mb-3" role="tablist" x-data="{ tab: '{{ old('role','student') }}' }">
+        <ul class="nav nav-tabs role-tabs" role="tablist" x-data="{ tab: '{{ old('role','student') }}' }">
             @foreach(['student'=>'Student','admin'=>'Admin','nok'=>'Next of Kin','lecturer'=>'Lecturer'] as $val => $label)
                 <li class="nav-item">
                     <button type="button"
@@ -361,7 +385,7 @@
             </button>
         </form>
 
-        <div class="demo-credentials mt-4">
+        <div class="demo-credentials">
             <h6 class="text-uppercase small text-muted mb-2"><i class="bi bi-info-circle"></i> Demo Credentials</h6>
             <div class="table-responsive">
                 <table class="table table-sm small mb-0">
