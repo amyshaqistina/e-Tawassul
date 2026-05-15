@@ -12,9 +12,17 @@ use App\Services\BlockchainService;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class LDMSController extends Controller
 {
+    /**
+     * The Flysystem disk that stores LDMS attachments with transparent
+     * AES-256-CBC encryption.  Configured in config/filesystems.php as
+     * 'ldms_secure' (driver: local, encrypt: true).
+     */
+    protected const SECURE_DISK = 'ldms_secure';
+
     public function __construct(
         protected BlockchainService $blockchain,
         protected NotificationService $notifications,
@@ -48,6 +56,9 @@ class LDMSController extends Controller
 
         $mediaPaths = $this->storeMediaFiles($request);
 
+        // NB: message_content is automatically AES-256-CBC encrypted by
+        //     the 'encrypted' cast on the Ldms model.  We just pass the
+        //     plaintext through and Eloquent handles the rest.
         $ldms = Ldms::create([
             'student_id'       => $student->student_id,
             'message_content'  => $request->input('message_content'),
@@ -79,8 +90,21 @@ class LDMSController extends Controller
             return back()->withErrors(['ldms' => 'Released messages cannot be edited.']);
         }
 
-        $newPaths = $this->storeMediaFiles($request);
         $existing = (array) ($ldms->media_file_path ?? []);
+
+        // 1) Remove any files the student ticked "Delete" on in the edit form.
+        $toRemove = (array) $request->input('remove_files', []);
+        if (!empty($toRemove)) {
+            foreach ($toRemove as $path) {
+                if (in_array($path, $existing, true)) {
+                    Storage::disk(self::SECURE_DISK)->delete($path);
+                }
+            }
+            $existing = array_values(array_diff($existing, $toRemove));
+        }
+
+        // 2) Store any newly uploaded files on the encrypted disk.
+        $newPaths = $this->storeMediaFiles($request);
 
         $ldms->update([
             'message_content' => $request->input('message_content'),
@@ -105,7 +129,7 @@ class LDMSController extends Controller
         }
 
         foreach ((array) ($ldms->media_file_path ?? []) as $path) {
-            Storage::disk('local')->delete($path);
+            Storage::disk(self::SECURE_DISK)->delete($path);
         }
         $ldms->delete();
 
@@ -201,6 +225,41 @@ class LDMSController extends Controller
         return view('nok.ldms.show', compact('ldms'));
     }
 
+    /**
+     * Stream a single LDMS attachment to a verified NOK.
+     *
+     * Because files live on the encrypted disk we cannot just expose
+     * a public URL — we must read & decrypt through the Storage facade
+     * and re-stream the bytes, with strict authorization first.
+     */
+    public function nokDownload(Ldms $ldms, string $filename)
+    {
+        /** @var \App\Models\NextOfKin $nok */
+        $nok = Auth::guard('nok')->user();
+
+        if (!$ldms->is_released) abort(403);
+        if ($ldms->student_id !== $nok->student_id) abort(403);
+
+        // Find the matching path in the manifest — never trust the URL alone.
+        $paths = (array) ($ldms->media_file_path ?? []);
+        $match = collect($paths)->first(fn($p) => basename($p) === $filename);
+        if (!$match) abort(404);
+
+        $disk = Storage::disk(self::SECURE_DISK);
+        if (!$disk->exists($match)) abort(404);
+
+        ActivityLog::record('nok', (string) $nok->nok_id, 'ldms_file_downloaded',
+            "NOK downloaded {$filename} from LDMS #{$ldms->ldms_id}");
+
+        // Stream decrypted bytes; the disk handles decryption transparently.
+        return response()->streamDownload(
+            function () use ($disk, $match) {
+                echo $disk->get($match);
+            },
+            $filename
+        );
+    }
+
     // -----------------------------------------------------------
     // Helpers
     // -----------------------------------------------------------
@@ -214,14 +273,36 @@ class LDMSController extends Controller
         }
     }
 
+    /**
+     * Persist any uploaded files onto the encrypted LDMS disk.
+     *
+     * We give every file a random name so the original filename never
+     * leaks into the filesystem (which an attacker with disk access
+     * could otherwise still read, even with ciphertext contents).
+     * The mime/extension is preserved so downloads still work.
+     */
     protected function storeMediaFiles($request): array
     {
         $paths = [];
-        if ($request->hasFile('media_files')) {
-            foreach ($request->file('media_files') as $file) {
-                $paths[] = $file->store('ldms-media', 'local');
-            }
+        if (!$request->hasFile('media_files')) {
+            return $paths;
         }
+
+        $disk = Storage::disk(self::SECURE_DISK);
+
+        foreach ($request->file('media_files') as $file) {
+            if (!$file || !$file->isValid()) continue;
+
+            $ext      = strtolower($file->getClientOriginalExtension() ?: 'bin');
+            $safeName = Str::random(40) . '.' . $ext;
+            $path     = 'ldms-media/' . $safeName;
+
+            // putFileAs() runs the bytes through the encrypted adapter.
+            $disk->putFileAs('ldms-media', $file, $safeName);
+
+            $paths[] = $path;
+        }
+
         return $paths;
     }
 }

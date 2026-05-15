@@ -103,6 +103,11 @@ Route::middleware(['role:nok', 'twofactor'])->prefix('nok')->name('nok.')->group
     Route::post('/death', [DeathConfirmationController::class, 'store'])->name('death.store');
 
     Route::get('/ldms/{ldms}', [LDMSController::class, 'nokShow'])->name('ldms.show');
+
+    // Streams a decrypted LDMS attachment to the verified NOK.
+    // Needed because encrypted files cannot be served as static URLs.
+    Route::get('/ldms/{ldms}/download/{filename}', [LDMSController::class, 'nokDownload'])
+        ->name('ldms.download');
 });
 
 /*

@@ -1,6 +1,6 @@
 @extends('layouts.student')
-@section('title', 'New Legacy Message')
-@section('page-title', 'Create a Legacy Message')
+@section('title', 'Create Last Digital Message')
+@section('page-title', 'Create Last Digital Message')
 
 @section('content')
 <div class="container-fluid py-3">
@@ -27,7 +27,18 @@
                 <ul class="small text-muted ps-3 mb-0">
                     <li>Encrypted using Laravel's built-in AES encryption.</li>
                     <li>Audio captured via your browser is uploaded as a webm/ogg file.</li>
+                    <li>Photos, videos, and documents are stored encrypted on disk.</li>
                     <li>Only the verified next of kin will be able to view this after release.</li>
+                </ul>
+            </div>
+            <div class="content-card mt-3">
+                <h6 class="text-uppercase text-muted small mb-2"><i class="bi bi-question-circle"></i> What can I leave?</h6>
+                <ul class="small text-muted ps-3 mb-0">
+                    <li><strong>Written letter</strong> — a final note in your own words.</li>
+                    <li><strong>Voice recording</strong> — record on-device or upload an audio file.</li>
+                    <li><strong>Photos</strong> — upload from gallery or take a photo right now.</li>
+                    <li><strong>Documents</strong> — PDFs (with preview) or Word docs.</li>
+                    <li><strong>Video</strong> — pre-recorded MP4 or record on the spot.</li>
                 </ul>
             </div>
         </div>
