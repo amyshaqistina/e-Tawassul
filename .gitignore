@@ -29,3 +29,28 @@ Thumbs.db
 !/storage/framework/testing/.gitkeep
 !/storage/framework/views/.gitkeep
 !/storage/logs/.gitkeep
+
+cd C:\xampp\htdocs\e-tawassul
+
+@"
+
+# ========================================
+# Besu network (besu-network/)
+# Contains PRIVATE KEYS in nodes/ — NEVER commit
+# ========================================
+besu-network/nodes/
+besu-network/generated/
+besu-network/data/
+
+# ========================================
+# Hardhat / Smart contract (e-tawassul-contract/)
+# ========================================
+e-tawassul-contract/node_modules/
+e-tawassul-contract/artifacts/
+e-tawassul-contract/cache/
+e-tawassul-contract/typechain-types/
+e-tawassul-contract/coverage/
+e-tawassul-contract/coverage.json
+e-tawassul-contract/deployments/
+e-tawassul-contract/.env
+"@ | Add-Content -Encoding ascii .gitignore

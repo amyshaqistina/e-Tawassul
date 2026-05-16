@@ -1,0 +1,15 @@
+# Shared Besu node configuration for all 4 validators.
+# Per-node settings (private key, RPC port) are set as docker-compose entrypoint flags.
+
+# Logging
+logging="INFO"
+
+# Mining must be enabled — every node is a validator and produces blocks in turn
+miner-enabled=true
+miner-coinbase="0x0000000000000000000000000000000000000000"
+
+# Free transactions on private chain
+min-gas-price=0
+
+# Full sync (small chain, no need for fast/snap sync)
+sync-mode="FULL"
