@@ -273,6 +273,15 @@
         </span>
     </div>
 
+    @if($report->submitted_by_nok)
+        <span class="badge mb-2"
+              style="background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; padding:6px 10px;">
+            <i class="bi bi-person-badge-fill"></i>
+            Submitted by NOK:
+            {{ $report->nok?->first_name }} {{ $report->nok?->last_name }}
+        </span>
+    @endif
+
     <div class="row g-3">
         {{-- =================== LEFT: ONE big card =================== --}}
         <div class="col-lg-8">

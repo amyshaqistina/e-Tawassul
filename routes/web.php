@@ -15,6 +15,7 @@ use App\Http\Controllers\NOKController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PdfExportController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\NokCrisisController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -101,8 +102,13 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
 |--------------------------------------------------------------------------
 */
 Route::middleware(['role:nok', 'twofactor'])->prefix('nok')->name('nok.')->group(function () {
+
     Route::get('/dashboard', [NOKController::class, 'dashboard'])->name('dashboard');
 
+    Route::get('/crisis/create', [NokCrisisController::class, 'create'])->name('crisis.create');
+    Route::post('/crisis', [NokCrisisController::class, 'store'])->name('crisis.store');
+    Route::get('/crisis/{report}', [NokCrisisController::class, 'show'])->name('crisis.show');
+    Route::get('/crisis-helpers/disaster-context', [\App\Http\Controllers\CrisisHelperController::class, 'disasterContext'])->name('crisis.helpers.disaster-context');
     Route::get('/death/create', [DeathConfirmationController::class, 'create'])->name('death.create');
     Route::post('/death', [DeathConfirmationController::class, 'store'])->name('death.store');
 
