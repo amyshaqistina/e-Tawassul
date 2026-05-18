@@ -24,8 +24,4 @@
     <a href="{{ route('admin.blockchain.index') }}" class="nav-link {{ request()->routeIs('admin.blockchain.*') ? 'active' : '' }}">
         <i class="bi bi-link-45deg"></i> Blockchain Audit
     </a>
-    <div class="nav-section">Notifications</div>
-    <a href="{{ route('notifications.index') }}" class="nav-link {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
-        <i class="bi bi-bell"></i> All Notifications
-    </a>
 @endsection

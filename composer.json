@@ -11,7 +11,9 @@
         "laravel/framework": "^10.10",
         "laravel/tinker": "^3.0",
         "symfony/css-selector": "^6.0",
-        "symfony/dom-crawler": "^6.0"
+        "symfony/dom-crawler": "^6.0",
+        "web3p/ethereum-tx": "0.4.3",
+        "web3p/web3.php": "^0.1.6"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
