@@ -1,79 +1,957 @@
 @extends('layouts.admin')
 @section('title', 'Death Confirmation #' . $confirmation->confirmation_id)
-@section('page-title', 'Death Confirmation #' . $confirmation->confirmation_id)
+@section('page-title', 'Death Confirmation Review')
+
+@php
+    $statusKey = $confirmation->status ?? 'pending';
+    $currentAdmin = auth('admin')->user();
+
+    $studentLdms = \App\Models\Ldms::where('student_id', $confirmation->student_id)
+        ->orderByDesc('updated_at')
+        ->get();
+@endphp
+
+@push('styles')
+<style>
+    /* ===== Status banner ===== */
+    .status-banner {
+        border-radius: 12px;
+        padding: 18px 22px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-left: 6px solid;
+    }
+    .status-banner.s-pending  { background:#FFFBEB; border-color:#F59E0B; }
+    .status-banner.s-verified { background:#ECFDF5; border-color:#10B981; }
+    .status-banner.s-rejected { background:#FEF2F2; border-color:#EF4444; }
+
+    .status-banner h3 {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0;
+        color: #111827;
+    }
+
+    .status-banner .ref-code {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        background: #fff;
+        padding: 2px 8px;
+        border-radius: 4px;
+        color: #374151;
+        border: 1px solid #E5E7EB;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    .status-pill.pending  { background:#FEF3C7; color:#92400E; }
+    .status-pill.verified { background:#D1FAE5; color:#065F46; }
+    .status-pill.rejected { background:#FEE2E2; color:#991B1B; }
+
+    /* ===== Single info card ===== */
+    .info-card {
+        background: #fff;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+    .info-card-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid #E5E7EB;
+        background: #F9FAFB;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .info-card-header h5 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .info-card-header i.title-icon {
+        color: #1E40AF;
+    }
+
+    /* Row layout (label / value) */
+    .info-row {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        padding: 14px 20px;
+        border-bottom: 1px solid #F3F4F6;
+        align-items: start;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #6B7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .label-icon {
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        background: #EFF6FF;
+        color: #1E40AF;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+    .info-row .value {
+        font-size: 14px;
+        color: #111827;
+        line-height: 1.55;
+        word-break: break-word;
+    }
+    .info-row .value .sub {
+        font-size: 12px;
+        color: #6B7280;
+        display: block;
+        margin-top: 2px;
+    }
+    .desc-box {
+        background: #F9FAFB;
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 13.5px;
+        color: #111827;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+    .evidence-inline {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .evidence-inline .file {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #F9FAFB;
+        border: 1px solid #E5E7EB;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    .evidence-inline .file i { color: #6B7280; }
+    .evidence-inline .file .file-name {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        color: #1E40AF;
+        word-break: break-all;
+        flex: 1;
+    }
+    .evidence-inline .file .file-meta {
+        font-size: 11px;
+        color: #6B7280;
+        white-space: nowrap;
+    }
+
+    /* ===== Right sidebar cards ===== */
+    .profile-card, .lect-card, .ldms-card {
+        background: #fff;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+    .profile-card-header, .lect-card-header, .ldms-card-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid #E5E7EB;
+        background: #F9FAFB;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .profile-card-header h5, .lect-card-header h5, .ldms-card-header h5 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #111827;
+    }
+    .profile-card-header i, .lect-card-header i, .ldms-card-header i {
+        color: #1E40AF;
+    }
+
+    .profile-body {
+        padding: 20px;
+        text-align: center;
+    }
+    .profile-avatar {
+        width: 70px; height: 70px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6B7280, #374151);
+        color: #fff;
+        font-size: 28px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+    }
+    .profile-body .name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #111827;
+    }
+    .profile-body .matric {
+        font-size: 12px;
+        color: #6B7280;
+        margin-bottom: 12px;
+    }
+    .profile-meta {
+        text-align: left;
+        padding-top: 10px;
+        border-top: 1px solid #F3F4F6;
+    }
+    .profile-meta div {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 12.5px;
+        color: #374151;
+        padding: 5px 0;
+        word-break: break-word;
+    }
+    .profile-meta i {
+        color: #6B7280;
+        width: 14px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .lect-card-body, .ldms-card-body {
+        padding: 16px 20px;
+    }
+    .lect-card-body .blurb {
+        font-size: 11.5px;
+        color: #6B7280;
+        margin: 0 0 12px;
+        line-height: 1.5;
+    }
+    .lect-row {
+        padding: 10px 0;
+        border-bottom: 1px solid #F3F4F6;
+    }
+    .lect-row:last-child { border-bottom: none; }
+    .lect-row .course {
+        font-size: 11px;
+        font-weight: 700;
+        color: #1E40AF;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+    }
+    .lect-row .lname {
+        font-size: 13px;
+        font-weight: 600;
+        color: #111827;
+        margin: 2px 0;
+    }
+    .lect-row .lemail {
+        font-size: 11.5px;
+        color: #6B7280;
+        word-break: break-all;
+    }
+    .lect-row .nomatch {
+        font-size: 11.5px;
+        color: #92400E;
+        font-style: italic;
+    }
+    .lect-empty {
+        font-size: 12px;
+        color: #6B7280;
+        padding: 8px 0;
+    }
+    .lect-test-banner {
+        background: #FFFBEB;
+        border: 1px solid #FCD34D;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 11.5px;
+        color: #92400E;
+        margin-top: 12px;
+        line-height: 1.45;
+    }
+    .lect-test-banner i { margin-right: 5px; }
+
+    /* LDMS row in sidebar */
+    .ldms-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #F3F4F6;
+        gap: 8px;
+    }
+    .ldms-row:last-child { border-bottom: none; }
+    .ldms-row .ldms-info { flex: 1; min-width: 0; }
+    .ldms-row .ldms-id {
+        font-size: 12px;
+        font-weight: 700;
+        color: #111827;
+    }
+    .ldms-row .ldms-status {
+        font-size: 11px;
+        color: #6B7280;
+    }
+    .ldms-row .btn-release {
+        font-size: 11px;
+        padding: 5px 10px;
+        background: #10B981;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+    }
+    .ldms-row .btn-release:hover { background: #059669; color: #fff; }
+    .ldms-row .btn-view {
+        font-size: 11px;
+        padding: 5px 10px;
+        background: #F3F4F6;
+        color: #374151;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .ldms-row .btn-view:hover { background: #E5E7EB; color: #111827; }
+
+    /* Decision card */
+    .decision-card {
+        background: #fff;
+        border: 1px solid #E5E7EB;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+    .decision-card-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid #E5E7EB;
+        background: #F9FAFB;
+    }
+    .decision-card-header h5 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .decision-card-header i { color: #1E40AF; }
+    .decision-card-body { padding: 18px 20px; }
+    .decision-card-body label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 5px;
+        display: block;
+    }
+    .decision-card-body .form-control { font-size: 13px; }
+
+    .outcome-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .outcome-option {
+        border: 1.5px solid #E5E7EB;
+        border-radius: 10px;
+        padding: 14px 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.15s;
+        background: #fff;
+    }
+    .outcome-option:hover { border-color: #9CA3AF; }
+    .outcome-option.active.verify {
+        border-color: #10B981;
+        background: #ECFDF5;
+        color: #065F46;
+    }
+    .outcome-option.active.reject {
+        border-color: #EF4444;
+        background: #FEF2F2;
+        color: #991B1B;
+    }
+    .outcome-option i {
+        font-size: 20px;
+        display: block;
+        margin-bottom: 4px;
+        color: #9CA3AF;
+    }
+    .outcome-option.active.verify i { color: #10B981; }
+    .outcome-option.active.reject i { color: #EF4444; }
+    .outcome-option .label-text {
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .outcome-option input[type="radio"] { display: none; }
+    .help-text {
+        font-size: 11px;
+        color: #6B7280;
+        margin-top: 4px;
+    }
+    .btn-decision {
+        font-size: 13px;
+        font-weight: 600;
+        padding: 9px 14px;
+        border-radius: 8px;
+        width: 100%;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn-decision:disabled {
+        background: #9CA3AF;
+        color: #fff;
+        cursor: not-allowed;
+    }
+    .btn-verify-action { background: #10B981; color: #fff; }
+    .btn-verify-action:hover { background: #059669; color: #fff; }
+    .btn-reject-action { background: #EF4444; color: #fff; }
+    .btn-reject-action:hover { background: #DC2626; color: #fff; }
+
+    /* Verdict card (after decision made) */
+    .verdict-card {
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 16px;
+        border: 1px solid;
+    }
+    .verdict-card.verified { background: #ECFDF5; border-color: #10B981; }
+    .verdict-card.rejected { background: #FEF2F2; border-color: #EF4444; }
+    .verdict-card h5 {
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .verdict-card.verified h5 { color: #065F46; }
+    .verdict-card.rejected h5 { color: #991B1B; }
+    .verdict-card p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    .verdict-card.verified p { color: #047857; }
+    .verdict-card.rejected p { color: #B91C1C; }
+
+    .back-link {
+        color: #1E40AF;
+        text-decoration: none;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .btn-print {
+        background: #374151;
+        color: #fff;
+    }
+    .btn-print:hover { background: #1F2937; color: #fff; }
+
+    @media print {
+        .no-print, .back-link, .decision-card { display: none !important; }
+        .info-card, .profile-card { border: 1px solid #E5E7EB !important; }
+    }
+</style>
+@endpush
 
 @section('content')
 <div class="container-fluid py-3">
-    <a href="{{ route('admin.death.index') }}" class="btn btn-link p-0 mb-3"><i class="bi bi-arrow-left"></i> Back</a>
+
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+        <a href="{{ route('admin.death.index') }}" class="back-link">
+            <i class="bi bi-arrow-left"></i> Back to Death Confirmations
+        </a>
+        <button type="button" class="btn btn-print btn-sm" onclick="window.print()">
+            <i class="bi bi-printer"></i> Print / Export PDF
+        </button>
+    </div>
+
+    {{-- Status banner --}}
+    <div class="status-banner s-{{ $statusKey }}">
+        <div>
+            <h3 class="mb-2">
+                Death Confirmation
+                <span style="font-size:14px; color:#6B7280; font-weight:500;">
+                    — Submitted by Next of Kin
+                </span>
+            </h3>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="ref-code">DC-{{ str_pad($confirmation->confirmation_id, 6, '0', STR_PAD_LEFT) }}</span>
+                <small class="text-muted">Submitted {{ $confirmation->date_triggered?->diffForHumans() }}</small>
+            </div>
+        </div>
+        <span class="status-pill {{ $statusKey }}">
+            @if($statusKey === 'pending')<i class="bi bi-clock"></i>@endif
+            @if($statusKey === 'verified')<i class="bi bi-check-circle-fill"></i>@endif
+            @if($statusKey === 'rejected')<i class="bi bi-x-circle-fill"></i>@endif
+            {{ strtoupper($statusKey) }}
+        </span>
+    </div>
 
     <div class="row g-3">
+        {{-- =================== LEFT: ONE big info card =================== --}}
         <div class="col-lg-8">
-            <div class="content-card">
-                <div class="d-flex align-items-center mb-3">
-                    @php $sc = ['pending'=>'warning','verified'=>'success','rejected'=>'danger'][$confirmation->status] ?? 'secondary'; @endphp
-                    <span class="badge bg-{{ $sc }} fs-6">{{ strtoupper($confirmation->status) }}</span>
-                    <small class="text-muted ms-auto">Submitted {{ $confirmation->date_triggered?->format('d M Y, h:i A') }}</small>
+            <div class="info-card">
+                <div class="info-card-header">
+                    <h5><i class="bi bi-info-circle-fill title-icon"></i> Confirmation Information</h5>
                 </div>
 
-                <h6 class="text-uppercase text-muted small">Student</h6>
-                <p class="mb-2"><strong>{{ $confirmation->student?->full_name ?? '—' }}</strong> ({{ $confirmation->student_id }})</p>
-                <p class="text-muted small">{{ $confirmation->student?->email }}</p>
+                <div class="info-row">
+                    <div class="label">
+                        <span class="label-icon"><i class="bi bi-person-fill"></i></span>
+                        Student
+                    </div>
+                    <div class="value">
+                        <strong>{{ $confirmation->student?->full_name ?? '—' }}</strong>
+                        <span class="text-muted">({{ $confirmation->student_id }})</span>
+                        @if($confirmation->student?->faculty)
+                            <span class="sub">{{ $confirmation->student->faculty }}</span>
+                        @endif
+                    </div>
+                </div>
 
-                <h6 class="text-uppercase text-muted small mt-3">Submitting next of kin</h6>
-                <p class="mb-1"><strong>{{ $confirmation->nextOfKin?->full_name ?? '—' }}</strong> &middot; {{ $confirmation->nextOfKin?->relationship_to_student }}</p>
-                <p class="text-muted small mb-0">{{ $confirmation->nextOfKin?->email }} &middot; {{ $confirmation->nextOfKin?->phone }}</p>
+                <div class="info-row">
+                    <div class="label">
+                        <span class="label-icon"><i class="bi bi-pencil-square"></i></span>
+                        Submitted By
+                    </div>
+                    <div class="value">
+                        <strong>{{ $confirmation->nextOfKin?->full_name ?? '—' }}</strong>
+                        <span class="text-muted">
+                            ({{ $confirmation->nextOfKin?->relationship_to_student ?? 'Next of Kin' }})
+                        </span>
+                        <span class="sub">
+                            Next-of-kin submission •
+                            {{ $confirmation->date_triggered?->format('d M Y, H:i') }}
+                        </span>
+                    </div>
+                </div>
 
-                @if($confirmation->media_file_path)
-                    <h6 class="text-uppercase text-muted small mt-3">Supporting document</h6>
-                    <div class="alert alert-light border">
-                        <i class="bi bi-file-earmark-medical"></i>
-                        <strong>{{ $confirmation->media_file_name }}</strong>
-                        <small class="text-muted ms-2">({{ number_format(($confirmation->media_file_size ?? 0)/1024, 1) }} KB)</small>
-                        <div class="small text-muted mt-1">Stored encrypted on the server. Verify offline before approval.</div>
+                @if($confirmation->nextOfKin?->email || $confirmation->nextOfKin?->phone)
+                    <div class="info-row">
+                        <div class="label">
+                            <span class="label-icon"><i class="bi bi-telephone-fill"></i></span>
+                            Kin Contact
+                        </div>
+                        <div class="value">
+                            @if($confirmation->nextOfKin?->email)
+                                <i class="bi bi-envelope"></i> {{ $confirmation->nextOfKin->email }}
+                            @endif
+                            @if($confirmation->nextOfKin?->phone)
+                                <span class="sub">
+                                    <i class="bi bi-phone"></i> {{ $confirmation->nextOfKin->phone }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 @endif
 
-                @if($confirmation->admin_comments)
-                    <h6 class="text-uppercase text-muted small">Notes</h6>
-                    <p class="alert alert-light border">{{ $confirmation->admin_comments }}</p>
+                <div class="info-row">
+                    <div class="label">
+                        <span class="label-icon"><i class="bi bi-calendar-event-fill"></i></span>
+                        Date Reported
+                    </div>
+                    <div class="value">
+                        {{ $confirmation->date_triggered?->format('d F Y, H:i') ?? '—' }}
+                    </div>
+                </div>
+
+                @if($confirmation->crisis_id)
+                    <div class="info-row">
+                        <div class="label">
+                            <span class="label-icon"><i class="bi bi-link-45deg"></i></span>
+                            Linked Crisis
+                        </div>
+                        <div class="value">
+                            <a href="{{ route('admin.crisis.show', $confirmation->crisis_id) }}">
+                                Crisis #{{ $confirmation->crisis_id }}
+                            </a>
+                            <span class="sub">
+                                This confirmation is associated with a prior crisis report.
+                            </span>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="info-row">
+                    <div class="label">
+                        <span class="label-icon"><i class="bi bi-file-text-fill"></i></span>
+                        Notes / Description
+                    </div>
+                    <div class="value">
+                        <div class="desc-box">
+                            {{ $confirmation->admin_comments ?: 'No additional notes provided by the next of kin.' }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="label">
+                        <span class="label-icon"><i class="bi bi-paperclip"></i></span>
+                        Supporting Document
+                    </div>
+                    <div class="value">
+                        @if($confirmation->media_file_path)
+                            <div class="evidence-inline">
+                                <div class="file">
+                                    <i class="bi bi-file-earmark-medical"></i>
+                                    <span class="file-name">{{ $confirmation->media_file_name ?? basename($confirmation->media_file_path) }}</span>
+                                    <span class="file-meta">
+                                        {{ number_format(($confirmation->media_file_size ?? 0)/1024, 1) }} KB
+                                    </span>
+                                    <span class="file-meta"><i class="bi bi-shield-lock"></i> Encrypted</span>
+                                </div>
+                            </div>
+                            <div class="help-text" style="margin-top:6px;">
+                                <i class="bi bi-info-circle"></i>
+                                Stored encrypted on the server. Verify the document offline before approval.
+                            </div>
+                        @else
+                            <em class="text-muted">No supporting document provided</em>
+                        @endif
+                    </div>
+                </div>
+
+                @if($confirmation->status !== 'pending' && $confirmation->admin_comments)
+                    <div class="info-row">
+                        <div class="label">
+                            <span class="label-icon"><i class="bi bi-chat-left-text-fill"></i></span>
+                            Reviewer's Notes
+                        </div>
+                        <div class="value">
+                            <div class="desc-box">{{ $confirmation->admin_comments }}</div>
+                        </div>
+                    </div>
                 @endif
 
                 @if($confirmation->blockchain_reference)
-                    <h6 class="text-uppercase text-muted small">Blockchain record</h6>
-                    <x-blockchain-badge :hash="$confirmation->blockchain_reference" />
+                    <div class="info-row">
+                        <div class="label">
+                            <span class="label-icon"><i class="bi bi-link-45deg"></i></span>
+                            Blockchain
+                        </div>
+                        <div class="value">
+                            <x-blockchain-badge :hash="$confirmation->blockchain_reference" />
+                        </div>
+                    </div>
                 @endif
             </div>
         </div>
 
+        {{-- =================== RIGHT SIDEBAR =================== --}}
         <div class="col-lg-4">
-            @if($confirmation->status === 'pending')
-                <div class="content-card border-success">
-                    <h5 class="text-success"><i class="bi bi-shield-check"></i> Verify Confirmation</h5>
-                    <p class="small text-muted">Verifying will mark the student as deceased and record the event on the audit chain. Any LDMS messages can then be released.</p>
-                    <form method="POST" action="{{ route('admin.death.verify', $confirmation->confirmation_id) }}">
-                        @csrf
-                        <input type="hidden" name="decision" value="verified">
-                        <div class="mb-2">
-                            <label class="form-label small">Admin comments (optional)</label>
-                            <textarea name="admin_comments" rows="2" maxlength="2000" class="form-control form-control-sm"></textarea>
-                        </div>
-                        <button class="btn btn-success w-100"><i class="bi bi-check-circle"></i> Approve & Record</button>
-                    </form>
-                </div>
 
-                <div class="content-card border-danger mt-3">
-                    <h5 class="text-danger"><i class="bi bi-x-circle"></i> Reject</h5>
-                    <form method="POST" action="{{ route('admin.death.verify', $confirmation->confirmation_id) }}">
-                        @csrf
-                        <input type="hidden" name="decision" value="rejected">
-                        <div class="mb-2">
-                            <textarea name="admin_comments" rows="3" maxlength="2000" class="form-control form-control-sm" placeholder="Reason / next steps"></textarea>
+            {{-- Verdict banner (after decision made) --}}
+            @if($statusKey === 'verified')
+                <div class="verdict-card verified">
+                    <h5><i class="bi bi-check-circle-fill"></i> Confirmation Verified</h5>
+                    <p>
+                        Verified by <strong>System Administrator</strong>
+                        @if($confirmation->date_confirmed)
+                            <br><small>{{ $confirmation->date_confirmed->format('d M Y, h:i A') }}</small>
+                        @endif
+                        <br><small>Student marked deceased. Lecturers notified.</small>
+                    </p>
+                </div>
+            @elseif($statusKey === 'rejected')
+                <div class="verdict-card rejected">
+                    <h5><i class="bi bi-x-circle-fill"></i> Confirmation Rejected</h5>
+                    <p>
+                        Rejected by <strong>System Administrator</strong>
+                        @if($confirmation->date_confirmed)
+                            <br><small>{{ $confirmation->date_confirmed->format('d M Y, h:i A') }}</small>
+                        @endif
+                    </p>
+                </div>
+            @endif
+
+            {{-- Student profile --}}
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <i class="bi bi-person-circle"></i>
+                    <h5>Student Profile</h5>
+                </div>
+                <div class="profile-body">
+                    <div class="profile-avatar">
+                        {{ strtoupper(substr($confirmation->student?->full_name ?? '?', 0, 1)) }}
+                    </div>
+                    <div class="name">{{ $confirmation->student?->full_name ?? '—' }}</div>
+                    <div class="matric">{{ $confirmation->student_id }}</div>
+
+                    <div class="profile-meta">
+                        @if($confirmation->student?->email)
+                            <div><i class="bi bi-envelope"></i> <span>{{ $confirmation->student->email }}</span></div>
+                        @endif
+                        @if($confirmation->student?->phone)
+                            <div><i class="bi bi-telephone"></i> <span>{{ $confirmation->student->phone }}</span></div>
+                        @endif
+                        @if($confirmation->student?->programme)
+                            <div><i class="bi bi-mortarboard"></i> <span>{{ $confirmation->student->programme }}</span></div>
+                        @endif
+                        @if($confirmation->student?->status)
+                            @php
+                                $isDeceased = $confirmation->student->status === 'deceased';
+                                $dotColor = $isDeceased ? '#6B7280' : '#10B981';
+                            @endphp
+                            <div>
+                                <i class="bi bi-circle-fill" style="font-size:7px; color:{{ $dotColor }}; margin-top:5px;"></i>
+                                <span>{{ ucfirst($confirmation->student->status) }} student</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- Lecturers who will be notified on verify --}}
+            <div class="lect-card">
+                <div class="lect-card-header">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    <h5>Student's Lecturers</h5>
+                </div>
+                <div class="lect-card-body">
+                    @if(($studentCourses ?? collect())->isEmpty())
+                        <div class="lect-empty">
+                            <i class="bi bi-info-circle"></i>
+                            No courses on file for this student. Lecturers cannot be notified
+                            unless the student's timetable was synced via iMaalum.
                         </div>
-                        <button class="btn btn-outline-danger w-100">Reject</button>
-                    </form>
+                    @else
+                        <p class="blurb">
+                            These {{ count($studentCourses) }} lecturer(s) will be notified by
+                            email when this confirmation is verified.
+                        </p>
+
+                        @foreach($studentCourses as $row)
+                            <div class="lect-row">
+                                <div class="course">{{ $row->course_code }}{{ $row->course_name ? ' — ' . \Illuminate\Support\Str::limit($row->course_name, 40) : '' }}</div>
+                                @if($row->lecturer_id)
+                                    <div class="lname">
+                                        {{ trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? '')) }}
+                                    </div>
+                                    <div class="lemail">
+                                        <i class="bi bi-envelope"></i> {{ $row->email }}
+                                    </div>
+                                @else
+                                    <div class="lname">{{ $row->lecturer_name_raw ?: 'Unknown lecturer' }}</div>
+                                    <div class="nomatch">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        Not in directory — will not be notified
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+
+                        @if(env('TESTING_MODE_REDIRECT_LECTURER_EMAILS', false))
+                            <div class="lect-test-banner">
+                                <i class="bi bi-cone-striped"></i>
+                                <strong>Test mode:</strong> all lecturer emails are redirected to
+                                <code>{{ env('TESTING_MODE_LECTURER_REDIRECT_EMAIL') }}</code>
+                                until the safety flag is turned off.
+                            </div>
+                        @endif
+                    @endif
+                </div>
+            </div>
+
+            {{-- LDMS panel (verified only) --}}
+            @if($statusKey === 'verified')
+                <div class="ldms-card">
+                    <div class="ldms-card-header">
+                        <i class="bi bi-envelope-paper-fill"></i>
+                        <h5>Last Digital Messages</h5>
+                    </div>
+                    <div class="ldms-card-body">
+                        @if($studentLdms->isEmpty())
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-info-circle"></i>
+                                This student did not leave any LDMS messages.
+                            </p>
+                        @else
+                            <p class="lect-card-body blurb" style="padding:0;">
+                                {{ $studentLdms->count() }} message(s) from this student.
+                                Release each one to notify the next of kin.
+                            </p>
+                            @foreach($studentLdms as $ldms)
+                                <div class="ldms-row">
+                                    <div class="ldms-info">
+                                        <div class="ldms-id">
+                                            LDMS #{{ $ldms->ldms_id }}
+                                            <span class="badge bg-secondary"
+                                                  style="font-size:9px; vertical-align:middle;">
+                                                {{ strtoupper($ldms->media_type ?? 'text') }}
+                                            </span>
+                                        </div>
+                                        <div class="ldms-status">
+                                            @if($ldms->is_released)
+                                                <i class="bi bi-check-circle text-success"></i>
+                                                Released {{ $ldms->date_triggered?->diffForHumans() }}
+                                            @else
+                                                <i class="bi bi-clock text-warning"></i>
+                                                Pending release
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @if($ldms->is_released)
+                                        <a href="{{ route('admin.ldms.show', $ldms->ldms_id) }}" class="btn-view">
+                                            View
+                                        </a>
+                                    @else
+                                        <a href="{{ route('admin.ldms.show', $ldms->ldms_id) }}" class="btn-release">
+                                            <i class="bi bi-send"></i> Release
+                                        </a>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+            @endif
+
+            {{-- Decision card (pending only) --}}
+            @if($statusKey === 'pending')
+                <div class="decision-card no-print">
+                    <div class="decision-card-header">
+                        <h5><i class="bi bi-shield-check"></i> Verify Confirmation</h5>
+                    </div>
+                    <div class="decision-card-body">
+                        <form id="verificationForm" method="POST" action="">
+                            @csrf
+                            <input type="hidden" name="decision" id="decisionInput" value="">
+
+                            <div class="mb-3">
+                                <label>Staff ID</label>
+                                <input type="text" name="staff_id" class="form-control"
+                                    value="{{ $currentAdmin?->admin_id ? 'STAFF' . str_pad($currentAdmin->admin_id, 3, '0', STR_PAD_LEFT) : '' }}"
+                                    placeholder="e.g. STAFF001" required>
+                                @if($currentAdmin)
+                                    <div class="help-text">Logged in as <strong>{{ $currentAdmin->admin_name }}</strong></div>
+                                @endif
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Decision <span style="color:#EF4444;">*</span></label>
+                                <div class="outcome-grid">
+                                    <label class="outcome-option" id="opt-verify" onclick="setOutcome('verify')">
+                                        <input type="radio" name="outcome" value="verify" required>
+                                        <i class="bi bi-check-circle"></i>
+                                        <div class="label-text">Verify</div>
+                                    </label>
+                                    <label class="outcome-option" id="opt-reject" onclick="setOutcome('reject')">
+                                        <input type="radio" name="outcome" value="reject" required>
+                                        <i class="bi bi-x-circle"></i>
+                                        <div class="label-text">Reject</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label id="notesLabel">Notes (Optional)</label>
+                                <textarea name="admin_comments" id="admin_comments" rows="3" class="form-control" maxlength="2000"
+                                    placeholder="Add any notes..."></textarea>
+                                <div class="help-text" id="notesHelp">Optional notes for the audit trail.</div>
+                            </div>
+
+                            <button type="submit" id="submitBtn" class="btn-decision" disabled
+                                    onclick="return confirmSubmit(event);">
+                                <i class="bi bi-arrow-right-circle"></i> Choose a decision first
+                            </button>
+                        </form>
+                    </div>
                 </div>
             @endif
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    const verifyAction = "{{ route('admin.death.verify', $confirmation->confirmation_id) }}";
+
+    function setOutcome(choice) {
+        const form = document.getElementById('verificationForm');
+        const optV = document.getElementById('opt-verify');
+        const optR = document.getElementById('opt-reject');
+        const btn  = document.getElementById('submitBtn');
+        const lbl  = document.getElementById('notesLabel');
+        const help = document.getElementById('notesHelp');
+        const txt  = document.getElementById('admin_comments');
+        const decisionInput = document.getElementById('decisionInput');
+
+        optV.classList.remove('active', 'verify', 'reject');
+        optR.classList.remove('active', 'verify', 'reject');
+
+        // Death verify endpoint is the same for both verify and reject —
+        // the controller branches on the `decision` field.
+        form.action = verifyAction;
+
+        if (choice === 'verify') {
+            optV.classList.add('active', 'verify');
+            decisionInput.value = 'verified';
+            btn.classList.remove('btn-reject-action');
+            btn.classList.add('btn-verify-action');
+            btn.innerHTML = '<i class="bi bi-check2-circle"></i> Verify &amp; Record';
+            lbl.innerHTML = 'Notes (Optional)';
+            help.textContent = 'Optional notes for the audit trail.';
+            txt.required = false;
+            txt.removeAttribute('minlength');
+        } else {
+            optR.classList.add('active', 'reject');
+            decisionInput.value = 'rejected';
+            btn.classList.remove('btn-verify-action');
+            btn.classList.add('btn-reject-action');
+            btn.innerHTML = '<i class="bi bi-x-circle"></i> Reject Confirmation';
+            lbl.innerHTML = 'Reason for Rejection <span style="color:#EF4444;">*</span>';
+            help.textContent = 'Required (min 10 characters). Recorded in the audit log.';
+            txt.required = true;
+            txt.minLength = 10;
+        }
+        btn.disabled = false;
+    }
+
+    function confirmSubmit(e) {
+        const outcome = document.querySelector('input[name="outcome"]:checked')?.value;
+        if (!outcome) { e.preventDefault(); return false; }
+        const msg = outcome === 'verify'
+            ? 'Verify this death confirmation? This will mark the student as deceased and record the event on the blockchain. Lecturers will be notified by email.'
+            : 'Reject this death confirmation? The next of kin will be informed.';
+        if (!confirm(msg)) { e.preventDefault(); return false; }
+        return true;
+    }
+</script>
+@endpush
 @endsection

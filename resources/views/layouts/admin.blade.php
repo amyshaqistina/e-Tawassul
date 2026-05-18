@@ -11,6 +11,9 @@
     <a href="{{ route('admin.death.index') }}" class="nav-link {{ request()->routeIs('admin.death.*') ? 'active' : '' }}">
         <i class="bi bi-file-earmark-medical"></i> Death Confirmations
     </a>
+    <a href="{{ route('admin.ldms.index') }}" class="nav-link {{ request()->routeIs('admin.ldms.*') ? 'active' : '' }}">
+        <i class="bi bi-envelope-paper"></i> Last Digital Messages
+    </a>
     <a href="{{ route('admin.donations.index') }}" class="nav-link {{ request()->routeIs('admin.donations.*') ? 'active' : '' }}">
         <i class="bi bi-cash-coin"></i> Donations
     </a>

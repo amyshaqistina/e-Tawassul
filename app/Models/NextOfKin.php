@@ -15,7 +15,8 @@ class NextOfKin extends Authenticatable
 
     protected $fillable = [
         'student_id', 'first_name', 'last_name', 'relationship_to_student',
-        'email', 'phone', 'access_level', 'emergency_contact_verified',
+        'email', 'phone', 'address', 'access_level', 'emergency_contact_verified',
+        'is_primary', 'registered_by', 'registered_at',
         'consent_date', 'expiry_date', 'password',
     ];
 
@@ -23,6 +24,8 @@ class NextOfKin extends Authenticatable
 
     protected $casts = [
         'emergency_contact_verified' => 'boolean',
+        'is_primary'                 => 'boolean',
+        'registered_at'              => 'datetime',
         'consent_date' => 'datetime',
         'expiry_date' => 'datetime',
         'password' => 'hashed',

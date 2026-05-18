@@ -17,9 +17,16 @@ class DonateRequest extends FormRequest
             'donor_name'      => 'required|string|max:150',
             'donor_email'     => 'required|email|max:191',
             'donation_amount' => 'required|numeric|min:1|max:1000000',
-            'payment_method'  => 'required|in:FPX,credit_card,wallet',
+            // Expanded set: bank_transfer + duitnow_qr added for the
+            // direct-transfer flow. FPX/card/wallet kept for the demo
+            // gateway flow.
+            'payment_method'  => 'required|in:FPX,credit_card,wallet,bank_transfer,duitnow_qr',
             'support_message' => 'nullable|string|max:1000',
             'anonymous'       => 'nullable|boolean',
+            // Optional confirmation reference number the donor types in
+            // after making the actual transfer. Used purely for audit/
+            // reconciliation — admin can match this to the bank statement.
+            'transfer_reference' => 'nullable|string|max:100',
         ];
     }
 

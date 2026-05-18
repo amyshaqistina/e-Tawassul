@@ -39,18 +39,18 @@ class Kernel extends HttpKernel
      * The application's middleware aliases.
      */
     protected $middlewareAliases = [
-        'auth'           => \Illuminate\Auth\Middleware\Authenticate::class,
-        'auth.basic'     => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'cache.headers'  => \Illuminate\Http\Middleware\SetCacheHeaders::class,
-        'can'            => \Illuminate\Auth\Middleware\Authorize::class,
-        'guest'          => \Illuminate\Auth\Middleware\RedirectIfAuthenticated::class,
+        'auth'             => \Illuminate\Auth\Middleware\Authenticate::class,
+        'auth.basic'       => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        'cache.headers'    => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+        'can'              => \Illuminate\Auth\Middleware\Authorize::class,
         'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
-        'signed'         => \Illuminate\Routing\Middleware\ValidateSignature::class,
-        'throttle'       => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'verified'       => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'signed'           => \Illuminate\Routing\Middleware\ValidateSignature::class,
+        'throttle'         => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'verified'         => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
         // e-Tawassul custom middleware
-        'role'           => \App\Http\Middleware\RoleMiddleware::class,
-        'twofactor'      => \App\Http\Middleware\TwoFactorMiddleware::class,
+        'role'             => \App\Http\Middleware\RoleMiddleware::class,
+        'twofactor'        => \App\Http\Middleware\TwoFactorMiddleware::class,
+        'email.confirmed'  => \App\Http\Middleware\EnsureEmailConfirmed::class,
     ];
 }

@@ -14,6 +14,9 @@ class StudentController extends Controller
     {
         /** @var \App\Models\Student $student */
         $student = Auth::guard('student')->user();
+        // Eager-load NoK so the dashboard can render the "please add a kin"
+        // nag banner without an N+1.
+        $student->load('nextOfKin');
 
         $scrapeStale = !$student->imaalum_synced_at
             || $student->imaalum_synced_at->lt(now()->subDay());

@@ -19,15 +19,22 @@ class Student extends Authenticatable
         'student_id', 'first_name', 'last_name', 'email', 'kulliyyah',
         'programme', 'year_of_study', 'mahallah', 'phone', 'gender',
         'nationality', 'date_of_birth', 'enrollment_status', 'emergency_contact',
+        'image_url', 'needs_email_confirmation',
         'imaalum_synced_at', 'status', 'password',
+        // Bank info — student-managed, shown to donors on verified cases
+        'bank_name', 'bank_account_holder', 'bank_account_number', 'qr_code_path',
     ];
 
     protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
-        'imaalum_synced_at' => 'datetime',
-        'date_of_birth' => 'date',
-        'password' => 'hashed',
+        'imaalum_synced_at'        => 'datetime',
+        'date_of_birth'            => 'date',
+        'password'                 => 'hashed',
+        'needs_email_confirmation' => 'boolean',
+        // Encrypts at rest. The donor-facing donate page also masks all
+        // but the last 4 digits in the rendered HTML (see view).
+        'bank_account_number'      => 'encrypted',
     ];
 
     public function getAuthIdentifierName() { return 'student_id'; }
@@ -35,6 +42,27 @@ class Student extends Authenticatable
     public function getFullNameAttribute(): string
     {
         return trim("{$this->first_name} {$this->last_name}");
+    }
+
+    /**
+     * Masked account number for display.
+     * "1234567890123" -> "•••• •••• 0123"
+     */
+    public function getBankAccountMaskedAttribute(): ?string
+    {
+        if (!$this->bank_account_number) return null;
+        $clean = preg_replace('/\D/', '', $this->bank_account_number);
+        if (strlen($clean) <= 4) return $clean;
+        return '•••• •••• ' . substr($clean, -4);
+    }
+
+    /**
+     * True when the student has enough info filled in for a donor
+     * to make a direct transfer (bank or QR).
+     */
+    public function getHasDirectDonationMethodsAttribute(): bool
+    {
+        return (bool) ($this->bank_account_number || $this->qr_code_path);
     }
 
     public function nextOfKin()

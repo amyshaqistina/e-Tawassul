@@ -16,6 +16,8 @@ class Donation extends Model
         'crisis_id', 'user_id', 'ldms_id', 'donation_amount', 'donation_date',
         'payment_method', 'donation_target', 'donor_name', 'donor_email',
         'support_message', 'blockchain_hash',
+        // Provenance / reconciliation fields (Phase 3b)
+        'transfer_reference', 'recorded_by', 'admin_note', 'recorded_by_admin_id',
     ];
 
     protected $casts = [
@@ -36,5 +38,13 @@ class Donation extends Model
     public function ldms()
     {
         return $this->belongsTo(Ldms::class, 'ldms_id', 'ldms_id');
+    }
+
+    /**
+     * Admin who recorded this donation manually (null for donor-submitted).
+     */
+    public function recordedByAdmin()
+    {
+        return $this->belongsTo(Admin::class, 'recorded_by_admin_id', 'admin_id');
     }
 }

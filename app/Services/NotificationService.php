@@ -10,27 +10,17 @@ use Illuminate\Support\Facades\Mail;
 /**
  * NotificationService
  *
- * Unified entrypoint for sending an email AND persisting a notification log
- * record for in-app display.
+ * Unified entry point for sending emails + recording a NotificationLog row.
  *
- * Usage:
- *   app(NotificationService::class)->send(
- *       recipientType: 'student',
- *       recipientId:   $student->student_id,
- *       email:         $student->email,
- *       mailable:      new CrisisVerifiedMail($report, $student->first_name),
- *       notificationType: 'crisis_verified',
- *       subject:       'Your crisis report has been verified',
- *       message:       "Your crisis report #{$report->report_id} has been verified.",
- *       link:          route('student.crisis.show', $report->crisis_id),
- *       studentId:     $student->student_id,
- *   );
+ * SAFETY: For lecturer recipients, if the env flag
+ * TESTING_MODE_REDIRECT_LECTURER_EMAILS=true is set, the email is REDIRECTED
+ * to TESTING_MODE_LECTURER_REDIRECT_EMAIL instead of the real lecturer's
+ * @iium.edu.my address. This protects real lecturers from receiving test
+ * notifications during development. Set the flag to false (or omit) in
+ * production to send emails to real lecturers.
  */
 class NotificationService
 {
-    /**
-     * Queue an email and create a NotificationLog row.
-     */
     public function send(
         string $recipientType,
         string $recipientId,
@@ -42,36 +32,57 @@ class NotificationService
         ?string $link = null,
         ?string $studentId = null,
     ): NotificationLog {
-        // 1) Try to queue the email (graceful failure — never blocks the workflow)
+        // The address we will ACTUALLY send to (may be rewritten in testing mode)
+        $finalEmail = $email;
+        $wasRedirected = false;
+
         if ($email && $mailable) {
+            // Safety redirect for lecturers in testing mode
+            if (
+                $recipientType === 'lecturer'
+                && env('TESTING_MODE_REDIRECT_LECTURER_EMAILS', false)
+            ) {
+                $redirectTo = env('TESTING_MODE_LECTURER_REDIRECT_EMAIL');
+                if ($redirectTo) {
+                    $finalEmail = $redirectTo;
+                    $wasRedirected = true;
+                    Log::info('Lecturer email redirected (testing mode)', [
+                        'original' => $email,
+                        'redirect' => $redirectTo,
+                        'lecturer_id' => $recipientId,
+                    ]);
+                }
+            }
+
             try {
-                Mail::to($email)->queue($mailable);
+                Mail::to($finalEmail)->queue($mailable);
             } catch (\Throwable $e) {
                 Log::warning('NotificationService: failed to queue email', [
                     'recipient_type' => $recipientType,
                     'recipient_id'   => $recipientId,
-                    'email'          => $email,
+                    'email'          => $finalEmail,
+                    'original_email' => $email,
                     'error'          => $e->getMessage(),
                 ]);
             }
         }
 
-        // 2) Persist the notification log for the in-app bell
+        // Record audit log — we store the ORIGINAL intended recipient,
+        // so the admin/audit trail always shows who the system *meant* to email.
         return NotificationLog::create([
             'recipient_type'       => $recipientType,
             'recipient_id'         => $recipientId,
             'student_id'           => $studentId,
             'notification_type'    => $notificationType,
-            'subject'              => $subject,
+            'subject'              => $wasRedirected
+                ? "[TEST MODE → {$finalEmail}] {$subject}"
+                : $subject,
             'notification_message' => $message,
             'link'                 => $link,
             'timestamp'            => now(),
         ]);
     }
 
-    /**
-     * Convenience helper — log only (no email).
-     */
     public function logOnly(
         string $recipientType,
         string $recipientId,
@@ -82,15 +93,15 @@ class NotificationService
         ?string $studentId = null,
     ): NotificationLog {
         return $this->send(
-            recipientType: $recipientType,
-            recipientId:   $recipientId,
-            email:         null,
-            mailable:      null,
+            recipientType:    $recipientType,
+            recipientId:      $recipientId,
+            email:            null,
+            mailable:         null,
             notificationType: $notificationType,
-            subject:       $subject,
-            message:       $message,
-            link:          $link,
-            studentId:     $studentId,
+            subject:          $subject,
+            message:          $message,
+            link:             $link,
+            studentId:        $studentId,
         );
     }
 }

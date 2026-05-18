@@ -6,6 +6,7 @@ use App\Http\Requests\SubmitDeathConfirmationRequest;
 use App\Http\Requests\VerifyDeathRequest;
 use App\Mail\DeathConfirmationSubmittedMail;
 use App\Mail\DeathVerifiedMail;
+use App\Mail\LecturerDeathNotificationMail;
 use App\Models\ActivityLog;
 use App\Models\Admin;
 use App\Models\Crisis;
@@ -13,6 +14,8 @@ use App\Models\DeathConfirmation;
 use App\Models\Student;
 use App\Services\BlockchainService;
 use App\Services\NotificationService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +27,7 @@ class DeathConfirmationController extends Controller
     ) {}
 
     // -----------------------------------------------------------
-    // NOK
+    // NOK — submit
     // -----------------------------------------------------------
 
     public function create()
@@ -104,30 +107,129 @@ class DeathConfirmationController extends Controller
     }
 
     // -----------------------------------------------------------
-    // ADMIN
+    // NOK — view a submitted confirmation
     // -----------------------------------------------------------
 
-    public function adminIndex()
+    /**
+     * NoK view of their own submitted death confirmation.
+     * Shows status, document metadata (size, name), admin notes if
+     * reviewed, and a status timeline. The actual file is NOT downloadable
+     * by the NoK because it's an encrypted artefact intended for admin
+     * verification only.
+     */
+    public function nokShow(DeathConfirmation $confirmation)
     {
-        $pending  = DeathConfirmation::with(['nextOfKin', 'student'])
-            ->where('status', 'pending')->orderByDesc('date_triggered')
-            ->paginate(15, ['*'], 'pending');
+        /** @var \App\Models\NextOfKin $nok */
+        $nok = Auth::guard('nok')->user();
 
-        $verified = DeathConfirmation::with(['nextOfKin', 'student'])
-            ->where('status', 'verified')->orderByDesc('date_confirmed')
-            ->paginate(15, ['*'], 'verified');
+        // Strict: a NoK may only view confirmations THEY submitted.
+        if ((string) $confirmation->nok_id !== (string) $nok->nok_id) {
+            abort(403, 'You can only view confirmations that you submitted.');
+        }
 
-        $rejected = DeathConfirmation::with(['nextOfKin', 'student'])
-            ->where('status', 'rejected')->orderByDesc('updated_at')
-            ->paginate(15, ['*'], 'rejected');
+        $confirmation->load('nextOfKin', 'student');
 
-        return view('admin.death.index', compact('pending', 'verified', 'rejected'));
+        // Released LDMS messages for the (now deceased) student, so the
+        // NoK can navigate from this verified confirmation directly to
+        // the messages that were released as a consequence of it.
+        $releasedLdms = \App\Models\Ldms::where('student_id', $confirmation->student_id)
+            ->where('is_released', true)
+            ->orderByDesc('date_triggered')
+            ->get();
+
+        return view('nok.death.show', compact('confirmation', 'releasedLdms'));
     }
 
+    // -----------------------------------------------------------
+    // ADMIN — list (search, filter, totals; matches crisis index)
+    // -----------------------------------------------------------
+
+    public function adminIndex(Request $request)
+    {
+        $tab = in_array($request->query('tab'), ['pending', 'verified', 'rejected'], true)
+            ? $request->query('tab')
+            : 'pending';
+
+        $applyFilters = function ($query) use ($request) {
+            // Free-text search: confirmation_id / student_id / NoK name
+            if ($s = trim((string) $request->query('search'))) {
+                $query->where(function ($w) use ($s) {
+                    $w->where('death_confirmation.confirmation_id', 'like', "%{$s}%")
+                      ->orWhere('death_confirmation.student_id', 'like', "%{$s}%")
+                      ->orWhereHas('nextOfKin', function ($nq) use ($s) {
+                          $nq->where('first_name', 'like', "%{$s}%")
+                             ->orWhere('last_name', 'like', "%{$s}%")
+                             ->orWhere('email', 'like', "%{$s}%");
+                      })
+                      ->orWhereHas('student', function ($sq) use ($s) {
+                          $sq->where('student_id', 'like', "%{$s}%");
+                      });
+                });
+            }
+
+            // Date range filter
+            [$from, $to] = $this->resolveDateRange($request);
+            if ($from) $query->whereDate('death_confirmation.date_triggered', '>=', $from);
+            if ($to)   $query->whereDate('death_confirmation.date_triggered', '<=', $to);
+
+            // "Has supporting document" / "missing document" filter
+            if ($request->query('has_doc') === 'yes') {
+                $query->whereNotNull('media_file_path');
+            } elseif ($request->query('has_doc') === 'no') {
+                $query->whereNull('media_file_path');
+            }
+
+            return $query;
+        };
+
+        $pending = $applyFilters(
+            DeathConfirmation::with(['student', 'nextOfKin'])
+                ->where('status', 'pending')
+                ->orderByDesc('date_triggered')
+        )->paginate(15, ['*'], 'pending')->withQueryString();
+
+        $verified = $applyFilters(
+            DeathConfirmation::with(['student', 'nextOfKin'])
+                ->where('status', 'verified')
+                ->orderByDesc('date_confirmed')
+        )->paginate(15, ['*'], 'verified')->withQueryString();
+
+        $rejected = $applyFilters(
+            DeathConfirmation::with(['student', 'nextOfKin'])
+                ->where('status', 'rejected')
+                ->orderByDesc('updated_at')
+        )->paginate(15, ['*'], 'rejected')->withQueryString();
+
+        return view('admin.death.index', compact('tab', 'pending', 'verified', 'rejected'));
+    }
+
+    /**
+     * Show one death confirmation. Loads relations and the student's
+     * lecturers list (same shape as crisis-show), so the right-side
+     * "Student's Lecturers" panel renders identically.
+     */
     public function adminShow(DeathConfirmation $confirmation)
     {
         $confirmation->load('nextOfKin', 'student', 'crisis');
-        return view('admin.death.show', compact('confirmation'));
+
+        $studentCourses = DB::table('student_courses')
+            ->leftJoin('lecturers', 'student_courses.lecturer_id', '=', 'lecturers.lecturer_id')
+            ->where('student_courses.student_id', $confirmation->student_id)
+            ->orderBy('student_courses.course_code')
+            ->select(
+                'student_courses.course_code',
+                'student_courses.course_name',
+                'student_courses.semester',
+                'student_courses.lecturer_name_raw',
+                'lecturers.lecturer_id',
+                'lecturers.first_name',
+                'lecturers.last_name',
+                'lecturers.email',
+                'lecturers.department',
+            )
+            ->get();
+
+        return view('admin.death.show', compact('confirmation', 'studentCourses'));
     }
 
     public function verify(VerifyDeathRequest $request, DeathConfirmation $confirmation)
@@ -183,6 +285,7 @@ class DeathConfirmationController extends Controller
             ActivityLog::record('admin', (string) $admin->admin_id, 'death_confirmed',
                 "Verified death confirmation #{$confirmation->confirmation_id} (hash: " . substr($result['hash'], 0, 16) . '…)');
 
+            // Notify NoK
             $nok = $confirmation->nextOfKin;
             if ($nok) {
                 $this->notifications->send(
@@ -198,9 +301,56 @@ class DeathConfirmationController extends Controller
                 );
             }
 
+            // Notify lecturers
+            $student = Student::where('student_id', $confirmation->student_id)->first();
+            if ($student) {
+                $studentCourses = DB::table('student_courses')
+                    ->where('student_id', $student->student_id)
+                    ->join('lecturers', 'student_courses.lecturer_id', '=', 'lecturers.lecturer_id')
+                    ->select(
+                        'lecturers.email',
+                        'lecturers.first_name',
+                        'lecturers.last_name',
+                        'student_courses.course_code',
+                        'student_courses.course_name',
+                        'lecturers.lecturer_id'
+                    )
+                    ->get();
+
+                foreach ($studentCourses as $course) {
+                    $lecturerEmail = $course->email;
+                    if (app()->environment('local')) {
+                        $lecturerEmail = 'nabilahahmad.nordin@student.iium.edu.my';
+                    }
+
+                    $lecturerDisplayName = trim(
+                        ($course->first_name ?? '') . ' ' . ($course->last_name ?? '')
+                    ) ?: 'Lecturer';
+
+                    $this->notifications->send(
+                        recipientType: 'lecturer',
+                        recipientId:   (string) $course->lecturer_id,
+                        email:         $lecturerEmail,
+                        mailable:      new LecturerDeathNotificationMail(
+                            confirmation:   $confirmation,
+                            studentName:    $student->full_name,
+                            courseCode:     $course->course_code,
+                            lecturerName:   $lecturerDisplayName,
+                            courseName:     $course->course_name ?? null,
+                            studentMatric:  $student->student_id ?? 'N/A',
+                        ),
+                        notificationType: 'lecturer_death_notified',
+                        subject:       "Student Bereavement - {$course->course_code}",
+                        message:       "Student {$student->full_name} has passed away. Please update your class records.",
+                        link:          null,
+                        studentId:     $student->student_id,
+                    );
+                }
+            }
+
             return redirect()
                 ->route('admin.death.show', $confirmation->confirmation_id)
-                ->with('status', 'Death confirmation verified and recorded on the blockchain.');
+                ->with('status', 'Death confirmation verified. NoK and lecturers have been notified.');
         }
 
         // Rejected
@@ -229,5 +379,29 @@ class DeathConfirmationController extends Controller
         return redirect()
             ->route('admin.death.show', $confirmation->confirmation_id)
             ->with('status', 'Death confirmation marked as rejected.');
+    }
+
+    // -----------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------
+
+    protected function resolveDateRange(Request $request): array
+    {
+        switch ($request->query('date_range')) {
+            case 'today':
+                return [Carbon::today(), Carbon::today()->endOfDay()];
+            case 'week':
+                return [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()];
+            case 'last_week':
+                return [Carbon::now()->subWeek()->startOfWeek(), Carbon::now()->subWeek()->endOfWeek()];
+            case 'month':
+                return [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()];
+            case 'custom':
+                $from = $request->query('date_from') ? Carbon::parse($request->query('date_from'))->startOfDay() : null;
+                $to   = $request->query('date_to')   ? Carbon::parse($request->query('date_to'))->endOfDay()   : null;
+                return [$from, $to];
+            default:
+                return [null, null];
+        }
     }
 }

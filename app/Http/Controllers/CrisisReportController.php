@@ -140,19 +140,23 @@ class CrisisReportController extends Controller
             ]);
         });
 
-        ActivityLog::record('student', $student->student_id, 'crisis_report_submitted',
-            "Submitted crisis report #{$report->report_id} ({$validated['crisis_type']}/{$validated['sub_category']})");
+        ActivityLog::record(
+            'student',
+            $student->student_id,
+            'crisis_report_submitted',
+            "Submitted crisis report #{$report->report_id} ({$validated['crisis_type']}/{$validated['sub_category']})"
+        );
 
         $this->notifications->send(
-            recipientType:    'student',
-            recipientId:      $student->student_id,
-            email:            $student->email,
-            mailable:         new CrisisReportSubmittedMail($report, $student->first_name),
+            recipientType: 'student',
+            recipientId: $student->student_id,
+            email: $student->email,
+            mailable: new CrisisReportSubmittedMail($report, $student->first_name),
             notificationType: 'crisis_report_submitted',
-            subject:          'Crisis report received',
-            message:          "Your crisis report #{$report->report_id} has been received and is awaiting administrator review.",
-            link:             route('student.crisis.show', $report->report_id),
-            studentId:        $student->student_id,
+            subject: 'Crisis report received',
+            message: "Your crisis report #{$report->report_id} has been received and is awaiting administrator review.",
+            link: route('student.crisis.show', $report->report_id),
+            studentId: $student->student_id,
         );
 
         $admins = Admin::where('active', true)->get();
@@ -160,13 +164,13 @@ class CrisisReportController extends Controller
             $perms = (array) ($admin->permissions ?? []);
             if (in_array('verify_crisis', $perms, true) || $admin->role === 'super_admin') {
                 $this->notifications->logOnly(
-                    recipientType:    'admin',
-                    recipientId:      (string) $admin->admin_id,
+                    recipientType: 'admin',
+                    recipientId: (string) $admin->admin_id,
                     notificationType: 'crisis_report_pending',
-                    subject:          'New crisis report pending review',
-                    message:          "Student {$student->full_name} ({$student->student_id}) has submitted a new crisis report.",
-                    link:             route('admin.crisis.show', $report->report_id),
-                    studentId:        $student->student_id,
+                    subject: 'New crisis report pending review',
+                    message: "Student {$student->full_name} ({$student->student_id}) has submitted a new crisis report.",
+                    link: route('admin.crisis.show', $report->report_id),
+                    studentId: $student->student_id,
                 );
             }
         }
@@ -196,43 +200,47 @@ class CrisisReportController extends Controller
     public function adminShow(CrisisReport $report)
     {
         $report->load('student', 'crisis', 'verifier');
-        return view('admin.crisis.show', compact('report'));
+
+        // Look up the student's current-semester courses and matched lecturers
+        // from student_courses (populated during their iMaalum login).
+        // This is what the admin sees in the "Student's Lecturers" side panel.
+        $studentCourses = DB::table('student_courses')
+            ->leftJoin('lecturers', 'student_courses.lecturer_id', '=', 'lecturers.lecturer_id')
+            ->where('student_courses.student_id', $report->student_id)
+            ->orderBy('student_courses.course_code')
+            ->select(
+                'student_courses.course_code',
+                'student_courses.course_name',
+                'student_courses.semester',
+                'student_courses.lecturer_name_raw',
+                'lecturers.lecturer_id',
+                'lecturers.first_name',
+                'lecturers.last_name',
+                'lecturers.email',
+                'lecturers.department',
+            )
+            ->get();
+
+        return view('admin.crisis.show', compact('report', 'studentCourses'));
     }
+
+
 
     public function verify(VerifyCrisisRequest $request, CrisisReport $report)
     {
-        /** @var \App\Models\Admin $admin */
         $admin = Auth::guard('admin')->user();
-
-        if (!$admin->active) abort(403, 'Inactive admin account.');
-        $perms = (array) ($admin->permissions ?? []);
-        if (!in_array('verify_crisis', $perms, true) && $admin->role !== 'super_admin') {
-            abort(403, 'You do not have permission to verify crisis reports.');
-        }
-
-        if ($report->report_status !== 'pending') {
-            return back()->withErrors(['report' => 'Only pending reports may be verified.']);
-        }
+        if (!$admin->active) abort(403);
 
         $crisis = $report->crisis;
-
         $payload = [
             'report_id'          => $report->report_id,
             'crisis_id'          => $report->crisis_id,
             'student_id'         => $report->student_id,
-            'crisis_type'        => $crisis?->crisis_type,
-            'sub_category'       => $crisis?->sub_category,
-            'report_description' => $report->report_description,
             'verified_by'        => $admin->admin_id,
             'verified_at'        => now()->toIso8601String(),
         ];
 
-        $result = $this->blockchain->recordEvent(
-            'CRISIS_VERIFIED',
-            $payload,
-            $report->report_id,
-            'crisis_report'
-        );
+        $result = $this->blockchain->recordEvent('CRISIS_VERIFIED', $payload, $report->report_id, 'crisis_report');
 
         DB::transaction(function () use ($request, $report, $crisis, $admin, $result) {
             $report->update([
@@ -242,40 +250,78 @@ class CrisisReportController extends Controller
                 'admin_remarks'      => $request->input('admin_remarks'),
                 'blockchain_hash'    => $result['hash'],
             ]);
-
             if ($crisis) {
-                $updates = ['status' => 'active'];
-                if ($request->filled('donation_target')) {
-                    $updates['donation_target'] = $request->input('donation_target');
-                }
-                if ($request->filled('impact_level')) {
-                    $updates['impact_level'] = $request->input('impact_level');
-                }
-                $crisis->update($updates);
+                $crisis->update(['status' => 'active']);
             }
         });
-
-        ActivityLog::record('admin', (string) $admin->admin_id, 'crisis_report_verified',
-            "Verified crisis report #{$report->report_id} (hash: " . substr($result['hash'], 0, 16) . '…)');
 
         $student = $report->student;
         if ($student) {
             $this->notifications->send(
-                recipientType:    'student',
-                recipientId:      $student->student_id,
-                email:            $student->email,
-                mailable:         new CrisisVerifiedMail($report, $student->first_name, $result['hash']),
+                recipientType: 'student',
+                recipientId: $student->student_id,
+                email: $student->email,
+                mailable: new \App\Mail\CrisisVerifiedMail($report, $student->first_name, $result['hash']),
                 notificationType: 'crisis_verified',
-                subject:          'Your crisis report has been verified',
-                message:          "Your crisis report #{$report->report_id} has been verified and is now active. Blockchain hash: " . substr($result['hash'], 0, 16) . '…',
-                link:             route('student.crisis.show', $report->report_id),
-                studentId:        $student->student_id,
+                subject: 'Your crisis report has been verified',
+                message: "Your crisis report #{$report->report_id} has been verified.",
+                link: route('student.crisis.show', $report->report_id),
+                studentId: $student->student_id,
             );
+
+            // NOTIFY LECTURERS
+            // Eager-load verifier + crisis so the Mailable can render
+            // verified-by name and crisis type without extra DB hits per job.
+            $report->loadMissing(['verifier', 'crisis']);
+            $crisisType = $report->crisis->crisis_type ?? 'N/A';
+
+            $studentCourses = DB::table('student_courses')
+                ->where('student_id', $student->student_id)
+                ->join('lecturers', 'student_courses.lecturer_id', '=', 'lecturers.lecturer_id')
+                ->select(
+                    'lecturers.email',
+                    'lecturers.first_name',
+                    'lecturers.last_name',
+                    'student_courses.course_code',
+                    'student_courses.course_name',
+                    'lecturers.lecturer_id'
+                )
+                ->get();
+
+            foreach ($studentCourses as $course) {
+                $lecturerEmail = $course->email;
+                if (app()->environment('local')) {
+                    $lecturerEmail = 'nabilahahmad.nordin@student.iium.edu.my';
+                }
+
+                $lecturerDisplayName = trim(
+                    ($course->first_name ?? '') . ' ' . ($course->last_name ?? '')
+                ) ?: 'Lecturer';
+
+                $this->notifications->send(
+                    recipientType: 'lecturer',
+                    recipientId: (string)$course->lecturer_id,
+                    email: $lecturerEmail,
+                    mailable: new \App\Mail\LecturerCrisisNotificationMail(
+                        report:        $report,
+                        studentName:   $student->full_name,
+                        courseCode:    $course->course_code,
+                        lecturerName:  $lecturerDisplayName,
+                        courseName:    $course->course_name ?? null,
+                        studentMatric: $student->student_id ?? 'N/A',
+                        crisisType:    $crisisType,
+                        studentEmail:  $student->email ?? null,
+                    ),
+                    notificationType: 'lecturer_crisis_notified',
+                    subject: "Student Crisis Notification - {$course->course_code}",
+                    message: "Student {$student->full_name} has had a crisis report verified. Please consider this for their attendance.",
+                    link: null,
+                    studentId: $student->student_id,
+                );
+            }
         }
 
-        return redirect()
-            ->route('admin.crisis.show', $report->report_id)
-            ->with('status', 'Crisis report verified and recorded on the blockchain.');
+        return redirect()->route('admin.crisis.show', $report->report_id)->with('status', 'Verified and lecturers notified.');
     }
 
     public function reject(RejectCrisisRequest $request, CrisisReport $report)
@@ -324,21 +370,25 @@ class CrisisReportController extends Controller
             }
         });
 
-        ActivityLog::record('admin', (string) $admin->admin_id, 'crisis_report_rejected',
-            "Rejected crisis report #{$report->report_id}");
+        ActivityLog::record(
+            'admin',
+            (string) $admin->admin_id,
+            'crisis_report_rejected',
+            "Rejected crisis report #{$report->report_id}"
+        );
 
         $student = $report->student;
         if ($student) {
             $this->notifications->send(
-                recipientType:    'student',
-                recipientId:      $student->student_id,
-                email:            $student->email,
-                mailable:         new CrisisRejectedMail($report, $student->first_name, $reason),
+                recipientType: 'student',
+                recipientId: $student->student_id,
+                email: $student->email,
+                mailable: new CrisisRejectedMail($report, $student->first_name, $reason),
                 notificationType: 'crisis_rejected',
-                subject:          'Update on your crisis report',
-                message:          "Your crisis report #{$report->report_id} requires additional information. Please review the administrator's notes.",
-                link:             route('student.crisis.show', $report->report_id),
-                studentId:        $student->student_id,
+                subject: 'Update on your crisis report',
+                message: "Your crisis report #{$report->report_id} requires additional information. Please review the administrator's notes.",
+                link: route('student.crisis.show', $report->report_id),
+                studentId: $student->student_id,
             );
         }
 

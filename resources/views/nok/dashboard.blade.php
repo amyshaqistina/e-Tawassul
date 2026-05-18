@@ -46,14 +46,16 @@
             <div class="content-card mt-3">
                 <h5 class="mb-3">My submissions</h5>
                 @forelse($myConfirmations as $c)
-                    <div class="list-row">
+                    <a href="{{ route('nok.death.show', $c->confirmation_id) }}"
+                       class="list-row text-decoration-none text-reset"
+                       style="cursor:pointer;">
                         <div>
                             <div class="fw-semibold">Confirmation #{{ $c->confirmation_id }}</div>
                             <small class="text-muted">Submitted {{ $c->date_triggered?->diffForHumans() }}</small>
                         </div>
                         @php $sc = ['pending'=>'warning','verified'=>'success','rejected'=>'danger'][$c->status] ?? 'secondary'; @endphp
                         <span class="badge bg-{{ $sc }}">{{ strtoupper($c->status) }}</span>
-                    </div>
+                    </a>
                 @empty
                     <p class="text-muted small text-center my-4">You haven't submitted any confirmations yet.</p>
                 @endforelse

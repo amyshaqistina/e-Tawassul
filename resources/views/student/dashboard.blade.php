@@ -204,6 +204,34 @@
 
     <div class="dashboard-wrap container-fluid py-3">
 
+        {{-- NoK nag banner — shown if student hasn't added any kin --}}
+        @if($student->nextOfKin->isEmpty())
+            <div style="background:#FFFBEB; border:1px solid #FCD34D; border-radius:12px;
+                        padding:14px 18px; margin-bottom:16px;
+                        display:flex; align-items:flex-start; gap:14px;">
+                <div style="background:#F59E0B; color:#fff; width:38px; height:38px;
+                            border-radius:8px; display:flex; align-items:center; justify-content:center;
+                            font-size:18px; flex-shrink:0;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div style="flex:1;">
+                    <strong style="color:#92400E; font-size:14px; display:block; margin-bottom:3px;">
+                        Please add at least one next of kin
+                    </strong>
+                    <p style="color:#78350F; font-size:12.5px; margin:0; line-height:1.5;">
+                        In an emergency, your family won't be able to access this platform on your behalf
+                        unless you've registered them as your next of kin. It only takes a minute.
+                    </p>
+                </div>
+                <a href="{{ route('student.profile') }}#kin"
+                   style="background:#F59E0B; color:#fff; font-size:12.5px; font-weight:600;
+                          padding:8px 14px; border-radius:8px; text-decoration:none;
+                          white-space:nowrap; flex-shrink:0;">
+                    <i class="bi bi-plus-lg"></i> Add Next of Kin
+                </a>
+            </div>
+        @endif
+
         {{-- ===== Hero Row ===== --}}
         <div class="hero-row">
             <div class="welcome-banner">

@@ -10,7 +10,10 @@ use App\Models\Ldms;
 use App\Models\NextOfKin;
 use App\Services\BlockchainService;
 use App\Services\NotificationService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -139,6 +142,117 @@ class LDMSController extends Controller
         return redirect()
             ->route('student.ldms.index')
             ->with('status', 'Message removed.');
+    }
+
+    // -----------------------------------------------------------
+    // ADMIN — list + view
+    // -----------------------------------------------------------
+
+    /**
+     * List ALL students' LDMS messages. Includes search, filter, and
+     * media-type chips. Mirrors crisis index for consistency.
+     */
+    public function adminIndex(Request $request)
+    {
+        $tab = in_array($request->query('tab'), ['pending', 'released'], true)
+            ? $request->query('tab')
+            : 'pending';
+
+        $applyFilters = function ($query) use ($request) {
+            if ($s = trim((string) $request->query('search'))) {
+                $query->where(function ($w) use ($s) {
+                    $w->where('ldms.ldms_id', 'like', "%{$s}%")
+                      ->orWhere('ldms.student_id', 'like', "%{$s}%")
+                      ->orWhereHas('student', function ($sq) use ($s) {
+                          $sq->where('student_id', 'like', "%{$s}%");
+                      });
+                });
+            }
+
+            if ($media = $request->query('media_type')) {
+                $query->where('media_type', $media);
+            }
+
+            // Filter by student's life status — quick way to find
+            // releasable messages (student deceased + message pending).
+            if ($request->query('student_status') === 'deceased') {
+                $query->whereHas('student', fn($q) => $q->where('status', 'deceased'));
+            } elseif ($request->query('student_status') === 'active') {
+                $query->whereHas('student', fn($q) => $q->where('status', 'active'));
+            }
+
+            [$from, $to] = $this->resolveDateRange($request);
+            if ($from) $query->whereDate('ldms.updated_at', '>=', $from);
+            if ($to)   $query->whereDate('ldms.updated_at', '<=', $to);
+
+            return $query;
+        };
+
+        $pending = $applyFilters(
+            Ldms::with(['student'])
+                ->where('is_released', false)
+                ->orderByDesc('updated_at')
+        )->paginate(15, ['*'], 'pending')->withQueryString();
+
+        $released = $applyFilters(
+            Ldms::with(['student'])
+                ->where('is_released', true)
+                ->orderByDesc('date_triggered')
+        )->paginate(15, ['*'], 'released')->withQueryString();
+
+        // Media-type breakdown (for chip row), scoped to active tab.
+        $mediaTotals = Ldms::query()
+            ->where('is_released', $tab === 'released')
+            ->selectRaw('media_type, COUNT(*) as total')
+            ->groupBy('media_type')
+            ->pluck('total', 'media_type')
+            ->toArray();
+
+        return view('admin.ldms.index', compact(
+            'tab', 'pending', 'released', 'mediaTotals'
+        ));
+    }
+
+    /**
+     * Show one LDMS to an admin.
+     *
+     * IMPORTANT — privacy design (FYP scope):
+     * The view DOES NOT display the message body or attachment filenames.
+     * The encrypted contents are intended ONLY for the next of kin. The
+     * admin's role is to verify prerequisites (student deceased, NoK
+     * exists) and click "Release" — they never need to read the content.
+     *
+     * The controller still loads the model so we can show metadata
+     * (media type, attachment count, timestamps). The Blade template
+     * intentionally never renders $ldms->message_content.
+     */
+    public function adminShow(Ldms $ldms)
+    {
+        $ldms->load('student', 'confirmation', 'nextOfKin');
+
+        $recipients = NextOfKin::where('student_id', $ldms->student_id)->get();
+        $studentDeceased = ($ldms->student?->status ?? null) === 'deceased';
+
+        // Lecturer context (same shape as crisis/death show, so the right
+        // sidebar can render an identical "Student's Lecturers" panel).
+        $studentCourses = DB::table('student_courses')
+            ->leftJoin('lecturers', 'student_courses.lecturer_id', '=', 'lecturers.lecturer_id')
+            ->where('student_courses.student_id', $ldms->student_id)
+            ->orderBy('student_courses.course_code')
+            ->select(
+                'student_courses.course_code',
+                'student_courses.course_name',
+                'student_courses.lecturer_name_raw',
+                'lecturers.lecturer_id',
+                'lecturers.first_name',
+                'lecturers.last_name',
+                'lecturers.email',
+            )
+            ->get();
+
+        return view('admin.ldms.show', compact(
+            'ldms', 'recipients', 'studentDeceased', 'studentCourses'
+        ));
     }
 
     // -----------------------------------------------------------
@@ -304,5 +418,28 @@ class LDMSController extends Controller
         }
 
         return $paths;
+    }
+
+    /**
+     * Resolve the date_range select into a [from, to] Carbon pair.
+     */
+    protected function resolveDateRange(Request $request): array
+    {
+        switch ($request->query('date_range')) {
+            case 'today':
+                return [Carbon::today(), Carbon::today()->endOfDay()];
+            case 'week':
+                return [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()];
+            case 'last_week':
+                return [Carbon::now()->subWeek()->startOfWeek(), Carbon::now()->subWeek()->endOfWeek()];
+            case 'month':
+                return [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()];
+            case 'custom':
+                $from = $request->query('date_from') ? Carbon::parse($request->query('date_from'))->startOfDay() : null;
+                $to   = $request->query('date_to')   ? Carbon::parse($request->query('date_to'))->endOfDay()   : null;
+                return [$from, $to];
+            default:
+                return [null, null];
+        }
     }
 }

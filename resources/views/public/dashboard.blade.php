@@ -1482,7 +1482,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
 
                 <div class="etw-headline">
                     <h1>When crisis strikes,<br><em>support is already here</em></h1>
-                    <p class="lead">e-Tawassul is UTM's comprehensive platform for student crisis management and digital
+                    <p class="lead">e-Tawassul is IIUM's comprehensive platform for student crisis management and digital
                         legacy preservation — ensuring no student faces hardship alone.</p>
                     <div class="etw-clock"><span class="dot"></span> Live · <span id="etwTime">--:--:--</span> · <span
                             id="etwDate">--</span></div>
