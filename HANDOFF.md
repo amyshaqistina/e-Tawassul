@@ -259,3 +259,22 @@ Route::get('/notifications/unread-count', [NotificationController::class, 'unrea
 5. **Password handling for iMaalum:** Never stored — passed to scraper job constructor, unset immediately after login call.
 6. **Notifications:** Always go through `NotificationService::send()` so both the email AND the in-app NotificationLog row are created in one call.
 7. **Admin permission strings (in `admins.permissions` JSON):** `verify_crisis`, `verify_death`, `trigger_ldms`, `manage_donations`, `view_blockchain`. `role='super_admin'` bypasses these checks in policies.
+
+cd C:\xampp\htdocs\e-tawassul\besu-network
+docker-compose up -d
+PowerShell -ExecutionPolicy Bypass -File .\test-rpc.ps1
+
+// 1. Show Besu is alive
+//$web3 = new \Web3\Web3(config('blockchain.node_url'));
+//$web3->clientVersion(function($e,$v){dump('Connected: ' . $v);});
+
+// 2. Record a crisis verification on-chain
+//$svc = app(\App\Services\BlockchainService::class);
+//$result = $svc->recordEvent('CRISIS_VERIFIED', ['demo' => true, 'time' => now()->toIso8601String()], 1, 'crisis_report');
+dump($result);  // shows mode: onchain + tx_hash
+
+// 3. Verify the hash made it into the smart contract
+//$svc->verifyHashOnChain($result['hash']);  // shows exists: true
+
+// 4. Demonstrate tamper-evidence
+$svc->verifyHash($result['blockchain_id'], ['demo' => true, 'time' => 'wrong-time']);  // returns false

@@ -139,28 +139,33 @@
         .report-row .report-title { font-weight: 600; color: #0f172a; font-size: 13.5px; }
         .report-row .report-time { font-size: 11px; color: #64748b; margin-top: 2px; }
 
-        /* ===== Status Timeline (right side) - matches your image 1 ===== */
+        /* ===== Status Timeline (right side) ===== */
         .status-timeline-card {
-            padding: 18px !important;
+            padding: 18px 18px 18px 24px !important;
         }
         .status-timeline-title {
             font-size: 11px; font-weight: 700; color: #64748b;
             text-transform: uppercase; letter-spacing: 0.6px;
             margin-bottom: 16px;
         }
+
         .timeline-item {
             display: flex; gap: 12px; align-items: flex-start;
-            position: relative; padding-bottom: 18px;
+            position: relative; padding-bottom: 22px;
         }
         .timeline-item:last-child { padding-bottom: 0; }
 
         .timeline-dot-col {
-            display: flex; flex-direction: column; align-items: center;
-            flex-shrink: 0; width: 16px;
+            flex-shrink: 0; width: 14px;
+            position: relative;
+            z-index: 2;
         }
+
         .timeline-dot {
             width: 14px; height: 14px; border-radius: 50%;
-            background: #cbd5e1; flex-shrink: 0; z-index: 1;
+            background: #cbd5e1;
+            display: block;
+            margin-top: 3px;
         }
         .timeline-dot.done    { background: #1a56db; }
         .timeline-dot.current { background: #1a56db; box-shadow: 0 0 0 4px rgba(26,86,219,0.15); }
@@ -168,17 +173,23 @@
         .timeline-dot.danger  { background: #dc2626; }
         .timeline-dot.future  { background: #fff; border: 2px solid #cbd5e1; }
 
+        /* Line is absolutely positioned — guaranteed centered under dot */
         .timeline-line {
-            width: 2px; flex-grow: 1; min-height: 24px;
-            margin-top: 2px; background: #e2e8f0;
+            position: absolute;
+            left: 6px;          /* (14px dot / 2) - (2px line / 2) = 6px */
+            top: 20px;          /* 3px margin-top + 14px dot + 3px gap */
+            bottom: 4px;
+            width: 2px;
+            background: #e2e8f0;
+            z-index: 1;
         }
         .timeline-line.done { background: #1a56db; }
 
         .timeline-content { flex: 1; padding-top: 0; min-width: 0; }
-        .timeline-label   { font-weight: 700; color: #0f172a; font-size: 14px; }
+        .timeline-label   { font-weight: 700; color: #0f172a; font-size: 14px; line-height: 1.2; }
         .timeline-label.future { color: #94a3b8; font-weight: 600; }
         .timeline-label.danger { color: #dc2626; }
-        .timeline-sub     { font-size: 12px; color: #64748b; margin-top: 2px; }
+        .timeline-sub     { font-size: 12px; color: #64748b; margin-top: 3px; }
 
         .timeline-status-banner {
             display: inline-flex; align-items: center; gap: 6px;
@@ -311,7 +322,7 @@
             </div>
         </div>
 
-        {{-- ===== Reports list + Status timeline (no more notifications column) ===== --}}
+        {{-- ===== Reports list + Status timeline ===== --}}
         <div class="row g-3 bottom-row">
 
             {{-- LEFT: report list with color-coded rows --}}
@@ -359,7 +370,7 @@
                 </div>
             </div>
 
-            {{-- RIGHT: status timeline for the most recent report (matches image 1 style) --}}
+            {{-- RIGHT: status timeline for the most recent report --}}
             <div class="col-lg-5">
                 <div class="content-card status-timeline-card">
                     @if($reports->isNotEmpty())
@@ -401,8 +412,8 @@
                         <div class="timeline-item">
                             <div class="timeline-dot-col">
                                 <span class="timeline-dot done"></span>
-                                <span class="timeline-line done"></span>
                             </div>
+                            <span class="timeline-line done"></span>
                             <div class="timeline-content">
                                 <div class="timeline-label">Submitted</div>
                                 <div class="timeline-sub">
@@ -415,12 +426,8 @@
                         <div class="timeline-item">
                             <div class="timeline-dot-col">
                                 <span class="timeline-dot {{ $stage > 1 ? 'done' : 'current' }}"></span>
-                                @if(!$isVerified && !$isRejected)
-                                    <span class="timeline-line"></span>
-                                @else
-                                    <span class="timeline-line done"></span>
-                                @endif
                             </div>
+                            <span class="timeline-line {{ ($isVerified || $isRejected) ? 'done' : '' }}"></span>
                             <div class="timeline-content">
                                 <div class="timeline-label">Admin Review</div>
                                 <div class="timeline-sub">
@@ -433,7 +440,7 @@
                             </div>
                         </div>
 
-                        {{-- Step 3: Final outcome --}}
+                        {{-- Step 3: Final outcome (NO line — last item) --}}
                         <div class="timeline-item">
                             <div class="timeline-dot-col">
                                 <span class="timeline-dot

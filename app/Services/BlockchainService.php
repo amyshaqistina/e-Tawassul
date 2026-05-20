@@ -12,34 +12,11 @@ use Web3\Utils;
 use Web3p\EthereumTx\Transaction;
 use Web3\Web3;
 
-/**
- * BlockchainService
- *
- * Records SHA-256 hashes of sensitive crisis events on a permissioned
- * Ethereum chain (Hyperledger Besu / GoQuorum, QBFT consensus).
- *
- * On-chain: only the hash + event type + timestamp + sender.
- * Off-chain: full payload stays in MySQL — never sent to the chain.
- *
- * Modes:
- *  - quorum     : real signed transaction submitted to a Besu/Quorum node
- *  - simulation : MySQL-only record (used when chain is unreachable, when
- *                 the event type isn't in `quorum_enabled_events`, or when
- *                 there's no QUORUM_NODE_URL configured)
- *
- * Auto-falls back to simulation on any chain error so the application
- * never breaks if the network is down or misconfigured.
- *
- * Eligible event types (per config/blockchain.php):
- *   CRISIS_VERIFIED, REPORT_REJECTED, DEATH_CONFIRMED, LDMS_TRIGGERED
- *   (DONATION_RECORDED is reserved for Phase 2)
- */
+
 class BlockchainService
 {
-    /** Lazily-instantiated web3 client */
-    protected ?Web3 $web3 = null;
 
-    /** Lazily-instantiated CrisisAudit contract handle */
+    protected ?Web3 $web3 = null;
     protected ?Contract $contract = null;
 
     // =================================================================
@@ -81,10 +58,10 @@ class BlockchainService
             try {
                 $txHash = $this->submitOnChain($eventType, $hash);
                 if ($txHash) {
-                    $mode = 'quorum';
+                    $mode = 'onchain';
                 }
             } catch (\Throwable $e) {
-                Log::warning('Quorum submission failed, falling back to simulation', [
+                Log::warning('onchain submission failed, falling back to simulation', [
                     'event' => $eventType,
                     'hash'  => $hash,
                     'error' => $e->getMessage(),
@@ -197,13 +174,10 @@ class BlockchainService
         return Blockchain::orderByDesc('timestamp')->limit(500)->get();
     }
 
-    // =================================================================
     //  Internal — chain integration
-    // =================================================================
 
-    /**
-     * Submit a recordEvent transaction to the chain and return its tx hash.
-     */
+    /*Submit a recordEvent transaction to the chain and return its tx hash.*/
+
     protected function submitOnChain(string $eventType, string $hashHex): ?string
     {
         $contractAddress = config('blockchain.contract_address');
@@ -266,9 +240,8 @@ class BlockchainService
         return $txHash;
     }
 
-    /**
-     * Build (and cache) the Web3 client.
-     */
+    /*Build (and cache) the Web3 client.*/
+
     protected function getWeb3(): Web3
     {
         if ($this->web3 === null) {
@@ -285,8 +258,7 @@ class BlockchainService
         return $this->web3;
     }
 
-    /**
-     * Build (and cache) the CrisisAudit Contract handle.
+    /*Build (and cache) the CrisisAudit Contract handle.
      */
     protected function getContract(): Contract
     {
@@ -301,9 +273,8 @@ class BlockchainService
         return $this->contract;
     }
 
-    /**
-     * Fetch eth_getTransactionCount("pending") for an address (the nonce).
-     */
+    /*Fetch eth_getTransactionCount("pending") for an address (the nonce).*/
+
     protected function getTransactionCount(string $address): int
     {
         $count = null;
@@ -325,9 +296,8 @@ class BlockchainService
         return (int) (string) $count->toString();
     }
 
-    /**
-     * eth_sendRawTransaction — returns the tx hash.
-     */
+    /*eth_sendRawTransaction — returns the tx hash.*/
+
     protected function sendRawTransaction(string $signedHex): string
     {
         $hash = null;
@@ -348,9 +318,9 @@ class BlockchainService
         return $hash;
     }
 
-    // =================================================================
+
     //  Internal — helpers
-    // =================================================================
+
 
     protected function isEventEligibleForChain(string $eventType): bool
     {

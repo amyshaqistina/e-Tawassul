@@ -1484,15 +1484,14 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                     <h1>When crisis strikes,<br><em>support is already here</em></h1>
                     <p class="lead">e-Tawassul is IIUM's comprehensive platform for student crisis management and digital
                         legacy preservation — ensuring no student faces hardship alone.</p>
-                    <div class="etw-clock"><span class="dot"></span> Live · <span id="etwTime">--:--:--</span> · <span
-                            id="etwDate">--</span></div>
+                        <div class="etw-clock"><span class="dot"></span> Live · <span id="etwTime">--:--:--</span> · <span
+                        id="etwDate">--</span></div>
                 </div>
-
                 @php
                     $helped = $totalHelped ?? 2487;
                     $helpedFormatted = $helped >= 1000 ? round($helped / 1000, 1) . 'k' : (string) $helped;
                 @endphp
-                <div class="etw-stats">
+                {{-- <div class="etw-stats">
                     <div class="etw-stat">
                         <div class="n">24</div>
                         <div class="l">Hours</div>
@@ -1512,7 +1511,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                         <div class="n">{{ $helpedFormatted }}</div>
                         <div class="l">Students Helped</div>
                     </div>
-                </div>
+                </div> --}}
 
                 <div class="etw-progress-wrap">
                     <h2>Support Progress</h2>
