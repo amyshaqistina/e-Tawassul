@@ -1432,6 +1432,102 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 font-size: 16px;
             }
         }
+        /* ==========================================================
+           WOW FACTOR for Active Cases, Voices, and FAQ only
+           Kept simple and parse-safe.
+           ========================================================== */
+
+        /* ACTIVE CASES — soft tinted background + card lift */
+        .etw-cases-wrap {
+            background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%);
+        }
+        .etw-cases-wrap .crisis-card {
+            background: white;
+            border-radius: 18px;
+            border: 1px solid var(--border-soft);
+            padding: 22px;
+            height: 100%;
+            transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s, border-color .3s;
+            box-shadow: 0 4px 16px -8px rgba(15, 23, 42, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        .etw-cases-wrap .crisis-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            opacity: 0;
+            transition: opacity .3s;
+        }
+        .etw-cases-wrap .crisis-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 48px -20px rgba(29, 78, 216, 0.25);
+            border-color: transparent;
+        }
+        .etw-cases-wrap .crisis-card:hover::after {
+            opacity: 1;
+        }
+
+        /* VOICES — gradient border, hover lift, gradient quote */
+        .etw-tcard {
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, #dbeafe, #ede9fe) border-box;
+            border: 1.5px solid transparent;
+            box-shadow: 0 8px 24px -16px rgba(15, 23, 42, 0.12);
+        }
+        .etw-tcard:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 28px 56px -24px rgba(29, 78, 216, 0.3);
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, #60a5fa, #a78bfa) border-box;
+        }
+        .etw-tcard .q {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 56px;
+            opacity: 0.7;
+        }
+        .etw-tavatar {
+            width: 52px;
+            height: 52px;
+            border: 3px solid white;
+            box-shadow: 0 8px 18px -8px rgba(29, 78, 216, 0.4);
+            transition: transform .25s;
+        }
+        .etw-tcard:hover .etw-tavatar {
+            transform: scale(1.08);
+        }
+
+        /* FAQ — frosted card style with hover slide + smooth open */
+        .etw-faq-item {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            transition: transform .2s, box-shadow .25s, border-color .25s, background .25s;
+        }
+        .etw-faq-item:hover {
+            transform: translateX(4px);
+            border-color: #93c5fd;
+            box-shadow: 0 10px 24px -16px rgba(29, 78, 216, 0.25);
+        }
+        .etw-faq-item.open {
+            background: linear-gradient(135deg, rgba(239, 246, 255, 0.95), rgba(237, 233, 254, 0.9));
+            border-color: #60a5fa;
+        }
+        .etw-faq-q {
+            font-weight: 700;
+        }
+
+        /* Section background tint helper for Active Cases */
+        .etw-section-tinted {
+            background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%);
+        }
+
     </style>
 @endpush
 
@@ -1449,34 +1545,34 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
 
                 <div class="etw-circle l c1" data-modal="flood" role="button" tabindex="0"><span class="ring"></span>
                     <div class="photo"
-                        style="background-image:url('https://images.unsplash.com/photo-1547683905-f686c993aae5?w=300&q=70')">
+                        style="background-image:url('/images/tawassul/flood.jpg')">
                     </div><span class="chip"><i class="fas fa-water"></i>Flood</span>
                 </div>
                 <div class="etw-circle l c2" data-modal="medical" role="button" tabindex="0"><span class="ring"></span>
                     <div class="photo"
-                        style="background-image:url('https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=300&q=70')">
-                    </div><span class="chip"><i class="fas fa-heart-pulse"></i>Medical</span>
+                        style="background-image:url('/images/tawassul/ilness.jpg')">
+                    </div><span class="chip"><i class="fas fa-heart-pulse"></i>Ilness</span>
                 </div>
                 <div class="etw-circle l c3" data-modal="firehouse" role="button" tabindex="0"><span
                         class="ring"></span>
                     <div class="photo"
-                        style="background-image:url('https://images.unsplash.com/photo-1602002418082-a4443e081dd1?w=300&q=70')">
+                        style="background-image:url('/images/tawassul/housefire.jpg')">
                     </div><span class="chip"><i class="fas fa-fire"></i>House Fire</span>
                 </div>
                 <div class="etw-circle r c4" data-modal="accident" role="button" tabindex="0"><span
                         class="ring"></span>
                     <div class="photo"
-                        style="background-image:url('https://images.unsplash.com/photo-1568438350562-2cae6d394ad0?w=300&q=70')">
+                        style="background-image:url('/images/tawassul/accident.jpg')">
                     </div><span class="chip"><i class="fas fa-car-burst"></i>Accident</span>
                 </div>
                 <div class="etw-circle r c5" data-modal="student" role="button" tabindex="0"><span class="ring"></span>
                     <div class="photo"
-                        style="background-image:url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=300&q=70')">
-                    </div><span class="chip"><i class="fas fa-graduation-cap"></i>Student Support</span>
+                        style="background-image:url('/images/tawassul/Death.jpg')">
+                    </div><span class="chip"><i class="fas fa-mosque"></i>Death</span>
                 </div>
                 <div class="etw-circle r c6" data-modal="legacy" role="button" tabindex="0"><span class="ring"></span>
                     <div class="photo"
-                        style="background-image:url('https://images.unsplash.com/photo-1579208030886-b937da0925dc?w=300&q=70')">
+                        style="background-image:url('/images/tawassul/Wasiat.jpg')">
                     </div><span class="chip"><i class="fas fa-envelope"></i>Last Message</span>
                 </div>
 
@@ -1484,37 +1580,10 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                     <h1>When crisis strikes,<br><em>support is already here</em></h1>
                     <p class="lead">e-Tawassul is IIUM's comprehensive platform for student crisis management and digital
                         legacy preservation — ensuring no student faces hardship alone.</p>
-                        <div class="etw-clock"><span class="dot"></span> Live · <span id="etwTime">--:--:--</span> · <span
-                        id="etwDate">--</span></div>
                 </div>
-                @php
-                    $helped = $totalHelped ?? 2487;
-                    $helpedFormatted = $helped >= 1000 ? round($helped / 1000, 1) . 'k' : (string) $helped;
-                @endphp
-                {{-- <div class="etw-stats">
-                    <div class="etw-stat">
-                        <div class="n">24</div>
-                        <div class="l">Hours</div>
-                    </div>
-                    <div class="etw-stat-sep"></div>
-                    <div class="etw-stat">
-                        <div class="n">7</div>
-                        <div class="l">Days</div>
-                    </div>
-                    <div class="etw-stat-sep"></div>
-                    <div class="etw-stat">
-                        <div class="n">{{ $casesSupported ?? 12 }}</div>
-                        <div class="l">Active Cases</div>
-                    </div>
-                    <div class="etw-stat-sep"></div>
-                    <div class="etw-stat">
-                        <div class="n">{{ $helpedFormatted }}</div>
-                        <div class="l">Students Helped</div>
-                    </div>
-                </div> --}}
 
                 <div class="etw-progress-wrap">
-                    <h2>Support Progress</h2>
+                    <h2>Total Donation</h2>
                     <div class="etw-progress-card">
                         <div class="etw-progress-top">
                             <div class="etw-progress-counter">
@@ -1537,6 +1606,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                             </div>
                         </div>
                     </div>
+                    <div class="etw-clock" style="margin: 14px auto 0; display: flex; width: fit-content;"><span class="dot"></span> Live · <span id="etwTime">--:--:--</span> · <span id="etwDate">--</span></div>
                 </div>
 
                 <div class="etw-cta-row">
@@ -1580,6 +1650,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         </section>
 
         {{-- ACTIVE CASES (uses controller data + your existing x-crisis-card component) --}}
+        <div class="etw-cases-wrap">
         <section class="etw-block" id="cases">
             <div class="etw-block-head etw-reveal">
                 <span class="etw-tag">Active Cases</span>
@@ -1601,33 +1672,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 </div>
             @endif
         </section>
-
-        {{-- LIVE STATS DASHBOARD --}}
-        <section class="etw-impact" id="impact">
-            <div class="etw-block-head etw-reveal">
-                <span class="etw-tag">Our Impact</span>
-                <h2>Real numbers, real lives changed</h2>
-                <p>Every figure below represents a student supported through our platform.</p>
-            </div>
-            <div class="etw-impact-grid">
-                <div class="etw-impact-card etw-reveal"><i class="fas fa-users"></i>
-                    <div class="v" data-count="{{ $totalHelped }}">0</div>
-                    <div class="k">Students Helped</div>
-                </div>
-                <div class="etw-impact-card etw-reveal"><i class="fas fa-hand-holding-dollar"></i>
-                    <div class="v">RM <span data-count="{{ $totalRaised }}">0</span></div>
-                    <div class="k">Total Donations</div>
-                </div>
-                <div class="etw-impact-card etw-reveal"><i class="fas fa-heart"></i>
-                    <div class="v" data-count="{{ $totalSupporters }}">0</div>
-                    <div class="k">Supporters</div>
-                </div>
-                <div class="etw-impact-card etw-reveal"><i class="fas fa-shield-halved"></i>
-                    <div class="v" data-count="{{ $legacyMessages }}">0</div>
-                    <div class="k">Legacy Messages</div>
-                </div>
-            </div>
-        </section>
+        </div>
 
         {{-- TESTIMONIALS --}}
         <section class="etw-block" id="testimonials">
@@ -1642,7 +1687,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                         me with support I didn't know existed. I graduated last month, Alhamdulillah.</p>
                     <div class="etw-tauthor">
                         <div class="etw-tavatar"
-                            style="background-image:url('https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200&q=80')">
+                            style="background-image:url('/images/tawassul/avatars/aiman.jpg')">
                         </div>
                         <div>
                             <h5>Aiman Hakim</h5><span>Engineering, Class of 2024</span>
@@ -1654,7 +1699,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                         donation went and the impact it made. Real transparency in giving.</p>
                     <div class="etw-tauthor">
                         <div class="etw-tavatar"
-                            style="background-image:url('https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')">
+                            style="background-image:url('/images/tawassul/avatars/siti.jpg')">
                         </div>
                         <div>
                             <h5>Dr. Siti Nurhaliza</h5><span>Donor &amp; IIUM Alumni</span>
@@ -1666,7 +1711,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                         emergency aid. The speed of response saved my brother's semester.</p>
                     <div class="etw-tauthor">
                         <div class="etw-tavatar"
-                            style="background-image:url('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80')">
+                            style="background-image:url('/images/tawassul/avatars/aishah.jpg')">
                         </div>
                         <div>
                             <h5>Nur Aishah</h5><span>Medicine, Year 4</span>
@@ -1712,36 +1757,6 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                         <i class="fas fa-chevron-down"></i></button>
                     <div class="etw-faq-a">No. e-Tawassul is a non-profit initiative by IIUM. There are no platform fees,
                         no processing fees, and no hidden costs. 100% of every donation reaches the verified student.</div>
-                </div>
-            </div>
-        </section>
-
-        {{-- HOW IT WORKS (moved to bottom) --}}
-        <section class="etw-block" id="how">
-            <div class="etw-block-head etw-reveal">
-                <span class="etw-tag">How It Works</span>
-                <h2>Three simple steps to get the support you need</h2>
-                <p>From the moment a crisis is reported to verified support reaching the student, every step is transparent.
-                </p>
-            </div>
-            <div class="etw-steps">
-                <div class="etw-step etw-reveal">
-                    <div class="etw-step-num">1</div>
-                    <h3>Report the crisis</h3>
-                    <p>Students or next-of-kin submit a case through a secure form. All evidence is encrypted at rest.</p><i
-                        class="fas fa-file-shield etw-step-icon"></i>
-                </div>
-                <div class="etw-step etw-reveal">
-                    <div class="etw-step-num">2</div>
-                    <h3>Admin verification</h3>
-                    <p>IIUM administrators review the case, validate documents, and publish it once confirmed authentic.</p>
-                    <i class="fas fa-user-check etw-step-icon"></i>
-                </div>
-                <div class="etw-step etw-reveal">
-                    <div class="etw-step-num">3</div>
-                    <h3>Community support</h3>
-                    <p>Donations are tracked on-chain. Every contribution and disbursement is permanently recorded.</p><i
-                        class="fas fa-handshake-angle etw-step-icon"></i>
                 </div>
             </div>
         </section>
@@ -1906,7 +1921,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 title: 'Monsoon floods displace 47 IIUM students from off-campus housing',
                 lead: 'Heavy rainfall in Gombak left several student rentals submerged. e-Tawassul activated emergency relocation, providing temporary mahallah housing, replacement essentials, and academic deferment letters within 6 hours of verification.',
                 slides: [
-                    'https://images.unsplash.com/photo-1547683905-f686c993aae5?w=900&q=80',
+                    '/images/tawassul/flood.jpg',
                     'https://images.unsplash.com/photo-1583244532610-2a234c44d2c6?w=900&q=80',
                     'https://images.unsplash.com/photo-1574788175366-15db8e0d0915?w=900&q=80'
                 ],
@@ -1922,12 +1937,12 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 }]
             },
             medical: {
-                cat: '<i class="fas fa-heart-pulse"></i> Medical',
+                cat: '<i class="fas fa-heart-pulse"></i> Ilness',
                 loc: 'IIUMMC Kuantan · Critical Care',
                 title: 'Final-year student\'s urgent surgery funded in 48 hours',
                 lead: 'A Kulliyyah of Engineering student needed emergency cardiac surgery beyond family means. e-Tawassul verified the case with IIUMMC, opened a transparent fund, and donors fully covered RM 42,300 within 48 hours — surgery proceeded on time.',
                 slides: [
-                    'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=900&q=80',
+                    '/images/tawassul/ilness.jpg',
                     'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=900&q=80',
                     'https://images.unsplash.com/photo-1666214280557-f1b5022eb634?w=900&q=80'
                 ],
@@ -1948,7 +1963,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 title: 'Student family loses home — academic continuity preserved',
                 lead: 'A house fire destroyed the family home of a Kulliyyah of Laws student, including textbooks, devices, and personal documents. e-Tawassul coordinated with the Mahallah office for a replacement laptop, free textbook loans, and replacement-document support so finals could proceed without delay.',
                 slides: [
-                    'https://images.unsplash.com/photo-1602002418082-a4443e081dd1?w=900&q=80',
+                    '/images/tawassul/housefire.jpg',
                     'https://images.unsplash.com/photo-1574870111867-089730e5a72b?w=900&q=80',
                     'https://images.unsplash.com/photo-1583936232743-1be91040548d?w=900&q=80'
                 ],
@@ -1969,7 +1984,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 title: 'Motorcycle accident leaves student in ICU — family supported',
                 lead: 'A second-year student commuting from Gombak was severely injured. e-Tawassul activated next-of-kin protocols within the hour, arranged hospital liaison with IIUMMC, transport for family from Terengganu, and an academic hold so credits weren\'t lost during recovery.',
                 slides: [
-                    'https://images.unsplash.com/photo-1568438350562-2cae6d394ad0?w=900&q=80',
+                    '/images/tawassul/accident.jpg',
                     'https://images.unsplash.com/photo-1612831455540-fcbe1f7e3739?w=900&q=80',
                     'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=900&q=80'
                 ],
@@ -1985,12 +2000,12 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 }]
             },
             student: {
-                cat: '<i class="fas fa-graduation-cap"></i> Student Support',
+                cat: '<i class="fas fa-mosque"></i> Death',
                 loc: 'IIUM-wide · Welfare Programs',
                 title: '612 students receiving ongoing financial & wellbeing support',
                 lead: 'Beyond emergencies, e-Tawassul runs continuous welfare programs: monthly food assistance, mental-health connections through CHARIS, peer-mentoring, and emergency stipends for students whose families lost income — keeping degrees on track.',
                 slides: [
-                    'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=900&q=80',
+                    '/images/tawassul/Death.jpg',
                     'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80',
                     'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=80'
                 ],
@@ -2011,7 +2026,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 title: 'Digital legacy: words that reach loved ones, when it matters most',
                 lead: 'e-Tawassul preserves voice notes, letters, and final wishes that students choose to share with their next-of-kin under specific conditions. End-to-end encrypted, blockchain-verified, released only when verified — giving every student peace of mind.',
                 slides: [
-                    'https://images.unsplash.com/photo-1579208030886-b937da0925dc?w=900&q=80',
+                    '/images/tawassul/Wasiat.jpg',
                     'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900&q=80',
                     'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=900&q=80'
                 ],
