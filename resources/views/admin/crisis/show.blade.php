@@ -90,6 +90,8 @@
             align-items: center;
             justify-content: space-between;
             border-left: 6px solid;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
         .status-banner.s-pending {
@@ -183,13 +185,16 @@
             color: #1E40AF;
         }
 
-        /* Row layout (label / value) — all info inline */
+        /* Row layout (label / value) — FIXED: minmax(0,1fr) + min-width:0
+           prevents grid columns from refusing to shrink and breaking text
+           character-by-character. */
         .info-row {
             display: grid;
-            grid-template-columns: 200px 1fr;
+            grid-template-columns: 200px minmax(0, 1fr);
             padding: 14px 20px;
             border-bottom: 1px solid #F3F4F6;
             align-items: start;
+            gap: 16px;
         }
 
         .info-row:last-child {
@@ -205,6 +210,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            min-width: 0;
         }
 
         .label-icon {
@@ -225,6 +231,8 @@
             color: #111827;
             line-height: 1.55;
             word-break: break-word;
+            overflow-wrap: anywhere;
+            min-width: 0;
         }
 
         .info-row .value .sub {
@@ -232,6 +240,15 @@
             color: #6B7280;
             display: block;
             margin-top: 2px;
+        }
+
+        /* Stack label above value on tablets and smaller screens to prevent
+           the 200px fixed label column from eating too much space. */
+        @media (max-width: 991px) {
+            .info-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
         }
 
         /* Description row gets a boxed value, like pic 3 / pic 6 */
@@ -246,7 +263,7 @@
             white-space: pre-wrap;
         }
 
-        /* Evidence files inline */
+        /* Evidence files inline — now clickable */
         .evidence-inline {
             display: flex;
             flex-direction: column;
@@ -262,10 +279,25 @@
             border-radius: 6px;
             padding: 8px 12px;
             font-size: 12px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.15s;
+        }
+
+        .evidence-inline .file:hover {
+            background: #EFF6FF;
+            border-color: #93C5FD;
+            color: inherit;
         }
 
         .evidence-inline .file i {
             color: #6B7280;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .evidence-inline .file:hover i.file-type-icon {
+            color: #1E40AF;
         }
 
         .evidence-inline .file .file-name {
@@ -274,12 +306,16 @@
             color: #1E40AF;
             word-break: break-all;
             flex: 1;
+            min-width: 0;
         }
 
         .evidence-inline .file .file-meta {
             font-size: 11px;
             color: #6B7280;
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .integration-mini {
@@ -869,7 +905,7 @@
                         </div>
                     </div>
 
-                    {{-- Immediate Actions — inline row (like pic 3) --}}
+                    {{-- Immediate Actions — inline row --}}
                     <div class="info-row">
                         <div class="label">
                             <span class="label-icon"><i class="bi bi-shield-check"></i></span>
@@ -884,7 +920,7 @@
                         </div>
                     </div>
 
-                    {{-- Supporting Documents — inline row (like pic 3) --}}
+                    {{-- Supporting Documents — clickable files --}}
                     <div class="info-row">
                         <div class="label">
                             <span class="label-icon"><i class="bi bi-paperclip"></i></span>
@@ -893,12 +929,24 @@
                         <div class="value">
                             @if ($evidenceCount > 0)
                                 <div class="evidence-inline">
-                                    @foreach ((array) $report->supporting_evidence_path as $p)
-                                        <div class="file">
-                                            <i class="bi bi-file-earmark-lock"></i>
-                                            <span class="file-name">{{ basename($p) }}</span>
-                                            <span class="file-meta"><i class="bi bi-shield-lock"></i> Encrypted</span>
-                                        </div>
+                                    @foreach ((array) $report->supporting_evidence_path as $i => $p)
+                                        @php
+                                            $name = basename($p);
+                                            $ext  = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                                            $isImg = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                                            $isPdf = $ext === 'pdf';
+                                            $icon  = $isImg ? 'bi-file-earmark-image'
+                                                  : ($isPdf ? 'bi-file-earmark-pdf'
+                                                  : 'bi-file-earmark-text');
+                                        @endphp
+                                        <a href="{{ route('admin.crisis.evidence.download', [$report->report_id, $i]) }}"
+                                           target="_blank" rel="noopener" class="file">
+                                            <i class="bi {{ $icon }} file-type-icon"></i>
+                                            <span class="file-name">{{ $name }}</span>
+                                            <span class="file-meta">
+                                                <i class="bi bi-box-arrow-up-right"></i> Open
+                                            </span>
+                                        </a>
                                     @endforeach
                                 </div>
                             @else
@@ -907,7 +955,7 @@
                         </div>
                     </div>
 
-                    {{-- System Integration — inline row (mini badges, not a giant card) --}}
+                    {{-- System Integration — inline row --}}
                     <div class="info-row">
                         <div class="label">
                             <span class="label-icon"><i class="bi bi-database-fill"></i></span>

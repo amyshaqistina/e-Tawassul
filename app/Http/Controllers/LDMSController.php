@@ -78,6 +78,38 @@ class LDMSController extends Controller
             ->route('student.ldms.index')
             ->with('status', 'Your message has been securely saved and encrypted.');
     }
+    public function show(Ldms $ldms)
+{
+    $this->authorizeStudent($ldms);
+    return view('student.ldms.show', compact('ldms'));
+}
+
+/**
+ * Stream a single LDMS attachment back to the OWNER student.
+ *
+ * Same pattern as nokDownload() — files live on the encrypted disk so
+ * we read decrypted bytes through the Storage facade and re-stream.
+ * Released messages are locked to prevent edits, but the student can
+ * still preview/download their own files before release.
+ */
+public function studentDownload(Ldms $ldms, string $filename)
+{
+    $this->authorizeStudent($ldms);
+
+    $paths = (array) ($ldms->media_file_path ?? []);
+    $match = collect($paths)->first(fn($p) => basename($p) === $filename);
+    if (!$match) abort(404);
+
+    $disk = Storage::disk(self::SECURE_DISK);
+    if (!$disk->exists($match)) abort(404);
+
+    return response()->streamDownload(
+        function () use ($disk, $match) {
+            echo $disk->get($match);
+        },
+        $filename
+    );
+}
 
     public function edit(Ldms $ldms)
     {

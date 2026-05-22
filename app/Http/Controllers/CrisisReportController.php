@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * CrisisReportController
@@ -224,7 +225,42 @@ class CrisisReportController extends Controller
         return view('admin.crisis.show', compact('report', 'studentCourses'));
     }
 
+        public function downloadEvidence(CrisisReport $report, int $index)
+    {
+        /** @var \App\Models\Admin $admin */
+        $admin = Auth::guard('admin')->user();
+            if (!$admin || !$admin->active) {
+            abort(403);
+            }
 
+        $paths = (array) ($report->supporting_evidence_path ?? []);
+        $path  = $paths[$index] ?? null;
+
+        if (!$path || !Storage::disk('local')->exists($path)) {
+            abort(404);
+        }
+
+        return Storage::disk('local')->response($path, basename($path));
+    }
+
+    public function downloadEvidenceStudent(CrisisReport $report, int $index)
+{
+    /** @var \App\Models\Student $student */
+    $student = Auth::guard('student')->user();
+
+    if (!$student || $report->student_id !== $student->student_id) {
+        abort(403);
+    }
+
+    $paths = (array) ($report->supporting_evidence_path ?? []);
+    $path  = $paths[$index] ?? null;
+
+    if (!$path || !Storage::disk('local')->exists($path)) {
+        abort(404);
+    }
+
+    return Storage::disk('local')->response($path, basename($path));
+}
 
     public function verify(VerifyCrisisRequest $request, CrisisReport $report)
     {

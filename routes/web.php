@@ -44,7 +44,6 @@ Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout',[AuthController::class, 'logout'])->name('logout');
 
-// NOK 2FA stubs (kept for route-name backward compatibility; not actually used in FYP scope)
 Route::get('/twofactor',         [AuthController::class, 'showTwoFactor'])->name('nok.twofactor.show');
 Route::post('/twofactor',        [AuthController::class, 'verifyTwoFactor'])->name('nok.twofactor.verify');
 Route::post('/twofactor/resend', [AuthController::class, 'resendOtp'])->name('nok.twofactor.resend');
@@ -52,7 +51,6 @@ Route::post('/twofactor/resend', [AuthController::class, 'resendOtp'])->name('no
 /*
 |--------------------------------------------------------------------------
 | Student email confirmation gate
-| (sits between login and dashboard for first-time iMaalum syncs)
 |--------------------------------------------------------------------------
 */
 Route::middleware('role:student')->prefix('student')->name('student.')->group(function () {
@@ -69,16 +67,13 @@ Route::middleware(['role:student', 'email.confirmed'])->prefix('student')->name(
     Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('dashboard');
     Route::get('/profile',   [StudentController::class, 'profile'])->name('profile');
 
-    // Profile editing
     Route::patch('/profile', [StudentProfileController::class, 'updateProfile'])->name('profile.update');
 
-    // Next of Kin CRUD (managed by the student on their own profile)
     Route::post  ('/kin',                       [StudentProfileController::class, 'storeKin'])      ->name('kin.store');
     Route::patch ('/kin/{kin}',                 [StudentProfileController::class, 'updateKin'])     ->name('kin.update');
     Route::delete('/kin/{kin}',                 [StudentProfileController::class, 'destroyKin'])    ->name('kin.destroy');
     Route::patch ('/kin/{kin}/make-primary',    [StudentProfileController::class, 'makePrimaryKin'])->name('kin.primary');
 
-    // Bank info + DuitNow QR (donation-receiving setup)
     Route::patch ('/bank',     [StudentProfileController::class, 'updateBank'])->name('bank.update');
     Route::post  ('/qr',       [StudentProfileController::class, 'uploadQr']) ->name('qr.upload');
     Route::delete('/qr',       [StudentProfileController::class, 'deleteQr']) ->name('qr.delete');
@@ -86,11 +81,13 @@ Route::middleware(['role:student', 'email.confirmed'])->prefix('student')->name(
     Route::get('/crisis/create', [CrisisReportController::class, 'create'])->name('crisis.create');
     Route::post('/crisis',       [CrisisReportController::class, 'store'])->name('crisis.store');
     Route::get('/crisis/{report}', [CrisisReportController::class, 'show'])->name('crisis.show');
+    Route::get('/crisis/{report}/evidence/{index}', [CrisisReportController::class, 'downloadEvidenceStudent'])->name('crisis.evidence.download');
 
     Route::get('/crisis-helpers/disaster-context', [CrisisHelperController::class, 'disasterContext'])
         ->name('crisis.helpers.disaster-context');
 
-    Route::resource('ldms', LDMSController::class)->except(['show']);
+    Route::resource('ldms', LDMSController::class);
+    Route::get('/ldms/{ldms}/download/{filename}', [LDMSController::class, 'studentDownload'])->name('ldms.download');
 });
 
 /*
@@ -104,14 +101,16 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
     Route::get('/students/{student}', [AdminStudentController::class, 'show'])->name('students.show');
     Route::post('/students/{student}/kin', [AdminStudentController::class, 'storeKin'])->name('students.kin.store');
 
-    Route::get('/crisis',                       [AdminCrisisController::class, 'index'])->name('crisis.index');
-    Route::get('/crisis/{report}',              [CrisisReportController::class, 'adminShow'])->name('crisis.show');
-    Route::post('/crisis/{report}/verify',      [CrisisReportController::class, 'verify'])->name('crisis.verify');
-    Route::post('/crisis/{report}/reject',      [CrisisReportController::class, 'reject'])->name('crisis.reject');
+    Route::get('/crisis',                                  [AdminCrisisController::class, 'index'])->name('crisis.index');
+    Route::get('/crisis/{report}',                         [CrisisReportController::class, 'adminShow'])->name('crisis.show');
+    Route::get('/crisis/{report}/evidence/{index}',        [CrisisReportController::class, 'downloadEvidence'])->name('crisis.evidence.download');
+    Route::post('/crisis/{report}/verify',                 [CrisisReportController::class, 'verify'])->name('crisis.verify');
+    Route::post('/crisis/{report}/reject',                 [CrisisReportController::class, 'reject'])->name('crisis.reject');
 
-    Route::get('/death',                        [DeathConfirmationController::class, 'adminIndex'])->name('death.index');
-    Route::get('/death/{confirmation}',         [DeathConfirmationController::class, 'adminShow'])->name('death.show');
-    Route::post('/death/{confirmation}/verify', [DeathConfirmationController::class, 'verify'])->name('death.verify');
+    Route::get('/death',                                  [DeathConfirmationController::class, 'adminIndex'])->name('death.index');
+    Route::get('/death/{confirmation}',                   [DeathConfirmationController::class, 'adminShow'])->name('death.show');
+    Route::get('/death/{confirmation}/document',          [DeathConfirmationController::class, 'downloadDocument'])->name('death.document.download');
+    Route::post('/death/{confirmation}/verify',           [DeathConfirmationController::class, 'verify'])->name('death.verify');
 
     Route::get('/ldms',                 [LDMSController::class, 'adminIndex'])->name('ldms.index');
     Route::get('/ldms/{ldms}',          [LDMSController::class, 'adminShow'])->name('ldms.show');
@@ -129,7 +128,7 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
 
 /*
 |--------------------------------------------------------------------------
-| NOK area (kept for code completeness; not exposed in FYP login form)
+| NOK area
 |--------------------------------------------------------------------------
 */
 Route::middleware(['role:nok', 'twofactor'])->prefix('nok')->name('nok.')->group(function () {
@@ -149,7 +148,7 @@ Route::middleware(['role:nok', 'twofactor'])->prefix('nok')->name('nok.')->group
 
 /*
 |--------------------------------------------------------------------------
-| Lecturer area (not used yet)
+| Lecturer area
 |--------------------------------------------------------------------------
 */
 Route::middleware('role:lecturer')->prefix('lecturer')->name('lecturer.')->group(function () {
@@ -158,7 +157,7 @@ Route::middleware('role:lecturer')->prefix('lecturer')->name('lecturer.')->group
 
 /*
 |--------------------------------------------------------------------------
-| Notifications (any authenticated user)
+| Notifications
 |--------------------------------------------------------------------------
 */
 Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
