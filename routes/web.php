@@ -19,18 +19,14 @@ use App\Http\Controllers\PdfExportController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\NokCrisisController;
+use App\Http\Controllers\ChatbotController;
 use Illuminate\Support\Facades\Route;
 
-
-
 Route::get('/test-imaalum', function () {
-    
     $base = env('IMAALUM_API_BASE');
-
     $response = Http::get($base . '/search', [
         'q' => 'ahmad'
     ]);
-
     dd([
         'status' => $response->status(),
         'json' => $response->json(),
@@ -38,6 +34,12 @@ Route::get('/test-imaalum', function () {
     ]);
 });
 
+/*
+|--------------------------------------------------------------------------
+| Chatbot AI
+|--------------------------------------------------------------------------
+*/
+Route::post('/chatbot/ask', [ChatbotController::class, 'ask']);
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +53,7 @@ Route::post('/donate/{crisis}', [DonationController::class, 'store'])->name('don
 Route::get('/crisis/{crisis}/progress', [DonationController::class, 'progress'])->name('donate.progress');
 
 Route::get('/pdf/crisis/{crisis}', [PdfExportController::class, 'crisisReceipt'])->name('pdf.crisis');
-Route::get('/pdf/donation/{donation}', [PdfExportController::class, 'donationReceipt'])->name('pdf.donation');
+Route::get('/pdf/donation/{donation}', [DonationController::class, 'donationReceipt'])->name('pdf.donation');
 
 /*
 |--------------------------------------------------------------------------
@@ -181,6 +183,3 @@ Route::middleware('role:lecturer')->prefix('lecturer')->name('lecturer.')->group
 Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
 Route::post('/notifications/{id}/read',   [NotificationController::class, 'markAsRead'])->name('notifications.read');
 Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread');
-
-
-
