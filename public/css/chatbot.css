@@ -1,0 +1,238 @@
+/* ============================================
+   e-Tawassul Chatbot Widget Styles (Blue theme)
+   Matches the royal blue used in the homepage hero & Login button
+   ============================================ */
+
+[x-cloak] { display: none !important; }
+
+.etw-chatbot {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1050;
+    font-family: inherit;
+}
+
+.etw-chatbot--rtl {
+    right: auto;
+    left: 24px;
+    direction: rtl;
+}
+
+/* ---------- Launcher button ---------- */
+.etw-chatbot__launcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    box-shadow: 0 4px 16px rgba(30, 64, 175, 0.35);
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.etw-chatbot__launcher:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 64, 175, 0.45);
+}
+.etw-chatbot__launcher i { font-size: 1.2rem; }
+
+/* ---------- Window ---------- */
+.etw-chatbot__window {
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    height: 560px;
+    max-height: calc(100vh - 48px);
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(30, 64, 175, 0.18);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ---------- Header ---------- */
+.etw-chatbot__header {
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.etw-chatbot__header small { opacity: 0.85; font-size: 0.75rem; }
+.etw-chatbot__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.etw-chatbot__lang {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.etw-chatbot__lang option { color: #000; }
+.etw-chatbot__close {
+    background: transparent;
+    color: #fff;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+.etw-chatbot__close:hover { background: rgba(255, 255, 255, 0.15); }
+
+/* ---------- Messages ---------- */
+.etw-chatbot__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.etw-chatbot__msg { display: flex; }
+.etw-chatbot__msg--user { justify-content: flex-end; }
+.etw-chatbot__msg--bot { justify-content: flex-start; }
+
+.etw-chatbot__msg-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    word-wrap: break-word;
+}
+.etw-chatbot__msg--user .etw-chatbot__msg-bubble {
+    background: #1e40af;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+.etw-chatbot__msg--bot .etw-chatbot__msg-bubble {
+    background: #fff;
+    color: #212529;
+    border: 1px solid #e9ecef;
+    border-bottom-left-radius: 4px;
+}
+/* Escalation (crisis hotline) message gets distinct styling */
+.etw-chatbot__msg--escalate .etw-chatbot__msg-bubble {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #664d03;
+}
+
+/* RTL flips */
+.etw-chatbot--rtl .etw-chatbot__msg--user .etw-chatbot__msg-bubble {
+    border-bottom-right-radius: 14px;
+    border-bottom-left-radius: 4px;
+}
+.etw-chatbot--rtl .etw-chatbot__msg--bot .etw-chatbot__msg-bubble {
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 4px;
+}
+
+/* ---------- Typing indicator ---------- */
+.etw-chatbot__typing {
+    display: flex;
+    gap: 4px;
+    padding: 14px 16px;
+}
+.etw-chatbot__typing span {
+    width: 7px;
+    height: 7px;
+    background: #adb5bd;
+    border-radius: 50%;
+    animation: etw-bounce 1.4s infinite;
+}
+.etw-chatbot__typing span:nth-child(2) { animation-delay: 0.2s; }
+.etw-chatbot__typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes etw-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30%           { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ---------- Quick-reply chips ---------- */
+.etw-chatbot__suggestions {
+    padding: 8px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+.etw-chatbot__chip {
+    background: #fff;
+    border: 1px solid #1e40af;
+    color: #1e40af;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.etw-chatbot__chip:hover {
+    background: #1e40af;
+    color: #fff;
+}
+
+/* ---------- Input row ---------- */
+.etw-chatbot__input-row {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid #e9ecef;
+    background: #fff;
+}
+.etw-chatbot__input {
+    flex: 1;
+    border: 1px solid #ced4da;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    outline: none;
+}
+.etw-chatbot__input:focus { border-color: #1e40af; }
+.etw-chatbot__send {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1e40af;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.etw-chatbot__send:disabled {
+    background: #adb5bd;
+    cursor: not-allowed;
+}
+
+/* ---------- Disclaimer ---------- */
+.etw-chatbot__disclaimer {
+    padding: 6px 12px 10px;
+    font-size: 0.7rem;
+    color: #6c757d;
+    text-align: center;
+    background: #fff;
+}
+
+/* ---------- Mobile responsive ---------- */
+@media (max-width: 480px) {
+    .etw-chatbot { bottom: 12px; right: 12px; }
+    .etw-chatbot--rtl { left: 12px; right: auto; }
+    .etw-chatbot__window {
+        width: calc(100vw - 24px);
+        height: calc(100vh - 100px);
+    }
+}

@@ -260,7 +260,7 @@ Route::get('/notifications/unread-count', [NotificationController::class, 'unrea
 6. **Notifications:** Always go through `NotificationService::send()` so both the email AND the in-app NotificationLog row are created in one call.
 7. **Admin permission strings (in `admins.permissions` JSON):** `verify_crisis`, `verify_death`, `trigger_ldms`, `manage_donations`, `view_blockchain`. `role='super_admin'` bypasses these checks in policies.
 
-cd C:\xampp\htdocs\e-tawassul\besu-network
+
 docker-compose up -d
 PowerShell -ExecutionPolicy Bypass -File .\test-rpc.ps1
 

@@ -27,4 +27,9 @@ return [
         'directory_fallback'   => env('LECTURER_DIRECTORY_FALLBACK', false),
         'cache_minutes'        => env('IMAALUM_CACHE_MINUTES', 30),
     ],
+
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
+    ],
 ];

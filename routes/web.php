@@ -20,7 +20,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\NokCrisisController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\ChatbotController;
 /*
 |--------------------------------------------------------------------------
 | Public routes
@@ -163,3 +163,12 @@ Route::middleware('role:lecturer')->prefix('lecturer')->name('lecturer.')->group
 Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
 Route::post('/notifications/{id}/read',   [NotificationController::class, 'markAsRead'])->name('notifications.read');
 Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread');
+
+/*
+|--------------------------------------------------------------------------
+| Chatbot AI
+|--------------------------------------------------------------------------
+*/
+Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])
+    ->middleware(['throttle:20,1'])
+    ->name('chatbot.ask');
