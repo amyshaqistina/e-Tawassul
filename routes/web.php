@@ -20,7 +20,25 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\NokCrisisController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ChatbotController;
+
+
+
+Route::get('/test-imaalum', function () {
+    
+    $base = env('IMAALUM_API_BASE');
+
+    $response = Http::get($base . '/search', [
+        'q' => 'ahmad'
+    ]);
+
+    dd([
+        'status' => $response->status(),
+        'json' => $response->json(),
+        'raw' => $response->body(),
+    ]);
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | Public routes
@@ -164,11 +182,5 @@ Route::get('/notifications',              [NotificationController::class, 'index
 Route::post('/notifications/{id}/read',   [NotificationController::class, 'markAsRead'])->name('notifications.read');
 Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread');
 
-/*
-|--------------------------------------------------------------------------
-| Chatbot AI
-|--------------------------------------------------------------------------
-*/
-Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])
-    ->middleware(['throttle:20,1'])
-    ->name('chatbot.ask');
+
+

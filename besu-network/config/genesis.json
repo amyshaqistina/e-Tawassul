@@ -1,37 +1,37 @@
 {
-    "config":  {
-                   "chainId":  1337,
-                   "homesteadBlock":  0,
-                   "eip150Block":  0,
-                   "eip155Block":  0,
-                   "eip158Block":  0,
-                   "byzantiumBlock":  0,
-                   "constantinopleBlock":  0,
-                   "petersburgBlock":  0,
-                   "istanbulBlock":  0,
-                   "berlinBlock":  0,
-                   "londonBlock":  0,
-                   "zeroBaseFee":  true,
-                   "qbft":  {
-                                "blockperiodseconds":  5,
-                                "epochlength":  30000,
-                                "requesttimeoutseconds":  10
-                            }
-               },
-    "nonce":  "0x0",
-    "timestamp":  "0x649e2cd0",
-    "gasLimit":  "0x1fffffffffffff",
-    "difficulty":  "0x1",
-    "mixHash":  "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
-    "coinbase":  "0x0000000000000000000000000000000000000000",
-    "alloc":  {
-                  "0x292b8920fe1b27a86dd7a6a10686d6b197235ce7":  {
-                                                                     "comment":  "Funded account for application use - private key is in the readme",
-                                                                     "balance":  "1000000000000000000000000000"
-                                                                 },
-                  "0x2072953daa5d0d8664e6b7809b51d27c624d2ef5":  {
-                                                                     "balance":  "1000000000000000000000000000"
-                                                                 }
-              },
-    "extraData":  "0xf87aa00000000000000000000000000000000000000000000000000000000000000000f8549429b5863a079c9c175fe8cd8323fdc61a566cc94a942072953daa5d0d8664e6b7809b51d27c624d2ef5946ed8ea7c52b3fb967faa42d5ddb88ab13b33a18e94f174d23785628f2e75287b25a1597199d47e13e6c080c0"
+  "config": {
+    "chainId": 1337,
+    "homesteadBlock": 0,
+    "eip150Block": 0,
+    "eip155Block": 0,
+    "eip158Block": 0,
+    "byzantiumBlock": 0,
+    "constantinopleBlock": 0,
+    "petersburgBlock": 0,
+    "istanbulBlock": 0,
+    "berlinBlock": 0,
+    "londonBlock": 0,
+    "zeroBaseFee": true,
+    "qbft": {
+      "blockperiodseconds": 5,
+      "epochlength": 30000,
+      "requesttimeoutseconds": 10
+    }
+  },
+  "nonce": "0x0",
+  "timestamp": "0x649e2cd0",
+  "gasLimit": "0x1fffffffffffff",
+  "difficulty": "0x1",
+  "mixHash": "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
+  "coinbase": "0x0000000000000000000000000000000000000000",
+  "alloc": {
+    "0x292b8920fe1b27a86dd7a6a10686d6b197235ce7": {
+      "comment": "Funded account for application use - private key is in the readme",
+      "balance": "1000000000000000000000000000"
+    },
+    "0x10ca654e0cdb40299beb3e05fe74a687ff28b5fa": {
+      "balance": "1000000000000000000000000000"
+    }
+  },
+  "extraData": "0xf87aa00000000000000000000000000000000000000000000000000000000000000000f85494a4401a7b88bb81a1e5fb6c3c3d65792baaa15b2a94ac9880f943059dee47374af35894bf649f56e7539410ca654e0cdb40299beb3e05fe74a687ff28b5fa94a1f613697c006ce3b73b3ae2159f1a45e41898c7c080c0"
 }

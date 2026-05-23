@@ -342,7 +342,7 @@ class DeathConfirmationController extends Controller
                 foreach ($studentCourses as $course) {
                     $lecturerEmail = $course->email;
                     if (app()->environment('local')) {
-                        $lecturerEmail = 'nabilahahmad.nordin@student.iium.edu.my';
+                        $lecturerEmail = env('TESTING_MODE_LECTURER_REDIRECT_EMAIL', 'nabilahnordin20082002@gmail.com');
                     }
 
                     $lecturerDisplayName = trim(
