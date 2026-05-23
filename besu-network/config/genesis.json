@@ -29,9 +29,9 @@
                                                                      "comment":  "Funded account for application use - private key is in the readme",
                                                                      "balance":  "1000000000000000000000000000"
                                                                  },
-                  "0x886bfb8a79fc2e07a106754108b1724d20e98bfa":  {
+                  "0x2072953daa5d0d8664e6b7809b51d27c624d2ef5":  {
                                                                      "balance":  "1000000000000000000000000000"
                                                                  }
               },
-    "extraData":  "0xf87aa00000000000000000000000000000000000000000000000000000000000000000f85494d9faa9465d1c21aa3a5ca47019566afe823a52ab94d683ecd0ea0935bd3735019911ce8f36211594df94cdbb5a66339a37edb16ce66531e49f5b8bd2788694886bfb8a79fc2e07a106754108b1724d20e98bfac080c0"
+    "extraData":  "0xf87aa00000000000000000000000000000000000000000000000000000000000000000f8549429b5863a079c9c175fe8cd8323fdc61a566cc94a942072953daa5d0d8664e6b7809b51d27c624d2ef5946ed8ea7c52b3fb967faa42d5ddb88ab13b33a18e94f174d23785628f2e75287b25a1597199d47e13e6c080c0"
 }

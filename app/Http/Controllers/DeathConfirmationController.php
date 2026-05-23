@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DeathConfirmationController extends Controller
 {
@@ -110,28 +111,17 @@ class DeathConfirmationController extends Controller
     // NOK — view a submitted confirmation
     // -----------------------------------------------------------
 
-    /**
-     * NoK view of their own submitted death confirmation.
-     * Shows status, document metadata (size, name), admin notes if
-     * reviewed, and a status timeline. The actual file is NOT downloadable
-     * by the NoK because it's an encrypted artefact intended for admin
-     * verification only.
-     */
     public function nokShow(DeathConfirmation $confirmation)
     {
         /** @var \App\Models\NextOfKin $nok */
         $nok = Auth::guard('nok')->user();
 
-        // Strict: a NoK may only view confirmations THEY submitted.
         if ((string) $confirmation->nok_id !== (string) $nok->nok_id) {
             abort(403, 'You can only view confirmations that you submitted.');
         }
 
         $confirmation->load('nextOfKin', 'student');
 
-        // Released LDMS messages for the (now deceased) student, so the
-        // NoK can navigate from this verified confirmation directly to
-        // the messages that were released as a consequence of it.
         $releasedLdms = \App\Models\Ldms::where('student_id', $confirmation->student_id)
             ->where('is_released', true)
             ->orderByDesc('date_triggered')
@@ -141,7 +131,7 @@ class DeathConfirmationController extends Controller
     }
 
     // -----------------------------------------------------------
-    // ADMIN — list (search, filter, totals; matches crisis index)
+    // ADMIN — list
     // -----------------------------------------------------------
 
     public function adminIndex(Request $request)
@@ -151,7 +141,6 @@ class DeathConfirmationController extends Controller
             : 'pending';
 
         $applyFilters = function ($query) use ($request) {
-            // Free-text search: confirmation_id / student_id / NoK name
             if ($s = trim((string) $request->query('search'))) {
                 $query->where(function ($w) use ($s) {
                     $w->where('death_confirmation.confirmation_id', 'like', "%{$s}%")
@@ -167,12 +156,10 @@ class DeathConfirmationController extends Controller
                 });
             }
 
-            // Date range filter
             [$from, $to] = $this->resolveDateRange($request);
             if ($from) $query->whereDate('death_confirmation.date_triggered', '>=', $from);
             if ($to)   $query->whereDate('death_confirmation.date_triggered', '<=', $to);
 
-            // "Has supporting document" / "missing document" filter
             if ($request->query('has_doc') === 'yes') {
                 $query->whereNotNull('media_file_path');
             } elseif ($request->query('has_doc') === 'no') {
@@ -203,11 +190,6 @@ class DeathConfirmationController extends Controller
         return view('admin.death.index', compact('tab', 'pending', 'verified', 'rejected'));
     }
 
-    /**
-     * Show one death confirmation. Loads relations and the student's
-     * lecturers list (same shape as crisis-show), so the right-side
-     * "Student's Lecturers" panel renders identically.
-     */
     public function adminShow(DeathConfirmation $confirmation)
     {
         $confirmation->load('nextOfKin', 'student', 'crisis');
@@ -230,6 +212,48 @@ class DeathConfirmationController extends Controller
             ->get();
 
         return view('admin.death.show', compact('confirmation', 'studentCourses'));
+    }
+
+    /**
+     * Stream the death confirmation supporting document to an admin.
+     *
+     * Files are stored on the 'local' disk under storage/app/death-confirmations/
+     * (see store() above). This action streams the bytes back with strict
+     * authorization: admin must be active and have 'verify_death' permission
+     * (or be super_admin).
+     */
+    public function downloadDocument(DeathConfirmation $confirmation)
+    {
+        /** @var \App\Models\Admin $admin */
+        $admin = Auth::guard('admin')->user();
+        if (!$admin || !$admin->active) {
+            abort(403);
+        }
+
+        $perms = (array) ($admin->permissions ?? []);
+        if (!in_array('verify_death', $perms, true) && $admin->role !== 'super_admin') {
+            abort(403);
+        }
+
+        if (!$confirmation->media_file_path) {
+            abort(404, 'No document attached to this confirmation.');
+        }
+
+        $disk = Storage::disk('local');
+        if (!$disk->exists($confirmation->media_file_path)) {
+            abort(404, 'Document file is missing from storage.');
+        }
+
+        $downloadName = $confirmation->media_file_name
+            ?: basename($confirmation->media_file_path);
+
+        ActivityLog::record('admin', (string) $admin->admin_id, 'death_doc_viewed',
+            "Viewed supporting document for confirmation #{$confirmation->confirmation_id}");
+
+        return $disk->response(
+            $confirmation->media_file_path,
+            $downloadName
+        );
     }
 
     public function verify(VerifyDeathRequest $request, DeathConfirmation $confirmation)
@@ -285,7 +309,6 @@ class DeathConfirmationController extends Controller
             ActivityLog::record('admin', (string) $admin->admin_id, 'death_confirmed',
                 "Verified death confirmation #{$confirmation->confirmation_id} (hash: " . substr($result['hash'], 0, 16) . '…)');
 
-            // Notify NoK
             $nok = $confirmation->nextOfKin;
             if ($nok) {
                 $this->notifications->send(
@@ -301,7 +324,6 @@ class DeathConfirmationController extends Controller
                 );
             }
 
-            // Notify lecturers
             $student = Student::where('student_id', $confirmation->student_id)->first();
             if ($student) {
                 $studentCourses = DB::table('student_courses')

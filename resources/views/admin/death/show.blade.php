@@ -13,7 +13,6 @@
 
 @push('styles')
 <style>
-    /* ===== Status banner ===== */
     .status-banner {
         border-radius: 12px;
         padding: 18px 22px;
@@ -22,124 +21,82 @@
         align-items: center;
         justify-content: space-between;
         border-left: 6px solid;
+        gap: 16px;
+        flex-wrap: wrap;
     }
     .status-banner.s-pending  { background:#FFFBEB; border-color:#F59E0B; }
     .status-banner.s-verified { background:#ECFDF5; border-color:#10B981; }
     .status-banner.s-rejected { background:#FEF2F2; border-color:#EF4444; }
-
     .status-banner h3 {
-        font-size: 22px;
-        font-weight: 700;
-        margin: 0;
-        color: #111827;
+        font-size: 22px; font-weight: 700; margin: 0; color: #111827;
     }
-
     .status-banner .ref-code {
         font-family: 'Courier New', monospace;
-        font-size: 11px;
-        background: #fff;
-        padding: 2px 8px;
-        border-radius: 4px;
-        color: #374151;
-        border: 1px solid #E5E7EB;
+        font-size: 11px; background: #fff; padding: 2px 8px;
+        border-radius: 4px; color: #374151; border: 1px solid #E5E7EB;
     }
-
     .status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 5px 12px;
-        border-radius: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 11px; font-weight: 700; padding: 5px 12px;
+        border-radius: 12px; text-transform: uppercase; letter-spacing: 0.3px;
     }
     .status-pill.pending  { background:#FEF3C7; color:#92400E; }
     .status-pill.verified { background:#D1FAE5; color:#065F46; }
     .status-pill.rejected { background:#FEE2E2; color:#991B1B; }
 
-    /* ===== Single info card ===== */
     .info-card {
-        background: #fff;
-        border: 1px solid #E5E7EB;
-        border-radius: 12px;
-        margin-bottom: 16px;
-        overflow: hidden;
+        background: #fff; border: 1px solid #E5E7EB;
+        border-radius: 12px; margin-bottom: 16px; overflow: hidden;
     }
     .info-card-header {
-        padding: 14px 20px;
-        border-bottom: 1px solid #E5E7EB;
-        background: #F9FAFB;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        padding: 14px 20px; border-bottom: 1px solid #E5E7EB;
+        background: #F9FAFB; display: flex; align-items: center; gap: 8px;
     }
     .info-card-header h5 {
-        margin: 0;
-        font-size: 15px;
-        font-weight: 700;
-        color: #111827;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        margin: 0; font-size: 15px; font-weight: 700; color: #111827;
+        display: flex; align-items: center; gap: 8px;
     }
-    .info-card-header i.title-icon {
-        color: #1E40AF;
-    }
+    .info-card-header i.title-icon { color: #1E40AF; }
 
-    /* Row layout (label / value) */
     .info-row {
         display: grid;
-        grid-template-columns: 200px 1fr;
+        grid-template-columns: 200px minmax(0, 1fr);
         padding: 14px 20px;
         border-bottom: 1px solid #F3F4F6;
         align-items: start;
+        gap: 16px;
     }
     .info-row:last-child { border-bottom: none; }
     .info-row .label {
-        font-size: 11px;
-        font-weight: 700;
-        color: #6B7280;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        font-size: 11px; font-weight: 700; color: #6B7280;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        display: flex; align-items: center; gap: 10px; min-width: 0;
     }
     .label-icon {
-        width: 32px; height: 32px;
-        border-radius: 8px;
-        background: #EFF6FF;
-        color: #1E40AF;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 15px;
-        flex-shrink: 0;
+        width: 32px; height: 32px; border-radius: 8px;
+        background: #EFF6FF; color: #1E40AF;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 15px; flex-shrink: 0;
     }
     .info-row .value {
-        font-size: 14px;
-        color: #111827;
-        line-height: 1.55;
-        word-break: break-word;
+        font-size: 14px; color: #111827; line-height: 1.55;
+        word-break: break-word; overflow-wrap: anywhere; min-width: 0;
     }
     .info-row .value .sub {
-        font-size: 12px;
-        color: #6B7280;
-        display: block;
-        margin-top: 2px;
+        font-size: 12px; color: #6B7280; display: block; margin-top: 2px;
     }
+    @media (max-width: 991px) {
+        .info-row { grid-template-columns: 1fr; gap: 8px; }
+    }
+
     .desc-box {
-        background: #F9FAFB;
-        border: 1px solid #E5E7EB;
-        border-radius: 8px;
-        padding: 10px 14px;
-        font-size: 13.5px;
-        color: #111827;
-        line-height: 1.6;
+        background: #F9FAFB; border: 1px solid #E5E7EB;
+        border-radius: 8px; padding: 10px 14px;
+        font-size: 13.5px; color: #111827; line-height: 1.6;
         white-space: pre-wrap;
     }
+
+    /* Document file styling — now clickable */
     .evidence-inline {
         display: flex;
         flex-direction: column;
@@ -152,334 +109,199 @@
         background: #F9FAFB;
         border: 1px solid #E5E7EB;
         border-radius: 6px;
-        padding: 8px 12px;
+        padding: 10px 14px;
         font-size: 12px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.15s;
     }
-    .evidence-inline .file i { color: #6B7280; }
+    .evidence-inline .file:hover {
+        background: #EFF6FF;
+        border-color: #93C5FD;
+        color: inherit;
+    }
+    .evidence-inline .file i.file-type-icon {
+        color: #6B7280;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+    .evidence-inline .file:hover i.file-type-icon { color: #1E40AF; }
     .evidence-inline .file .file-name {
         font-family: 'Courier New', monospace;
-        font-size: 11px;
+        font-size: 11.5px;
         color: #1E40AF;
         word-break: break-all;
         flex: 1;
+        min-width: 0;
+        font-weight: 600;
     }
     .evidence-inline .file .file-meta {
         font-size: 11px;
         color: #6B7280;
         white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .evidence-inline .file .file-action {
+        font-size: 11px;
+        color: #1E40AF;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
     }
 
-    /* ===== Right sidebar cards ===== */
     .profile-card, .lect-card, .ldms-card {
-        background: #fff;
-        border: 1px solid #E5E7EB;
-        border-radius: 12px;
-        margin-bottom: 16px;
-        overflow: hidden;
+        background: #fff; border: 1px solid #E5E7EB;
+        border-radius: 12px; margin-bottom: 16px; overflow: hidden;
     }
     .profile-card-header, .lect-card-header, .ldms-card-header {
-        padding: 14px 20px;
-        border-bottom: 1px solid #E5E7EB;
-        background: #F9FAFB;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        padding: 14px 20px; border-bottom: 1px solid #E5E7EB;
+        background: #F9FAFB; display: flex; align-items: center; gap: 8px;
     }
     .profile-card-header h5, .lect-card-header h5, .ldms-card-header h5 {
-        margin: 0;
-        font-size: 15px;
-        font-weight: 700;
-        color: #111827;
+        margin: 0; font-size: 15px; font-weight: 700; color: #111827;
     }
     .profile-card-header i, .lect-card-header i, .ldms-card-header i {
         color: #1E40AF;
     }
-
-    .profile-body {
-        padding: 20px;
-        text-align: center;
-    }
+    .profile-body { padding: 20px; text-align: center; }
     .profile-avatar {
-        width: 70px; height: 70px;
-        border-radius: 50%;
+        width: 70px; height: 70px; border-radius: 50%;
         background: linear-gradient(135deg, #6B7280, #374151);
-        color: #fff;
-        font-size: 28px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        color: #fff; font-size: 28px; font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
         margin: 0 auto 10px;
     }
-    .profile-body .name {
-        font-size: 15px;
-        font-weight: 700;
-        color: #111827;
-    }
-    .profile-body .matric {
-        font-size: 12px;
-        color: #6B7280;
-        margin-bottom: 12px;
-    }
-    .profile-meta {
-        text-align: left;
-        padding-top: 10px;
-        border-top: 1px solid #F3F4F6;
-    }
+    .profile-body .name { font-size: 15px; font-weight: 700; color: #111827; }
+    .profile-body .matric { font-size: 12px; color: #6B7280; margin-bottom: 12px; }
+    .profile-meta { text-align: left; padding-top: 10px; border-top: 1px solid #F3F4F6; }
     .profile-meta div {
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-        font-size: 12.5px;
-        color: #374151;
-        padding: 5px 0;
+        display: flex; align-items: flex-start; gap: 8px;
+        font-size: 12.5px; color: #374151; padding: 5px 0;
         word-break: break-word;
     }
-    .profile-meta i {
-        color: #6B7280;
-        width: 14px;
-        flex-shrink: 0;
-        margin-top: 2px;
-    }
+    .profile-meta i { color: #6B7280; width: 14px; flex-shrink: 0; margin-top: 2px; }
 
-    .lect-card-body, .ldms-card-body {
-        padding: 16px 20px;
-    }
+    .lect-card-body, .ldms-card-body { padding: 16px 20px; }
     .lect-card-body .blurb {
-        font-size: 11.5px;
-        color: #6B7280;
-        margin: 0 0 12px;
-        line-height: 1.5;
+        font-size: 11.5px; color: #6B7280;
+        margin: 0 0 12px; line-height: 1.5;
     }
-    .lect-row {
-        padding: 10px 0;
-        border-bottom: 1px solid #F3F4F6;
-    }
+    .lect-row { padding: 10px 0; border-bottom: 1px solid #F3F4F6; }
     .lect-row:last-child { border-bottom: none; }
     .lect-row .course {
-        font-size: 11px;
-        font-weight: 700;
-        color: #1E40AF;
-        letter-spacing: 0.3px;
-        text-transform: uppercase;
+        font-size: 11px; font-weight: 700; color: #1E40AF;
+        letter-spacing: 0.3px; text-transform: uppercase;
     }
     .lect-row .lname {
-        font-size: 13px;
-        font-weight: 600;
-        color: #111827;
-        margin: 2px 0;
+        font-size: 13px; font-weight: 600; color: #111827; margin: 2px 0;
     }
-    .lect-row .lemail {
-        font-size: 11.5px;
-        color: #6B7280;
-        word-break: break-all;
-    }
-    .lect-row .nomatch {
-        font-size: 11.5px;
-        color: #92400E;
-        font-style: italic;
-    }
-    .lect-empty {
-        font-size: 12px;
-        color: #6B7280;
-        padding: 8px 0;
-    }
+    .lect-row .lemail { font-size: 11.5px; color: #6B7280; word-break: break-all; }
+    .lect-row .nomatch { font-size: 11.5px; color: #92400E; font-style: italic; }
+    .lect-empty { font-size: 12px; color: #6B7280; padding: 8px 0; }
     .lect-test-banner {
-        background: #FFFBEB;
-        border: 1px solid #FCD34D;
-        border-radius: 8px;
-        padding: 10px 12px;
-        font-size: 11.5px;
-        color: #92400E;
-        margin-top: 12px;
-        line-height: 1.45;
+        background: #FFFBEB; border: 1px solid #FCD34D;
+        border-radius: 8px; padding: 10px 12px;
+        font-size: 11.5px; color: #92400E; margin-top: 12px; line-height: 1.45;
     }
     .lect-test-banner i { margin-right: 5px; }
 
-    /* LDMS row in sidebar */
     .ldms-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #F3F4F6;
-        gap: 8px;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 10px 0; border-bottom: 1px solid #F3F4F6; gap: 8px;
     }
     .ldms-row:last-child { border-bottom: none; }
     .ldms-row .ldms-info { flex: 1; min-width: 0; }
-    .ldms-row .ldms-id {
-        font-size: 12px;
-        font-weight: 700;
-        color: #111827;
-    }
-    .ldms-row .ldms-status {
-        font-size: 11px;
-        color: #6B7280;
-    }
+    .ldms-row .ldms-id { font-size: 12px; font-weight: 700; color: #111827; }
+    .ldms-row .ldms-status { font-size: 11px; color: #6B7280; }
     .ldms-row .btn-release {
-        font-size: 11px;
-        padding: 5px 10px;
-        background: #10B981;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        white-space: nowrap;
+        font-size: 11px; padding: 5px 10px; background: #10B981; color: #fff;
+        border: none; border-radius: 6px; text-decoration: none;
+        display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
     }
     .ldms-row .btn-release:hover { background: #059669; color: #fff; }
     .ldms-row .btn-view {
-        font-size: 11px;
-        padding: 5px 10px;
-        background: #F3F4F6;
-        color: #374151;
-        border: none;
-        border-radius: 6px;
-        text-decoration: none;
-        white-space: nowrap;
+        font-size: 11px; padding: 5px 10px; background: #F3F4F6; color: #374151;
+        border: none; border-radius: 6px; text-decoration: none; white-space: nowrap;
     }
     .ldms-row .btn-view:hover { background: #E5E7EB; color: #111827; }
 
-    /* Decision card */
     .decision-card {
-        background: #fff;
-        border: 1px solid #E5E7EB;
-        border-radius: 12px;
-        overflow: hidden;
-        margin-bottom: 16px;
+        background: #fff; border: 1px solid #E5E7EB;
+        border-radius: 12px; overflow: hidden; margin-bottom: 16px;
     }
     .decision-card-header {
-        padding: 14px 20px;
-        border-bottom: 1px solid #E5E7EB;
-        background: #F9FAFB;
+        padding: 14px 20px; border-bottom: 1px solid #E5E7EB; background: #F9FAFB;
     }
     .decision-card-header h5 {
-        margin: 0;
-        font-size: 15px;
-        font-weight: 700;
-        color: #111827;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        margin: 0; font-size: 15px; font-weight: 700; color: #111827;
+        display: flex; align-items: center; gap: 8px;
     }
     .decision-card-header i { color: #1E40AF; }
     .decision-card-body { padding: 18px 20px; }
     .decision-card-body label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 5px;
-        display: block;
+        font-size: 12px; font-weight: 600; color: #374151;
+        margin-bottom: 5px; display: block;
     }
     .decision-card-body .form-control { font-size: 13px; }
 
-    .outcome-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
+    .outcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .outcome-option {
-        border: 1.5px solid #E5E7EB;
-        border-radius: 10px;
-        padding: 14px 8px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.15s;
-        background: #fff;
+        border: 1.5px solid #E5E7EB; border-radius: 10px;
+        padding: 14px 8px; text-align: center; cursor: pointer;
+        transition: all 0.15s; background: #fff;
     }
     .outcome-option:hover { border-color: #9CA3AF; }
     .outcome-option.active.verify {
-        border-color: #10B981;
-        background: #ECFDF5;
-        color: #065F46;
+        border-color: #10B981; background: #ECFDF5; color: #065F46;
     }
     .outcome-option.active.reject {
-        border-color: #EF4444;
-        background: #FEF2F2;
-        color: #991B1B;
+        border-color: #EF4444; background: #FEF2F2; color: #991B1B;
     }
     .outcome-option i {
-        font-size: 20px;
-        display: block;
-        margin-bottom: 4px;
-        color: #9CA3AF;
+        font-size: 20px; display: block; margin-bottom: 4px; color: #9CA3AF;
     }
     .outcome-option.active.verify i { color: #10B981; }
     .outcome-option.active.reject i { color: #EF4444; }
-    .outcome-option .label-text {
-        font-size: 12px;
-        font-weight: 600;
-    }
+    .outcome-option .label-text { font-size: 12px; font-weight: 600; }
     .outcome-option input[type="radio"] { display: none; }
-    .help-text {
-        font-size: 11px;
-        color: #6B7280;
-        margin-top: 4px;
-    }
+    .help-text { font-size: 11px; color: #6B7280; margin-top: 4px; }
     .btn-decision {
-        font-size: 13px;
-        font-weight: 600;
-        padding: 9px 14px;
-        border-radius: 8px;
-        width: 100%;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
+        font-size: 13px; font-weight: 600; padding: 9px 14px;
+        border-radius: 8px; width: 100%; border: none;
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
-    .btn-decision:disabled {
-        background: #9CA3AF;
-        color: #fff;
-        cursor: not-allowed;
-    }
+    .btn-decision:disabled { background: #9CA3AF; color: #fff; cursor: not-allowed; }
     .btn-verify-action { background: #10B981; color: #fff; }
     .btn-verify-action:hover { background: #059669; color: #fff; }
     .btn-reject-action { background: #EF4444; color: #fff; }
     .btn-reject-action:hover { background: #DC2626; color: #fff; }
 
-    /* Verdict card (after decision made) */
     .verdict-card {
-        border-radius: 12px;
-        padding: 16px 18px;
-        margin-bottom: 16px;
-        border: 1px solid;
+        border-radius: 12px; padding: 16px 18px;
+        margin-bottom: 16px; border: 1px solid;
     }
     .verdict-card.verified { background: #ECFDF5; border-color: #10B981; }
     .verdict-card.rejected { background: #FEF2F2; border-color: #EF4444; }
     .verdict-card h5 {
-        font-size: 14px;
-        font-weight: 700;
-        margin: 0 0 6px 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        font-size: 14px; font-weight: 700; margin: 0 0 6px 0;
+        display: flex; align-items: center; gap: 8px;
     }
     .verdict-card.verified h5 { color: #065F46; }
     .verdict-card.rejected h5 { color: #991B1B; }
-    .verdict-card p {
-        margin: 0;
-        font-size: 13px;
-        line-height: 1.5;
-    }
+    .verdict-card p { margin: 0; font-size: 13px; line-height: 1.5; }
     .verdict-card.verified p { color: #047857; }
     .verdict-card.rejected p { color: #B91C1C; }
 
     .back-link {
-        color: #1E40AF;
-        text-decoration: none;
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+        color: #1E40AF; text-decoration: none; font-size: 14px;
+        display: inline-flex; align-items: center; gap: 6px;
     }
     .back-link:hover { text-decoration: underline; }
-    .btn-print {
-        background: #374151;
-        color: #fff;
-    }
+    .btn-print { background: #374151; color: #fff; }
     .btn-print:hover { background: #1F2937; color: #fff; }
 
     @media print {
@@ -501,7 +323,6 @@
         </button>
     </div>
 
-    {{-- Status banner --}}
     <div class="status-banner s-{{ $statusKey }}">
         <div>
             <h3 class="mb-2">
@@ -524,7 +345,6 @@
     </div>
 
     <div class="row g-3">
-        {{-- =================== LEFT: ONE big info card =================== --}}
         <div class="col-lg-8">
             <div class="info-card">
                 <div class="info-card-header">
@@ -620,6 +440,7 @@
                     </div>
                 </div>
 
+                {{-- Supporting Document — now clickable --}}
                 <div class="info-row">
                     <div class="label">
                         <span class="label-icon"><i class="bi bi-paperclip"></i></span>
@@ -627,19 +448,34 @@
                     </div>
                     <div class="value">
                         @if($confirmation->media_file_path)
+                            @php
+                                $docName = $confirmation->media_file_name ?: basename($confirmation->media_file_path);
+                                $ext = strtolower(pathinfo($docName, PATHINFO_EXTENSION));
+                                $isImg = in_array($ext, ['jpg','jpeg','png','gif','webp']);
+                                $isPdf = $ext === 'pdf';
+                                $icon = $isImg ? 'bi-file-earmark-image'
+                                      : ($isPdf ? 'bi-file-earmark-pdf'
+                                      : 'bi-file-earmark-medical');
+                            @endphp
                             <div class="evidence-inline">
-                                <div class="file">
-                                    <i class="bi bi-file-earmark-medical"></i>
-                                    <span class="file-name">{{ $confirmation->media_file_name ?? basename($confirmation->media_file_path) }}</span>
-                                    <span class="file-meta">
-                                        {{ number_format(($confirmation->media_file_size ?? 0)/1024, 1) }} KB
+                                <a href="{{ route('admin.death.document.download', $confirmation->confirmation_id) }}"
+                                   target="_blank" rel="noopener"
+                                   class="file">
+                                    <i class="bi {{ $icon }} file-type-icon"></i>
+                                    <span class="file-name">{{ $docName }}</span>
+                                    @if($confirmation->media_file_size)
+                                        <span class="file-meta">
+                                            {{ number_format($confirmation->media_file_size / 1024, 1) }} KB
+                                        </span>
+                                    @endif
+                                    <span class="file-action">
+                                        <i class="bi bi-box-arrow-up-right"></i> Open
                                     </span>
-                                    <span class="file-meta"><i class="bi bi-shield-lock"></i> Encrypted</span>
-                                </div>
+                                </a>
                             </div>
                             <div class="help-text" style="margin-top:6px;">
-                                <i class="bi bi-info-circle"></i>
-                                Stored encrypted on the server. Verify the document offline before approval.
+                                <i class="bi bi-shield-lock"></i>
+                                Stored securely on the server. Click to download and verify offline before approval.
                             </div>
                         @else
                             <em class="text-muted">No supporting document provided</em>
@@ -673,10 +509,8 @@
             </div>
         </div>
 
-        {{-- =================== RIGHT SIDEBAR =================== --}}
         <div class="col-lg-4">
 
-            {{-- Verdict banner (after decision made) --}}
             @if($statusKey === 'verified')
                 <div class="verdict-card verified">
                     <h5><i class="bi bi-check-circle-fill"></i> Confirmation Verified</h5>
@@ -700,7 +534,6 @@
                 </div>
             @endif
 
-            {{-- Student profile --}}
             <div class="profile-card">
                 <div class="profile-card-header">
                     <i class="bi bi-person-circle"></i>
@@ -737,7 +570,6 @@
                 </div>
             </div>
 
-            {{-- Lecturers who will be notified on verify --}}
             <div class="lect-card">
                 <div class="lect-card-header">
                     <i class="bi bi-mortarboard-fill"></i>
@@ -788,7 +620,6 @@
                 </div>
             </div>
 
-            {{-- LDMS panel (verified only) --}}
             @if($statusKey === 'verified')
                 <div class="ldms-card">
                     <div class="ldms-card-header">
@@ -842,7 +673,6 @@
                 </div>
             @endif
 
-            {{-- Decision card (pending only) --}}
             @if($statusKey === 'pending')
                 <div class="decision-card no-print">
                     <div class="decision-card-header">
@@ -915,8 +745,6 @@
         optV.classList.remove('active', 'verify', 'reject');
         optR.classList.remove('active', 'verify', 'reject');
 
-        // Death verify endpoint is the same for both verify and reject —
-        // the controller branches on the `decision` field.
         form.action = verifyAction;
 
         if (choice === 'verify') {
