@@ -264,6 +264,13 @@ Route::get('/notifications/unread-count', [NotificationController::class, 'unrea
 docker-compose up -d
 PowerShell -ExecutionPolicy Bypass -File .\test-rpc.ps1
 
+nabilah punya
+cd C:\laragon\www\e-Tawassul\besu-network
+docker-compose up -d
+docker-compose ps
+
+
+php artisan tinker
 // 1. Show Besu is alive
 //$web3 = new \Web3\Web3(config('blockchain.node_url'));
 //$web3->clientVersion(function($e,$v){dump('Connected: ' . $v);});
