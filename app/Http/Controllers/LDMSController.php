@@ -414,8 +414,30 @@ public function studentDownload(Ldms $ldms, string $filename)
     {
         /** @var \App\Models\Student $student */
         $student = Auth::guard('student')->user();
-        if (!$student || $ldms->student_id !== $student->student_id) {
-            abort(403);
+
+        // No logged-in student → kick to login
+        if (!$student) {
+            abort(403, 'Please log in to access your messages.');
+        }
+
+        // Use loose comparison (==) instead of strict (===) to defeat any
+        // sneaky type coercion between integer and string student IDs that
+        // could happen if a row was created via raw SQL or migration without
+        // explicit casting.
+        //
+        // Both columns should be VARCHAR(20) per migrations, but if the
+        // logged-in student object somehow exposes an int while the LDMS
+        // row stores a string (or vice versa) the strict !== check fails
+        // even when the values represent the same person.
+        if ((string) $ldms->student_id !== (string) $student->student_id) {
+            // Log the mismatch for debugging — visible in storage/logs/laravel.log
+            \Illuminate\Support\Facades\Log::warning('LDMS access denied', [
+                'ldms_id'           => $ldms->ldms_id,
+                'ldms_student_id'   => $ldms->student_id,
+                'logged_in_student' => $student->student_id,
+                'route'             => request()->path(),
+            ]);
+            abort(403, "This message belongs to a different student account. (Message owner: {$ldms->student_id}, you are logged in as: {$student->student_id})");
         }
     }
 

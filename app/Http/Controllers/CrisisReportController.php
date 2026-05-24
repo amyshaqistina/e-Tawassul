@@ -76,13 +76,21 @@ class CrisisReportController extends Controller
             'crisis_description'    => 'required|string|min:10|max:2000',
             'impact_level'          => 'required|in:low,medium,high,critical',
             'immediate_actions'     => 'nullable|string|max:1000',
-            'supporting_evidence'   => 'nullable|array|max:5',
+            // Supporting evidence is now required on first submission to
+            // ensure admin has documents to verify the case. Edits remain
+            // flexible (the update() method keeps existing files even if
+            // the user uploads nothing new).
+            'supporting_evidence'   => 'required|array|min:1|max:5',
             'supporting_evidence.*' => 'file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
             'consent'               => 'accepted',
         ], [
-            'consent.accepted'          => 'You must consent to share information before submitting.',
-            'crisis_description.min'    => 'Description must be at least 10 characters.',
-            'incident_date.before_or_equal' => 'The incident date cannot be in the future.',
+            'consent.accepted'                  => 'You must consent to share information before submitting.',
+            'crisis_description.min'            => 'Description must be at least 10 characters.',
+            'incident_date.before_or_equal'     => 'The incident date cannot be in the future.',
+            'supporting_evidence.required'      => 'Please upload at least one supporting document (photo, police report, medical report, etc.).',
+            'supporting_evidence.min'           => 'Please upload at least one supporting document.',
+            'supporting_evidence.*.mimes'       => 'Each file must be PDF, JPG, PNG, or DOC.',
+            'supporting_evidence.*.max'         => 'Each file must be smaller than 5MB.',
         ]);
 
         /** @var \App\Models\Student $student */
@@ -195,6 +203,274 @@ class CrisisReportController extends Controller
     }
 
     // -----------------------------------------------------------
+    // STUDENT — My Reports (full list with status filters)
+    // -----------------------------------------------------------
+
+    /**
+     * List ALL reports submitted by the logged-in student, with a
+     * status filter tab (all|pending|verified|rejected). Used by the
+     * "My Reports" page in the student dropdown.
+     */
+    public function myReports(Request $request)
+    {
+        /** @var \App\Models\Student $student */
+        $student = Auth::guard('student')->user();
+
+        $filter = $request->query('status', 'all');
+        $allowed = ['all', 'pending', 'verified', 'rejected'];
+        if (!in_array($filter, $allowed, true)) {
+            $filter = 'all';
+        }
+
+        $query = CrisisReport::with('crisis')
+            ->where('student_id', $student->student_id)
+            ->orderByDesc('date_reported');
+
+        if ($filter !== 'all') {
+            $query->where('report_status', $filter);
+        }
+
+        $reports = $query->paginate(15)->withQueryString();
+
+        // Per-tab counts for the filter chips
+        $counts = [
+            'all'      => CrisisReport::where('student_id', $student->student_id)->count(),
+            'pending'  => CrisisReport::where('student_id', $student->student_id)->where('report_status', 'pending')->count(),
+            'verified' => CrisisReport::where('student_id', $student->student_id)->where('report_status', 'verified')->count(),
+            'rejected' => CrisisReport::where('student_id', $student->student_id)->where('report_status', 'rejected')->count(),
+        ];
+
+        return view('student.reports.index', compact('reports', 'filter', 'counts'));
+    }
+
+    // -----------------------------------------------------------
+    // STUDENT — Edit / Update / Delete
+    // -----------------------------------------------------------
+    //
+    // Editing rules (this matters for blockchain integrity):
+    //   pending  → fully editable; original report stays, no new row
+    //   rejected → editable; on submit we treat it as a resubmission
+    //              (status flips back to 'pending', re-enters admin queue)
+    //   verified → LOCKED. Blockchain hash refers to specific values;
+    //              changing them would break audit trail.
+    //
+    // Every edit is logged to activity_log with a snapshot of the change.
+
+    public function edit(CrisisReport $report)
+    {
+        /** @var \App\Models\Student $student */
+        $student = Auth::guard('student')->user();
+
+        if ($report->student_id !== $student->student_id) {
+            abort(403);
+        }
+
+        // VERIFIED → cannot edit (blockchain immutability)
+        if ($report->report_status === 'verified') {
+            return redirect()
+                ->route('student.crisis.show', $report->report_id)
+                ->with('error', 'Verified reports are locked by blockchain and cannot be edited. Contact welfare@iium.edu.my if something has changed.');
+        }
+
+        $report->load('crisis', 'verifier');
+
+        // Decode crisis_details JSON for prefilling the form
+        $details = [];
+        if ($report->crisis && $report->crisis->crisis_details) {
+            $decoded = json_decode($report->crisis->crisis_details, true);
+            if (is_array($decoded)) {
+                $details = $decoded;
+            }
+        }
+
+        return view('student.crisis.edit', compact('report', 'details'));
+    }
+
+    public function update(Request $request, CrisisReport $report)
+    {
+        /** @var \App\Models\Student $student */
+        $student = Auth::guard('student')->user();
+
+        if ($report->student_id !== $student->student_id) {
+            abort(403);
+        }
+
+        // Same lock rule as edit() — defense in depth
+        if ($report->report_status === 'verified') {
+            return redirect()
+                ->route('student.crisis.show', $report->report_id)
+                ->with('error', 'Verified reports are locked and cannot be edited.');
+        }
+
+        $validated = $request->validate([
+            'crisis_type'           => 'required|in:medical,accident,natural_disaster,death',
+            'sub_category'          => 'required|string|max:100',
+            'location'              => 'required|string|max:500',
+            'incident_date'         => 'required|date|before_or_equal:today',
+            'incident_time'         => 'required|date_format:H:i',
+            'crisis_description'    => 'required|string|min:10|max:2000',
+            'impact_level'          => 'required|in:low,medium,high,critical',
+            'immediate_actions'     => 'nullable|string|max:1000',
+            'supporting_evidence'   => 'nullable|array|max:5',
+            'supporting_evidence.*' => 'file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
+        ]);
+
+        $incidentDateTime = \Carbon\Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $validated['incident_date'] . ' ' . $validated['incident_time']
+        );
+
+        // Merge new uploaded evidence with existing (don't replace; append)
+        $evidencePaths = (array) ($report->supporting_evidence_path ?? []);
+        if ($request->hasFile('supporting_evidence')) {
+            foreach ($request->file('supporting_evidence') as $file) {
+                $evidencePaths[] = $file->store('crisis-evidence', 'local');
+            }
+        }
+
+        $wasRejected = $report->report_status === 'rejected';
+
+        // Build updated crisis_details JSON
+        $existingDetails = [];
+        if ($report->crisis && $report->crisis->crisis_details) {
+            $decoded = json_decode($report->crisis->crisis_details, true);
+            if (is_array($decoded)) {
+                $existingDetails = $decoded;
+            }
+        }
+        $updatedDetails = array_merge($existingDetails, [
+            'sub_category'      => $validated['sub_category'],
+            'incident_at'       => $incidentDateTime->toIso8601String(),
+            'immediate_actions' => $validated['immediate_actions'] ?? null,
+            'last_edited_at'    => now()->toIso8601String(),
+            'last_edited_by'    => 'student:' . $student->student_id,
+        ]);
+        $internalDetails = json_encode($updatedDetails, JSON_UNESCAPED_UNICODE);
+
+        DB::transaction(function () use ($report, $validated, $evidencePaths, $internalDetails, $incidentDateTime, $wasRejected) {
+            if ($report->crisis) {
+                $report->crisis->update([
+                    'crisis_type'        => $validated['crisis_type'],
+                    'crisis_description' => $validated['crisis_description'],
+                    'crisis_details'     => $internalDetails,
+                    'impact_level'       => $validated['impact_level'],
+                    'location'           => $validated['location'],
+                    'sub_category'       => $validated['sub_category'],
+                    'incident_at'        => $incidentDateTime,
+                    // If it was rejected, putting the case back into the
+                    // queue means resetting to 'pending'
+                    'status'             => $wasRejected ? 'pending' : $report->crisis->status,
+                ]);
+            }
+
+            $updates = [
+                'report_description'       => $validated['crisis_description'],
+                'supporting_evidence_path' => $evidencePaths ?: null,
+            ];
+
+            // RESUBMISSION — rejected reports flip back to pending so admin
+            // re-reviews. We clear the verifier/timestamp/admin_remarks so
+            // the previous rejection doesn't linger on the next admin view.
+            // (The activity log keeps the audit trail intact.)
+            if ($wasRejected) {
+                $updates['report_status']        = 'pending';
+                $updates['admin_verification']   = null;
+                $updates['verified_at']          = null;
+                $updates['admin_remarks']        = null;
+            }
+
+            $report->update($updates);
+        });
+
+        \App\Models\ActivityLog::record(
+            'student',
+            $report->student_id,
+            $wasRejected ? 'crisis_report_resubmitted' : 'crisis_report_edited',
+            $wasRejected
+                ? "Resubmitted report #{$report->report_id} after rejection — back in pending queue."
+                : "Edited pending report #{$report->report_id}."
+        );
+
+        // FRAUD-PATTERN ALERT — if this student now has 3+ rejected reports
+        // total, log a high-priority alert so welfare admins know to review
+        // them carefully. This is a non-blocking informational notification.
+        if ($wasRejected) {
+            $rejectionCount = CrisisReport::where('student_id', $report->student_id)
+                ->where('report_status', 'rejected')
+                ->count();
+
+            // Include this resubmission's previous rejection in the count
+            if (($rejectionCount + 1) >= 3) {
+                $admins = \App\Models\Admin::where('active', true)->get();
+                foreach ($admins as $admin) {
+                    $perms = (array) ($admin->permissions ?? []);
+                    if (in_array('verify_crisis', $perms, true) || $admin->role === 'super_admin') {
+                        try {
+                            $this->notifications->logOnly(
+                                recipientType: 'admin',
+                                recipientId:   (string) $admin->admin_id,
+                                notificationType: 'fraud_pattern_alert',
+                                subject:       'Student with multiple rejections has resubmitted',
+                                message:       "Student {$student->student_id} (now {$rejectionCount}+ rejections) has resubmitted report #{$report->report_id}. Please review carefully.",
+                                link:          route('admin.crisis.show', $report->report_id),
+                                studentId:     $student->student_id,
+                            );
+                        } catch (\Throwable $e) {
+                            // never block the user's resubmission on a notification error
+                        }
+                    }
+                }
+            }
+        }
+
+        $message = $wasRejected
+            ? 'Your report has been resubmitted and is now awaiting admin review again. Thank you for addressing the feedback.'
+            : 'Your report has been updated.';
+
+        return redirect()
+            ->route('student.crisis.show', $report->report_id)
+            ->with('status', $message);
+    }
+
+    public function destroy(CrisisReport $report)
+    {
+        /** @var \App\Models\Student $student */
+        $student = Auth::guard('student')->user();
+
+        if ($report->student_id !== $student->student_id) {
+            abort(403);
+        }
+
+        // Only pending reports can be deleted by the student. Rejected
+        // ones stay (audit trail), and verified ones are blockchain-locked.
+        if ($report->report_status !== 'pending') {
+            return redirect()
+                ->route('student.crisis.show', $report->report_id)
+                ->with('error', 'Only pending reports can be deleted.');
+        }
+
+        DB::transaction(function () use ($report) {
+            // Delete attached crisis row too (it was created with the report
+            // in pending state, never published, never donated to)
+            if ($report->crisis) {
+                $report->crisis->delete();
+            }
+            $report->delete();
+        });
+
+        \App\Models\ActivityLog::record(
+            'student',
+            $student->student_id,
+            'crisis_report_deleted',
+            "Deleted pending crisis report #{$report->report_id}."
+        );
+
+        return redirect()
+            ->route('student.reports.index')
+            ->with('status', 'Pending report has been deleted.');
+    }
+
+    // -----------------------------------------------------------
     // ADMIN (single-report actions only — listing lives in AdminCrisisController)
     // -----------------------------------------------------------
 
@@ -222,7 +498,34 @@ class CrisisReportController extends Controller
             )
             ->get();
 
-        return view('admin.crisis.show', compact('report', 'studentCourses'));
+        // EDIT HISTORY — pull related ActivityLog rows so admin can see
+        // every edit / resubmit / rejection. The action_description column
+        // already contains "report #{id}" so we filter by that pattern.
+        // Limited to 20 entries (typical reports have <5).
+        $editHistory = \App\Models\ActivityLog::where('user_type', 'student')
+            ->where('user_id', $report->student_id)
+            ->whereIn('action', [
+                'crisis_report_submitted',
+                'crisis_report_edited',
+                'crisis_report_resubmitted',
+                'crisis_report_rejected',
+                'crisis_report_verified',
+            ])
+            ->where('action_description', 'like', '%#' . $report->report_id . '%')
+            ->orderBy('timestamp', 'asc')
+            ->limit(20)
+            ->get();
+
+        // FRAUD SIGNAL — count prior rejections for this student so admin
+        // can see "this is their 4th rejected report" at a glance.
+        $studentRejectionCount = CrisisReport::where('student_id', $report->student_id)
+            ->where('report_status', 'rejected')
+            ->where('report_id', '!=', $report->report_id)
+            ->count();
+
+        return view('admin.crisis.show', compact(
+            'report', 'studentCourses', 'editHistory', 'studentRejectionCount'
+        ));
     }
 
         public function downloadEvidence(CrisisReport $report, int $index)

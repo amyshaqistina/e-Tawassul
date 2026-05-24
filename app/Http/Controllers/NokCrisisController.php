@@ -71,13 +71,19 @@ class NokCrisisController extends Controller
             'crisis_description'    => 'required|string|min:10|max:2000',
             'impact_level'          => 'required|in:low,medium,high,critical',
             'immediate_actions'     => 'nullable|string|max:1000',
-            'supporting_evidence'   => 'nullable|array|max:5',
+            // Supporting evidence required on first submission so admin can
+            // verify the case without a rejection-resubmission cycle.
+            'supporting_evidence'   => 'required|array|min:1|max:5',
             'supporting_evidence.*' => 'file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
             'consent'               => 'accepted',
         ], [
             'consent.accepted'              => 'You must consent to share information before submitting.',
             'crisis_description.min'        => 'Description must be at least 10 characters.',
             'incident_date.before_or_equal' => 'The incident date cannot be in the future.',
+            'supporting_evidence.required'  => 'Please upload at least one supporting document (photo, police report, medical report, etc.).',
+            'supporting_evidence.min'       => 'Please upload at least one supporting document.',
+            'supporting_evidence.*.mimes'   => 'Each file must be PDF, JPG, PNG, or DOC.',
+            'supporting_evidence.*.max'     => 'Each file must be smaller than 5MB.',
         ]);
 
         $incidentDateTime = Carbon::createFromFormat(

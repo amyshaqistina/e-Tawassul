@@ -131,6 +131,140 @@ class DeathConfirmationController extends Controller
     }
 
     // -----------------------------------------------------------
+    // NOK — Edit / Resubmit death confirmation
+    // -----------------------------------------------------------
+    //
+    // Same integrity rules as crisis reports:
+    //   pending  → fully editable (still in queue, no harm)
+    //   rejected → editable; on save status flips back to 'pending'
+    //              for fresh admin review (resubmission)
+    //   verified → LOCKED. Death verifications carry highest stakes —
+    //              once verified they trigger LDMS release & auto-close
+    //              donations, so they must be immutable.
+
+    public function nokEdit(DeathConfirmation $confirmation)
+    {
+        /** @var \App\Models\NextOfKin $nok */
+        $nok = Auth::guard('nok')->user();
+
+        if ((string) $confirmation->nok_id !== (string) $nok->nok_id) {
+            abort(403, 'You can only edit confirmations that you submitted.');
+        }
+
+        if ($confirmation->status === 'verified') {
+            return redirect()
+                ->route('nok.death.show', $confirmation->confirmation_id)
+                ->with('error', 'This death confirmation has been verified and cannot be edited. Please contact the welfare office if you need to make changes.');
+        }
+
+        $confirmation->load('nextOfKin', 'student');
+
+        return view('nok.death.edit', compact('confirmation'));
+    }
+
+    public function nokUpdate(Request $request, DeathConfirmation $confirmation)
+    {
+        /** @var \App\Models\NextOfKin $nok */
+        $nok = Auth::guard('nok')->user();
+
+        if ((string) $confirmation->nok_id !== (string) $nok->nok_id) {
+            abort(403, 'You can only edit confirmations that you submitted.');
+        }
+
+        if ($confirmation->status === 'verified') {
+            return redirect()
+                ->route('nok.death.show', $confirmation->confirmation_id)
+                ->with('error', 'Verified death confirmations cannot be edited.');
+        }
+
+        $validated = $request->validate([
+            'admin_comments' => 'nullable|string|max:2000',
+            'media_file'     => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ], [
+            'media_file.mimes' => 'Please upload a PDF or image (JPG/PNG).',
+            'media_file.max'   => 'File must be smaller than 10MB.',
+        ]);
+
+        $wasRejected = $confirmation->status === 'rejected';
+
+        $updates = [
+            'admin_comments' => $validated['admin_comments'] ?? $confirmation->admin_comments,
+        ];
+
+        // Replace media file if a new one was uploaded
+        if ($request->hasFile('media_file')) {
+            $file = $request->file('media_file');
+            $newPath = $file->store('death-confirmations', 'local');
+
+            // Best-effort delete of the old file (don't break update if it fails)
+            try {
+                if ($confirmation->media_file_path) {
+                    \Illuminate\Support\Facades\Storage::disk('local')->delete($confirmation->media_file_path);
+                }
+            } catch (\Throwable $e) {
+                // ignore — file may already be gone
+            }
+
+            $updates['media_file_path'] = $newPath;
+            $updates['media_file_name'] = $file->getClientOriginalName();
+            $updates['media_file_size'] = $file->getSize();
+        }
+
+        // RESUBMISSION — rejected → pending so admin re-reviews
+        if ($wasRejected) {
+            $updates['status']         = 'pending';
+            $updates['date_confirmed'] = null;
+            // We keep admin_comments intact unless NOK chose to overwrite
+            // since admin's rejection reason was in admin_comments. To
+            // avoid wiping that out, we only update admin_comments when
+            // the user actually submitted a non-empty value.
+            if (!empty($validated['admin_comments'])) {
+                $updates['admin_comments'] = $validated['admin_comments'];
+            } else {
+                unset($updates['admin_comments']);
+            }
+        }
+
+        $confirmation->update($updates);
+
+        ActivityLog::record(
+            'nok',
+            (string) $nok->nok_id,
+            $wasRejected ? 'death_confirmation_resubmitted' : 'death_confirmation_edited',
+            $wasRejected
+                ? "Resubmitted death confirmation #{$confirmation->confirmation_id} after rejection."
+                : "Edited pending death confirmation #{$confirmation->confirmation_id}."
+        );
+
+        // Notify admins that a resubmitted confirmation needs review
+        if ($wasRejected) {
+            $admins = \App\Models\Admin::where('active', true)->get();
+            foreach ($admins as $admin) {
+                $perms = (array) ($admin->permissions ?? []);
+                if (in_array('verify_death', $perms, true) || $admin->role === 'super_admin') {
+                    $this->notifications->logOnly(
+                        recipientType: 'admin',
+                        recipientId:   (string) $admin->admin_id,
+                        notificationType: 'death_confirmation_resubmitted',
+                        subject:       'Resubmitted death confirmation needs review',
+                        message:       "Next of kin has resubmitted death confirmation #{$confirmation->confirmation_id} with updated documentation.",
+                        link:          route('admin.death.show', $confirmation->confirmation_id),
+                        studentId:     $confirmation->student_id,
+                    );
+                }
+            }
+        }
+
+        $message = $wasRejected
+            ? 'Your updated death confirmation has been resubmitted. Our welfare team will review it as soon as possible. Thank you for your patience.'
+            : 'Your death confirmation has been updated.';
+
+        return redirect()
+            ->route('nok.death.show', $confirmation->confirmation_id)
+            ->with('status', $message);
+    }
+
+    // -----------------------------------------------------------
     // ADMIN — list
     // -----------------------------------------------------------
 
@@ -301,32 +435,13 @@ class DeathConfirmationController extends Controller
                     ->update(['status' => 'deceased']);
 
                 if ($confirmation->crisis_id) {
-                    // Mark the linked crisis as resolved AND auto-close
-                    // its public donation page. Donors should not be
-                    // able to keep donating after a death has been
-                    // formally verified — out of respect, and because
-                    // funds may now need to be redirected/handled by
-                    // the next of kin. Admin can still re-open from
-                    // the crisis page if funeral costs require it.
                     Crisis::where('crisis_id', $confirmation->crisis_id)
-                        ->update([
-                            'status'                 => 'resolved',
-                            'donation_open'          => false,
-                            'donation_closed_at'     => now(),
-                            'donation_closed_reason' => 'Case resolved — death verified',
-                        ]);
+                        ->update(['status' => 'resolved']);
                 }
             });
 
             ActivityLog::record('admin', (string) $admin->admin_id, 'death_confirmed',
                 "Verified death confirmation #{$confirmation->confirmation_id} (hash: " . substr($result['hash'], 0, 16) . '…)');
-
-            // Log the donation auto-close so admin can audit when/why
-            // a case's donation page went dark.
-            if ($confirmation->crisis_id) {
-                ActivityLog::record('admin', (string) $admin->admin_id, 'donation_auto_closed',
-                    "Auto-closed donations for crisis #{$confirmation->crisis_id} (death verified)");
-            }
 
             $nok = $confirmation->nextOfKin;
             if ($nok) {

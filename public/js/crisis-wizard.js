@@ -164,6 +164,17 @@
             const desc = $('#crisis_description').value.trim();
             if (!loc) { toast('warning', 'Location required', 'Please enter where the incident happened.'); $('#location').focus(); return false; }
             if (!desc || desc.length < 10) { toast('warning', 'Description too short', 'Please provide at least 10 characters describing what happened.'); $('#crisis_description').focus(); return false; }
+
+            // Supporting documents now required to maintain report quality
+            // and reduce admin rejection cycles. Allows up to 5 files.
+            // state.files[] is the source of truth (synced to file input via DataTransfer)
+            if (!state.files || state.files.length === 0) {
+                toast('warning', 'Supporting document required', 'Please upload at least one document (photo, police report, medical report, etc.) so admin can verify your case.');
+                $('#file-dropzone')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                $('#file-dropzone')?.classList.add('error-shake');
+                setTimeout(() => $('#file-dropzone')?.classList.remove('error-shake'), 600);
+                return false;
+            }
         }
         if (step === 3) {
             if (!$('#consent').checked) { toast('warning', 'Consent required', 'Please accept the consent to share information before submitting.'); return false; }

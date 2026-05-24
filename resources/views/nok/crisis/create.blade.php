@@ -184,6 +184,8 @@
 
 .file-dropzone { background: #f8faff !important; border: 2px dashed #cbd5e1 !important; border-radius: 12px !important; padding: 28px 20px !important; text-align: center !important; cursor: pointer !important; transition: all 0.2s !important; display: block !important; }
 .file-dropzone:hover, .file-dropzone.dragover { border-color: #1a56db !important; background: #eff6ff !important; }
+.file-dropzone.error-shake { border-color: #dc2626 !important; background: #fef2f2 !important; animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both !important; }
+@keyframes shake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(3px); } 30%, 50%, 70% { transform: translateX(-4px); } 40%, 60% { transform: translateX(4px); } }
 .file-dropzone i { font-size: 32px !important; color: #1a56db !important; display: block !important; margin-bottom: 8px !important; }
 .file-dropzone p { font-size: 13.5px !important; font-weight: 600 !important; color: #0f172a !important; margin: 0 0 4px 0 !important; }
 .file-dropzone small { font-size: 11px !important; color: #64748b !important; }
@@ -447,8 +449,8 @@
                     </div>
 
                     <div class="section-divider">
-                        <h4>Supporting documents</h4>
-                        <p>Upload photos, medical reports, or police reports (optional, max 5 files, 5MB each).</p>
+                        <h4>Supporting documents <span style="color:#dc2626">*</span></h4>
+                        <p>Please upload at least one supporting document to help admin verify this report (max 5 files, 5MB each).</p>
                     </div>
 
                     <div class="suggested-docs" id="suggested-docs" style="display:none;">
@@ -456,14 +458,14 @@
                         <div class="suggested-docs-body">
                             <h6>💡 Suggested documents for this situation:</h6>
                             <p id="suggested-docs-list"></p>
-                            <p class="docs-note">All documents are optional. You can submit your report first and add more files later from the case page.</p>
+                            <p class="docs-note">Upload at least one. If you have additional documents, you can add more from the case page later.</p>
                         </div>
                     </div>
 
                     <label for="file-input" class="file-dropzone" id="file-dropzone">
                         <i class="bi bi-cloud-arrow-up-fill"></i>
                         <p>Click to upload or drag and drop</p>
-                        <small>JPG, PNG, PDF, DOC (Max 5MB per file)</small>
+                        <small>JPG, PNG, PDF, DOC (Max 5MB per file) — <strong>at least 1 file required</strong></small>
                     </label>
                     <input type="file" name="supporting_evidence[]" id="file-input" multiple
                         accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display:none;">

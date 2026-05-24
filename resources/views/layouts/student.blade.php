@@ -17,12 +17,32 @@
         </a>
     </li>
 
-    <li>
-        <a href="{{ route('student.crisis.create') }}"
-           class="et-nav-link {{ request()->routeIs('student.crisis.create') ? 'active' : '' }}">
+    {{-- Reports dropdown (Submit a Report + My Reports) --}}
+    <li class="et-nav-dropdown {{ request()->routeIs('student.crisis.*') || request()->routeIs('student.reports.*') ? 'open' : '' }}">
+        <a href="#"
+           class="et-nav-link {{ request()->routeIs('student.crisis.*') || request()->routeIs('student.reports.*') ? 'active' : '' }}">
             <i class="bi bi-plus-circle"></i>
             <span class="label">Submit a Report</span>
+            <i class="bi bi-chevron-down chev"></i>
         </a>
+        <div class="et-dropdown-panel">
+            <a href="{{ route('student.crisis.create') }}"
+               class="et-dropdown-item {{ request()->routeIs('student.crisis.create') ? 'active' : '' }}">
+                <i class="bi bi-plus-square"></i>
+                <span>
+                    New Report
+                    <span class="et-dropdown-item-sub">Submit a new crisis report</span>
+                </span>
+            </a>
+            <a href="{{ route('student.reports.index') }}"
+               class="et-dropdown-item {{ request()->routeIs('student.reports.*') || request()->routeIs('student.crisis.show') || request()->routeIs('student.crisis.edit') ? 'active' : '' }}">
+                <i class="bi bi-folder2-open"></i>
+                <span>
+                    My Reports
+                    <span class="et-dropdown-item-sub">View, edit, and track your reports</span>
+                </span>
+            </a>
+        </div>
     </li>
 
     {{-- Legacy Messages dropdown --}}

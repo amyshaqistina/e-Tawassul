@@ -103,6 +103,14 @@ Route::middleware(['role:student', 'email.confirmed'])->prefix('student')->name(
     Route::get('/crisis/{report}', [CrisisReportController::class, 'show'])->name('crisis.show');
     Route::get('/crisis/{report}/evidence/{index}', [CrisisReportController::class, 'downloadEvidenceStudent'])->name('crisis.evidence.download');
 
+    // Report editing (pending + rejected only — verified are blockchain-locked)
+    Route::get('/crisis/{report}/edit',  [CrisisReportController::class, 'edit'])->name('crisis.edit');
+    Route::patch('/crisis/{report}',     [CrisisReportController::class, 'update'])->name('crisis.update');
+    Route::delete('/crisis/{report}',    [CrisisReportController::class, 'destroy'])->name('crisis.destroy');
+
+    // My Reports — full listing of student's submitted reports
+    Route::get('/reports', [CrisisReportController::class, 'myReports'])->name('reports.index');
+
     Route::get('/crisis-helpers/disaster-context', [CrisisHelperController::class, 'disasterContext'])
         ->name('crisis.helpers.disaster-context');
 
@@ -126,10 +134,6 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
     Route::get('/crisis/{report}/evidence/{index}',        [CrisisReportController::class, 'downloadEvidence'])->name('crisis.evidence.download');
     Route::post('/crisis/{report}/verify',                 [CrisisReportController::class, 'verify'])->name('crisis.verify');
     Route::post('/crisis/{report}/reject',                 [CrisisReportController::class, 'reject'])->name('crisis.reject');
-
-    // Donation control (added 2026-05-24) — open/close & set cap per crisis
-    Route::post('/crisis/{crisis}/donation-cap',           [AdminCrisisController::class, 'updateDonationCap'])->name('crisis.donation-cap');
-    Route::post('/crisis/{crisis}/toggle-donation',        [AdminCrisisController::class, 'toggleDonation'])->name('crisis.toggle-donation');
 
     Route::get('/death',                                  [DeathConfirmationController::class, 'adminIndex'])->name('death.index');
     Route::get('/death/{confirmation}',                   [DeathConfirmationController::class, 'adminShow'])->name('death.show');
@@ -166,6 +170,14 @@ Route::middleware(['role:nok', 'twofactor'])->prefix('nok')->name('nok.')->group
     Route::get('/death/create', [DeathConfirmationController::class, 'create'])->name('death.create');
     Route::post('/death',       [DeathConfirmationController::class, 'store'])->name('death.store');
     Route::get('/death/{confirmation}', [DeathConfirmationController::class, 'nokShow'])->name('death.show');
+
+    // Death confirmation editing (pending + rejected only)
+    Route::get('/death/{confirmation}/edit',  [DeathConfirmationController::class, 'nokEdit'])->name('death.edit');
+    Route::patch('/death/{confirmation}',     [DeathConfirmationController::class, 'nokUpdate'])->name('death.update');
+
+    // My submissions — combined view of NOK's crisis reports & death confirmations
+    Route::get('/submissions', [NOKController::class, 'mySubmissions'])->name('submissions.index');
+
     Route::get('/ldms/{ldms}',  [LDMSController::class, 'nokShow'])->name('ldms.show');
     Route::get('/ldms/{ldms}/download/{filename}', [LDMSController::class, 'nokDownload'])->name('ldms.download');
 });
