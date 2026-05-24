@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
+use App\Models\Crisis;
 use App\Models\CrisisReport;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Admin-side crisis report listing.
@@ -17,6 +20,10 @@ use Illuminate\Http\Request;
  *   what IS in the students table: student_id (matric) and the real name columns
  *   if you have them. Adjust the column list in $studentNameColumns below to match
  *   your actual `students` schema.
+ *
+ * Donation control endpoints (added 2026-05-24):
+ *   POST /admin/crisis/{crisis}/donation-cap
+ *   POST /admin/crisis/{crisis}/toggle-donation
  */
 class AdminCrisisController extends Controller
 {
@@ -143,5 +150,100 @@ class AdminCrisisController extends Controller
             default:
                 return [null, null];
         }
+    }
+
+    // ==================================================================
+    // DONATION CONTROL — admin-only endpoints for managing the public
+    // donation page per crisis case.
+    // ==================================================================
+
+    /**
+     * Update the donation cap and auto-close preference for a crisis.
+     *
+     * Route: POST /admin/crisis/{crisis}/donation-cap
+     */
+    public function updateDonationCap(Request $request, Crisis $crisis)
+    {
+        $admin = Auth::guard('admin')->user();
+        if (!$admin->active) abort(403);
+
+        $validated = $request->validate([
+            'donation_target'      => ['required', 'numeric', 'min:100', 'max:1000000'],
+            'auto_close_on_target' => ['nullable', 'boolean'],
+        ], [
+            'donation_target.min' => 'Donation cap must be at least RM 100.',
+            'donation_target.max' => 'Donation cap cannot exceed RM 1,000,000.',
+        ]);
+
+        $crisis->update([
+            'donation_target'      => $validated['donation_target'],
+            'auto_close_on_target' => (bool) ($validated['auto_close_on_target'] ?? false),
+        ]);
+
+        // If auto-close is on AND the cap is already met by previous
+        // donations, close immediately so the page reflects reality.
+        if ($crisis->auto_close_on_target
+            && $crisis->donation_raised >= $crisis->donation_target
+            && $crisis->donation_open) {
+            $crisis->update([
+                'donation_open'          => false,
+                'donation_closed_at'     => now(),
+                'donation_closed_reason' => 'Goal reached (auto-close on cap update)',
+            ]);
+        }
+
+        ActivityLog::record(
+            'admin',
+            (string) $admin->admin_id,
+            'donation_cap_updated',
+            "Set donation cap to RM {$crisis->donation_target} for crisis #{$crisis->crisis_id}"
+        );
+
+        return back()->with('status', 'Donation cap updated.');
+    }
+
+    /**
+     * Toggle whether the public donate page accepts donations for this
+     * crisis. Same endpoint handles open->closed and closed->open; the
+     * action is inferred from current state.
+     *
+     * Route: POST /admin/crisis/{crisis}/toggle-donation
+     */
+    public function toggleDonation(Request $request, Crisis $crisis)
+    {
+        $admin = Auth::guard('admin')->user();
+        if (!$admin->active) abort(403);
+
+        $validated = $request->validate([
+            'reason' => ['nullable', 'string', 'max:200'],
+        ]);
+
+        $wasOpen = (bool) $crisis->donation_open;
+
+        if ($wasOpen) {
+            // CLOSING — record when and why
+            $crisis->update([
+                'donation_open'          => false,
+                'donation_closed_at'     => now(),
+                'donation_closed_reason' => $validated['reason'] ?? 'Manually closed by admin',
+            ]);
+            $action  = 'donation_closed';
+            $message = "Closed donation for crisis #{$crisis->crisis_id}";
+            $flash   = 'Donation page closed. The public donate form is now hidden.';
+        } else {
+            // RE-OPENING — clear the closed-at timestamp + reason
+            $crisis->update([
+                'donation_open'          => true,
+                'donation_closed_at'     => null,
+                'donation_closed_reason' => null,
+            ]);
+            $action  = 'donation_reopened';
+            $message = "Re-opened donation for crisis #{$crisis->crisis_id}";
+            $flash   = 'Donation page re-opened. Donors can now contribute again.';
+        }
+
+        ActivityLog::record('admin', (string) $admin->admin_id, $action, $message);
+
+        return back()->with('status', $flash);
     }
 }

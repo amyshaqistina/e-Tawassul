@@ -301,13 +301,32 @@ class DeathConfirmationController extends Controller
                     ->update(['status' => 'deceased']);
 
                 if ($confirmation->crisis_id) {
+                    // Mark the linked crisis as resolved AND auto-close
+                    // its public donation page. Donors should not be
+                    // able to keep donating after a death has been
+                    // formally verified — out of respect, and because
+                    // funds may now need to be redirected/handled by
+                    // the next of kin. Admin can still re-open from
+                    // the crisis page if funeral costs require it.
                     Crisis::where('crisis_id', $confirmation->crisis_id)
-                        ->update(['status' => 'resolved']);
+                        ->update([
+                            'status'                 => 'resolved',
+                            'donation_open'          => false,
+                            'donation_closed_at'     => now(),
+                            'donation_closed_reason' => 'Case resolved — death verified',
+                        ]);
                 }
             });
 
             ActivityLog::record('admin', (string) $admin->admin_id, 'death_confirmed',
                 "Verified death confirmation #{$confirmation->confirmation_id} (hash: " . substr($result['hash'], 0, 16) . '…)');
+
+            // Log the donation auto-close so admin can audit when/why
+            // a case's donation page went dark.
+            if ($confirmation->crisis_id) {
+                ActivityLog::record('admin', (string) $admin->admin_id, 'donation_auto_closed',
+                    "Auto-closed donations for crisis #{$confirmation->crisis_id} (death verified)");
+            }
 
             $nok = $confirmation->nextOfKin;
             if ($nok) {

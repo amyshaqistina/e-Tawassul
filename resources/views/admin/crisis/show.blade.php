@@ -1168,6 +1168,9 @@
                         </div>
                     </div>
                 @endif
+
+                {{-- Donation Control Panel — appears only when report is verified --}}
+                @include('admin.crisis._donation_control')
             </div>
         </div>
     </div>

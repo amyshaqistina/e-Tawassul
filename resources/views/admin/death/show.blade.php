@@ -308,6 +308,87 @@
         .no-print, .back-link, .decision-card { display: none !important; }
         .info-card, .profile-card { border: 1px solid #E5E7EB !important; }
     }
+
+    /* ============ Donation Summary Card (read-only) ============ */
+    .donation-summary-card {
+        background: #fff; border: 1px solid #E5E7EB;
+        border-radius: 12px; overflow: hidden;
+        margin-bottom: 16px; position: relative;
+    }
+    .donation-summary-card::before {
+        content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, #15803d, #22c55e);
+    }
+    .donation-summary-card.closed::before {
+        background: linear-gradient(90deg, #374151, #1f2937);
+    }
+    .ds-header {
+        padding: 14px 18px; border-bottom: 1px solid #F3F4F6;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .ds-header-icon {
+        width: 32px; height: 32px; border-radius: 9px;
+        background: #E8F6EE; color: #15803d;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; flex-shrink: 0;
+    }
+    .donation-summary-card.closed .ds-header-icon {
+        background: #F3F4F6; color: #6B7280;
+    }
+    .ds-header h5 { margin: 0; font-size: 14px; font-weight: 700; color: #111827; }
+    .ds-header .ds-sub { margin: 0; font-size: 11.5px; color: #9CA3AF; }
+    .ds-body { padding: 16px 18px; }
+    .ds-status-row {
+        display: flex; align-items: center; gap: 8px;
+        padding: 9px 12px; border-radius: 7px; margin-bottom: 12px;
+        font-size: 12.5px; font-weight: 600;
+    }
+    .ds-status-row.open { background: #E8F6EE; color: #15803d; }
+    .ds-status-row.closed { background: #F3F4F6; color: #374151; }
+    .ds-status-row i { font-size: 14px; }
+    .ds-amount-row {
+        display: flex; justify-content: space-between; align-items: baseline;
+        margin-bottom: 8px;
+    }
+    .ds-amount-raised {
+        font-size: 22px; font-weight: 700; color: #111827; line-height: 1.1;
+        letter-spacing: -0.01em;
+    }
+    .ds-amount-target { font-size: 12px; color: #6B7280; }
+    .ds-amount-target strong { color: #111827; }
+    .ds-bar {
+        height: 8px; background: #F3F4F6;
+        border-radius: 999px; overflow: hidden; margin-bottom: 10px;
+    }
+    .ds-bar-fill {
+        height: 100%; border-radius: 999px;
+        background: linear-gradient(90deg, #15803d, #22c55e);
+    }
+    .ds-bar-fill.hit { background: linear-gradient(90deg, #a16207, #eab308); }
+    .ds-stats-row {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+        font-size: 11.5px; color: #6B7280; margin-bottom: 12px;
+    }
+    .ds-stat { padding: 8px 10px; background: #F9FAFB; border-radius: 7px; }
+    .ds-stat strong { display: block; font-size: 14px; color: #111827; font-weight: 700; }
+    .ds-stat span { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #9CA3AF; }
+    .ds-closed-note {
+        background: #FEF3C7; border: 1px solid #FCD34D;
+        border-radius: 7px; padding: 9px 11px; margin-bottom: 12px;
+        font-size: 11.5px; color: #78350F; line-height: 1.5;
+    }
+    .ds-closed-note strong { color: #92400E; }
+    .ds-manage-link {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 8px; padding: 10px 13px; background: #EFF6FF;
+        border: 1px solid #BFDBFE; border-radius: 8px;
+        color: #1E40AF; text-decoration: none; font-weight: 600;
+        font-size: 12.5px; transition: all 0.15s ease;
+    }
+    .ds-manage-link:hover {
+        background: #1E40AF; color: #fff; border-color: #1E40AF;
+    }
+    .ds-manage-link i { font-size: 13px; }
 </style>
 @endpush
 
@@ -531,6 +612,82 @@
                             <br><small>{{ $confirmation->date_confirmed->format('d M Y, h:i A') }}</small>
                         @endif
                     </p>
+                </div>
+            @endif
+
+            {{-- Donation Summary (read-only) — shows context while reviewing the death --}}
+            @if($confirmation->crisis_id && $confirmation->crisis)
+                @php
+                    $linkedCrisis = $confirmation->crisis;
+                    $dRaised      = (float) $linkedCrisis->donation_raised;
+                    $dTarget      = (float) $linkedCrisis->donation_target;
+                    $dPercent     = $dTarget > 0 ? min(100, ($dRaised / $dTarget) * 100) : 0;
+                    $dDonors      = $linkedCrisis->donations()->count();
+                    $dIsOpen      = (bool) $linkedCrisis->donation_open;
+                @endphp
+
+                <div class="donation-summary-card {{ $dIsOpen ? '' : 'closed' }}">
+                    <div class="ds-header">
+                        <div class="ds-header-icon">
+                            <i class="bi bi-heart-fill"></i>
+                        </div>
+                        <div>
+                            <h5>Donation Summary</h5>
+                            <p class="ds-sub">For linked Crisis #{{ $linkedCrisis->crisis_id }}</p>
+                        </div>
+                    </div>
+                    <div class="ds-body">
+
+                        <div class="ds-status-row {{ $dIsOpen ? 'open' : 'closed' }}">
+                            @if($dIsOpen)
+                                <i class="bi bi-broadcast"></i>
+                                <span>Donations are OPEN</span>
+                            @else
+                                <i class="bi bi-lock-fill"></i>
+                                <span>Donations are CLOSED</span>
+                            @endif
+                        </div>
+
+                        <div class="ds-amount-row">
+                            <div class="ds-amount-raised">RM {{ number_format($dRaised, 2) }}</div>
+                            <div class="ds-amount-target">of <strong>RM {{ number_format($dTarget, 2) }}</strong></div>
+                        </div>
+
+                        <div class="ds-bar">
+                            <div class="ds-bar-fill {{ $dPercent >= 100 ? 'hit' : '' }}" style="width: {{ $dPercent }}%"></div>
+                        </div>
+
+                        <div class="ds-stats-row">
+                            <div class="ds-stat">
+                                <strong>{{ $dDonors }}</strong>
+                                <span>{{ \Illuminate\Support\Str::plural('Donor', $dDonors) }}</span>
+                            </div>
+                            <div class="ds-stat">
+                                <strong>{{ number_format($dPercent, 0) }}%</strong>
+                                <span>Funded</span>
+                            </div>
+                        </div>
+
+                        @if(!$dIsOpen && $linkedCrisis->donation_closed_reason)
+                            <div class="ds-closed-note">
+                                <strong>Closed:</strong> {{ $linkedCrisis->donation_closed_reason }}
+                                @if($linkedCrisis->donation_closed_at)
+                                    <br><small>{{ $linkedCrisis->donation_closed_at->diffForHumans() }}</small>
+                                @endif
+                            </div>
+                        @endif
+
+                        @if($statusKey === 'pending' && $dIsOpen)
+                            <div class="ds-closed-note">
+                                <strong>Note:</strong> If you verify this death, donations will automatically close and the public donate page will show a respectful closed message.
+                            </div>
+                        @endif
+
+                        <a href="{{ route('admin.crisis.show', $linkedCrisis->crisis_id) }}" class="ds-manage-link">
+                            <span><i class="bi bi-sliders"></i> Manage donation on crisis page</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             @endif
 

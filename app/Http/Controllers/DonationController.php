@@ -29,11 +29,27 @@ class DonationController extends Controller
         // filled them in.
         $crisis->load('student');
 
-        return view('public.donate', compact('crisis'));
+        // Donation control state (added 2026-05-24)
+        //   $isClosed    true → hide donate form, show closed message
+        //   $closedKind  'goal_reached' → celebratory message
+        //                'admin_closed' → neutral closed message
+        $isClosed   = !$crisis->isAcceptingDonations();
+        $closedKind = $crisis->closed_kind;
+
+        return view('public.donate', compact('crisis', 'isClosed', 'closedKind'));
     }
 
     public function store(DonateRequest $request, Crisis $crisis)
     {
+        // GUARD — block submissions to a closed donation page. Donors
+        // who kept an old tab open could otherwise POST after admin
+        // closed the case; this ensures server state is authoritative.
+        if (!$crisis->isAcceptingDonations()) {
+            return redirect()
+                ->route('donate.create', $crisis->crisis_id)
+                ->with('error', 'Donations are no longer being accepted for this case.');
+        }
+
         $anonymous = (bool) $request->input('anonymous', false);
         $donorName = $anonymous ? 'Anonymous Donor' : $request->input('donor_name');
 
@@ -53,6 +69,22 @@ class DonationController extends Controller
             ]);
 
             $crisis->increment('donation_raised', $donation->donation_amount);
+
+            // AUTO-CLOSE — if this donation pushed the case past its
+            // cap AND admin has auto_close_on_target enabled, close the
+            // page now. Refresh first so we see post-increment amount.
+            $crisis->refresh();
+            if ($crisis->auto_close_on_target
+                && $crisis->donation_target > 0
+                && $crisis->donation_raised >= $crisis->donation_target
+                && $crisis->donation_open) {
+                $crisis->update([
+                    'donation_open'          => false,
+                    'donation_closed_at'     => now(),
+                    'donation_closed_reason' => 'Goal reached',
+                ]);
+            }
+
             return $donation;
         });
 
