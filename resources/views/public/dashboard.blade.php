@@ -1922,8 +1922,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'Heavy rainfall in Gombak left several student rentals submerged. e-Tawassul activated emergency relocation, providing temporary mahallah housing, replacement essentials, and academic deferment letters within 6 hours of verification.',
                 slides: [
                     '/images/tawassul/flood.jpg',
-                    'https://images.unsplash.com/photo-1583244532610-2a234c44d2c6?w=900&q=80',
-                    'https://images.unsplash.com/photo-1574788175366-15db8e0d0915?w=900&q=80'
+                    '/images/tawassul/flood2.jpg',
+                    '/images/tawassul/flood3.jpg'
                 ],
                 stats: [{
                     v: '47',
@@ -1943,8 +1943,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'A Kulliyyah of Engineering student needed emergency cardiac surgery beyond family means. e-Tawassul verified the case with IIUMMC, opened a transparent fund, and donors fully covered RM 42,300 within 48 hours — surgery proceeded on time.',
                 slides: [
                     '/images/tawassul/ilness.jpg',
-                    'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=900&q=80',
-                    'https://images.unsplash.com/photo-1666214280557-f1b5022eb634?w=900&q=80'
+                    '/images/tawassul/ilness2.jpg',
+                    '/images/tawassul/ilness3.jpg'
                 ],
                 stats: [{
                     v: '48h',
@@ -1964,8 +1964,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'A house fire destroyed the family home of a Kulliyyah of Laws student, including textbooks, devices, and personal documents. e-Tawassul coordinated with the Mahallah office for a replacement laptop, free textbook loans, and replacement-document support so finals could proceed without delay.',
                 slides: [
                     '/images/tawassul/housefire.jpg',
-                    'https://images.unsplash.com/photo-1574870111867-089730e5a72b?w=900&q=80',
-                    'https://images.unsplash.com/photo-1583936232743-1be91040548d?w=900&q=80'
+                    '/images/tawassul/housefire2.jpg',
+                    '/images/tawassul/housefires3.jpg'
                 ],
                 stats: [{
                     v: '1',
@@ -1985,8 +1985,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'A second-year student commuting from Gombak was severely injured. e-Tawassul activated next-of-kin protocols within the hour, arranged hospital liaison with IIUMMC, transport for family from Terengganu, and an academic hold so credits weren\'t lost during recovery.',
                 slides: [
                     '/images/tawassul/accident.jpg',
-                    'https://images.unsplash.com/photo-1612831455540-fcbe1f7e3739?w=900&q=80',
-                    'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=900&q=80'
+                    '/images/tawassul/accident2.jpg',
+                    '/images/tawassul/aciident3.jpg'
                 ],
                 stats: [{
                     v: '<1h',
@@ -2006,8 +2006,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'Beyond emergencies, e-Tawassul runs continuous welfare programs: monthly food assistance, mental-health connections through CHARIS, peer-mentoring, and emergency stipends for students whose families lost income — keeping degrees on track.',
                 slides: [
                     '/images/tawassul/Death.jpg',
-                    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80',
-                    'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=80'
+                    '/images/tawassul/death2.jpg',
+                    '/images/tawassul/death3.jpg'
                 ],
                 stats: [{
                     v: '612',
@@ -2027,8 +2027,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'e-Tawassul preserves voice notes, letters, and final wishes that students choose to share with their next-of-kin under specific conditions. End-to-end encrypted, blockchain-verified, released only when verified — giving every student peace of mind.',
                 slides: [
                     '/images/tawassul/Wasiat.jpg',
-                    'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900&q=80',
-                    'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=900&q=80'
+                    '/images/tawassul/lastmessage2.jpg',
+                    '/images/tawassul/lastmessage3.jpg'
                 ],
                 stats: [{
                     v: '892',

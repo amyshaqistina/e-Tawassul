@@ -27,8 +27,6 @@
             </button>
             <div class="collapse navbar-collapse" id="topnav">
                 <ul class="navbar-nav ms-auto align-items-lg-center">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Active Cases</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
                     <li class="nav-item ms-lg-2">
                         <a class="btn btn-outline-primary btn-sm" href="{{ route('login') }}">
                             <i class="bi bi-box-arrow-in-right"></i> Login
