@@ -515,7 +515,7 @@
 
                     <div class="mb-3">
                         <label class="form-label small text-uppercase fw-semibold">
-                            <span x-show="tab === 'student'">Student ID or Email</span>
+                            <span x-show="tab === 'student'">Matric ID or Email</span>
                             <span x-show="tab === 'admin'">Admin Email</span>
                             <span x-show="tab === 'nok'">Registered Email</span>
                         </label>
@@ -531,14 +531,19 @@
                     </div>
 
                     {{-- Password: hidden for Next of Kin (OTP-based login) --}}
-                    <div class="mb-3" x-show="tab !== 'nok'" x-cloak>
+                    <div class="mb-3" x-data="{ showPassword: false }" x-show="tab !== 'nok'" x-cloak>
                         <label class="form-label small text-uppercase fw-semibold">Password</label>
-                        <input type="password" name="password"
-                            class="form-control form-control-lg @error('password') is-invalid @enderror"
-                            :required="tab !== 'nok'">
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <div class="input-group">
+                            <input :type="showPassword ? 'text' : 'password'" name="password"
+                                class="form-control form-control-lg @error('password') is-invalid @enderror"
+                                :required="tab !== 'nok'">
+                            <button class="btn btn-outline-secondary" type="button" @click="showPassword = !showPassword">
+                                <i class="bi" :class="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                            </button>
+                            @error('password')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
                     {{-- Delivery choice: only for Next of Kin --}}
