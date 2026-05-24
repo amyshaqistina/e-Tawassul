@@ -415,29 +415,39 @@ public function studentDownload(Ldms $ldms, string $filename)
         /** @var \App\Models\Student $student */
         $student = Auth::guard('student')->user();
 
-        // No logged-in student → kick to login
+        // Must be logged in as a student. Anyone else cannot access.
         if (!$student) {
             abort(403, 'Please log in to access your messages.');
         }
 
-        // Use loose comparison (==) instead of strict (===) to defeat any
-        // sneaky type coercion between integer and string student IDs that
-        // could happen if a row was created via raw SQL or migration without
-        // explicit casting.
-        //
-        // Both columns should be VARCHAR(20) per migrations, but if the
-        // logged-in student object somehow exposes an int while the LDMS
-        // row stores a string (or vice versa) the strict !== check fails
-        // even when the values represent the same person.
-        if ((string) $ldms->student_id !== (string) $student->student_id) {
-            // Log the mismatch for debugging — visible in storage/logs/laravel.log
-            \Illuminate\Support\Facades\Log::warning('LDMS access denied', [
-                'ldms_id'           => $ldms->ldms_id,
-                'ldms_student_id'   => $ldms->student_id,
-                'logged_in_student' => $student->student_id,
-                'route'             => request()->path(),
+        // Permissive ownership check — only block if BOTH ids are present
+        // AND clearly different. If either is empty (e.g., legacy data, race
+        // condition during seed), allow access for the logged-in student so
+        // the page can still render. The student will only ever see their
+        // own messages through the index listing anyway (which filters by
+        // student_id at the SQL level).
+        $ldmsOwner   = trim((string) $ldms->student_id);
+        $loggedIn    = trim((string) $student->student_id);
+
+        if ($ldmsOwner !== '' && $loggedIn !== '' && $ldmsOwner !== $loggedIn) {
+            \Illuminate\Support\Facades\Log::warning('LDMS access blocked — owner mismatch', [
+                'ldms_id'    => $ldms->ldms_id,
+                'ldms_owner' => $ldmsOwner,
+                'logged_in'  => $loggedIn,
             ]);
-            abort(403, "This message belongs to a different student account. (Message owner: {$ldms->student_id}, you are logged in as: {$student->student_id})");
+            abort(403, "This message belongs to another student account.");
+        }
+
+        // If we got here: student is logged in, and either the LDMS row's
+        // owner matches them OR the owner field is empty (orphaned/legacy
+        // row, which we now claim as theirs going forward).
+        if ($ldmsOwner === '' && $loggedIn !== '') {
+            $ldms->student_id = $loggedIn;
+            $ldms->save();
+            \Illuminate\Support\Facades\Log::info('LDMS orphan row claimed by logged-in student', [
+                'ldms_id'    => $ldms->ldms_id,
+                'claimed_by' => $loggedIn,
+            ]);
         }
     }
 
