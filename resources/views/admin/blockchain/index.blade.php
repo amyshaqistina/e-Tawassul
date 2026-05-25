@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Blockchain Audit')
-@section('page-title', 'Blockchain Audit Log')
 
 @push('styles')
 <style>

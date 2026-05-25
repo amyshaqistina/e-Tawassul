@@ -43,31 +43,32 @@
         /* Brand */
         .et-brand {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0px;
             text-decoration: none;
-            color: #0f172a;
+            color: #1a6fa8;
             flex-shrink: 0;
         }
-        .et-brand:hover { color: #1d4ed8; }
+        .et-brand:hover { color: #14567f; }
         .et-brand-mark {
             font-family: 'Playfair Display', serif;
-            font-size: 20px;
+            font-size: 1.3rem;
             font-weight: 800;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.5px;
             line-height: 1;
+            color: #1a6fa8;
         }
         .et-brand-sub {
-            font-size: 10px;
-            font-weight: 700;
-            color: #64748b;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: #94a3b8;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            padding: 3px 8px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border-radius: 999px;
-            line-height: 1;
+            padding: 0px;
+            background: transparent;
+            border-radius: 0px;
+            line-height: 1.2;
         }
 
         /* Nav items wrapper */
@@ -384,7 +385,6 @@
         /* Mobile toggle */
         .et-mobile-toggle {
             display: none;
-            margin-left: auto;
             background: transparent;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
@@ -471,7 +471,7 @@
     <nav class="et-topnav">
         <div class="et-topnav-inner">
             {{-- Brand --}}
-            <a href="#" class="et-brand">
+            <a href="{{ route('public.dashboard') }}" class="et-brand">
                 <span class="et-brand-mark">e-Tawassul</span>
                 <span class="et-brand-sub">{{ $roleLabel ?? 'User' }}</span>
             </a>

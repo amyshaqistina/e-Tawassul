@@ -1,8 +1,5 @@
 @extends('layouts.nok')
 @section('title', 'NOK Dashboard')
-@section('page-title', 'Welcome, ' . $nok->first_name)
-@section('page-subtitle', $student ? 'Linked to student: ' . $student->full_name . ' (' . $student->student_id . ')' : '')
-
 @push('styles')
 <style>
     /* ===== Action cards (Death confirmation + Crisis reporting) ===== */

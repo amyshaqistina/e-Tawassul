@@ -1,7 +1,5 @@
 @extends('layouts.student')
 @section('title', 'Student Dashboard')
-@section('page-title', 'Welcome, ' . $student->first_name)
-@section('page-subtitle', 'Your e-Tawassul home')
 
 @section('content')
     <style>
@@ -150,15 +148,22 @@
         }
 
         .timeline-item {
-            display: flex; gap: 12px; align-items: flex-start;
-            position: relative; padding-bottom: 22px;
+            display: flex; gap: 14px; align-items: stretch;
+            padding-bottom: 22px;
         }
         .timeline-item:last-child { padding-bottom: 0; }
 
+        /* The connecting line is drawn as a border on the LEFT of the dot-col,
+           offset so it lines up exactly with the dot's vertical center.
+           This is the most bulletproof method — no absolute positioning,
+           no flex gap interference. */
         .timeline-dot-col {
-            flex-shrink: 0; width: 14px;
+            flex-shrink: 0;
+            width: 14px;
             position: relative;
-            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .timeline-dot {
@@ -166,6 +171,9 @@
             background: #cbd5e1;
             display: block;
             margin-top: 3px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;
         }
         .timeline-dot.done    { background: #1a56db; }
         .timeline-dot.current { background: #1a56db; box-shadow: 0 0 0 4px rgba(26,86,219,0.15); }
@@ -173,17 +181,21 @@
         .timeline-dot.danger  { background: #dc2626; }
         .timeline-dot.future  { background: #fff; border: 2px solid #cbd5e1; }
 
-        /* Line is absolutely positioned — guaranteed centered under dot */
-        .timeline-line {
-            position: absolute;
-            left: 6px;          /* (14px dot / 2) - (2px line / 2) = 6px */
-            top: 20px;          /* 3px margin-top + 14px dot + 3px gap */
-            bottom: 4px;
+        /* Vertical line below the dot — sits inside the dot column so it's
+           always centered under the dot regardless of layout shifts */
+        .timeline-dot-col::after {
+            content: "";
+            flex: 1;
             width: 2px;
             background: #e2e8f0;
-            z-index: 1;
+            margin-top: 4px;
+            min-height: 18px;
         }
-        .timeline-line.done { background: #1a56db; }
+        .timeline-item:last-child .timeline-dot-col::after { display: none; }
+        .timeline-item.done-line .timeline-dot-col::after { background: #1a56db; }
+
+        /* Legacy class — no longer used */
+        .timeline-line { display: none; }
 
         .timeline-content { flex: 1; padding-top: 0; min-width: 0; }
         .timeline-label   { font-weight: 700; color: #0f172a; font-size: 14px; line-height: 1.2; }
@@ -409,11 +421,10 @@
                         </div>
 
                         {{-- Step 1: Submitted (always done) --}}
-                        <div class="timeline-item">
+                        <div class="timeline-item done-line">
                             <div class="timeline-dot-col">
                                 <span class="timeline-dot done"></span>
                             </div>
-                            <span class="timeline-line done"></span>
                             <div class="timeline-content">
                                 <div class="timeline-label">Submitted</div>
                                 <div class="timeline-sub">
@@ -423,11 +434,10 @@
                         </div>
 
                         {{-- Step 2: Admin Review --}}
-                        <div class="timeline-item">
+                        <div class="timeline-item {{ ($isVerified || $isRejected) ? 'done-line' : '' }}">
                             <div class="timeline-dot-col">
                                 <span class="timeline-dot {{ $stage > 1 ? 'done' : 'current' }}"></span>
                             </div>
-                            <span class="timeline-line {{ ($isVerified || $isRejected) ? 'done' : '' }}"></span>
                             <div class="timeline-content">
                                 <div class="timeline-label">Admin Review</div>
                                 <div class="timeline-sub">

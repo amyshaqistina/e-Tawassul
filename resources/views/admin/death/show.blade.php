@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Death Confirmation #' . $confirmation->confirmation_id)
-@section('page-title', 'Death Confirmation Review')
 
 @php
     $statusKey = $confirmation->status ?? 'pending';

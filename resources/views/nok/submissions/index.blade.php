@@ -18,17 +18,19 @@
     .nsub-wrap *,.nsub-wrap *::before,.nsub-wrap *::after{box-sizing:border-box}
 
     .nsub-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:14px;flex-wrap:wrap}
-    .nsub-header h1{font-family:'Fraunces',serif;font-weight:600;font-size:28px;margin:0;letter-spacing:-.015em}
+    .nsub-header h1{font-family:'Inter',sans-serif;font-weight:700;font-size:24px;margin:0;letter-spacing:-.01em;color:var(--ink)}
     .nsub-header p{color:var(--ink-soft);font-size:14px;margin:4px 0 0}
 
-    .nsub-tabs{display:flex;gap:6px;margin-bottom:16px;background:#fff;padding:6px;border-radius:12px;border:1px solid var(--border-soft);box-shadow:var(--shadow);width:fit-content;max-width:100%;flex-wrap:wrap}
-    .nsub-tab{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-weight:600;font-size:13px;color:var(--ink-soft);text-decoration:none;cursor:pointer;transition:all .15s;border:none;background:transparent;font-family:inherit}
+    .nsub-tabs{display:flex;gap:4px;margin-bottom:16px;background:#fff;padding:5px;border-radius:12px;border:1px solid var(--border-soft);box-shadow:var(--shadow);width:fit-content;max-width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
+    .nsub-tabs::-webkit-scrollbar{height:4px}
+    .nsub-tabs::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+    .nsub-tab{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-weight:600;font-size:13px;color:var(--ink-soft);text-decoration:none;cursor:pointer;transition:all .15s;border:none;background:transparent;font-family:inherit;white-space:nowrap;flex-shrink:0}
     .nsub-tab:hover{background:var(--bg);color:var(--ink)}
     .nsub-tab.active{background:var(--primary);color:#fff}
     .nsub-tab-count{background:rgba(255,255,255,.25);padding:1px 7px;border-radius:99px;font-size:11px;font-weight:700}
     .nsub-tab:not(.active) .nsub-tab-count{background:var(--bg);color:var(--ink-faint)}
 
-    .nsub-section-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin:24px 0 12px;display:flex;align-items:center;gap:8px;color:var(--ink)}
+    .nsub-section-title{font-family:'Inter',sans-serif;font-size:16px;font-weight:700;margin:24px 0 12px;display:flex;align-items:center;gap:8px;color:var(--ink)}
     .nsub-section-title i{color:var(--primary)}
     .nsub-section-title .count{background:var(--primary-tint);color:var(--primary);font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;font-family:'Inter',sans-serif}
 
@@ -65,7 +67,7 @@
 
     .nsub-empty{padding:60px 24px;text-align:center;color:var(--ink-soft);background:#fff;border-radius:14px}
     .nsub-empty i{font-size:48px;color:var(--ink-faint);margin-bottom:14px;display:block}
-    .nsub-empty h3{font-family:'Fraunces',serif;font-size:18px;margin:0 0 4px;font-weight:600;color:var(--ink)}
+    .nsub-empty h3{font-family:'Inter',sans-serif;font-size:16px;margin:0 0 4px;font-weight:700;color:var(--ink)}
     .nsub-empty p{margin:0;font-size:14px}
 
     @media (max-width:640px){
@@ -78,12 +80,12 @@
 @section('content')
 <div class="nsub-wrap">
 
-    <div class="nsub-header">
+    {{-- <div class="nsub-header">
         <div>
             <h1>My Submissions</h1>
             <p>All crisis reports and death confirmations you've submitted ({{ $counts['all'] }} total)</p>
         </div>
-    </div>
+    </div> --}}
 
     @if (session('status'))
         <div style="background:var(--success-tint);border:1px solid #BBF7D0;border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">

@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Death Confirmations')
-@section('page-title', 'Death Confirmations')
 
 @push('styles')
 <style>

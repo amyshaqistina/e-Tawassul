@@ -10,10 +10,10 @@
     </li>
 
     <li>
-        <a href="{{ route('nok.submissions.index') }}"
-           class="et-nav-link {{ request()->routeIs('nok.submissions.*') || request()->routeIs('nok.death.show') || request()->routeIs('nok.death.edit') || request()->routeIs('nok.crisis.show') ? 'active' : '' }}">
-            <i class="bi bi-folder2-open"></i>
-            <span class="label">My Submissions</span>
+        <a href="{{ route('nok.crisis.create') }}"
+           class="et-nav-link {{ request()->routeIs('nok.crisis.create') ? 'active' : '' }}">
+            <i class="bi bi-file-earmark-medical"></i>
+            <span class="label">Submit Crisis Report</span>
         </a>
     </li>
 
@@ -26,10 +26,10 @@
     </li>
 
     <li>
-        <a href="{{ route('notifications.index') }}"
-           class="et-nav-link {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
-            <i class="bi bi-bell"></i>
-            <span class="label">Notifications</span>
+        <a href="{{ route('nok.submissions.index') }}"
+           class="et-nav-link {{ request()->routeIs('nok.submissions.*') || request()->routeIs('nok.death.show') || request()->routeIs('nok.death.edit') || request()->routeIs('nok.crisis.show') ? 'active' : '' }}">
+            <i class="bi bi-folder2-open"></i>
+            <span class="label">My Submissions</span>
         </a>
     </li>
 @endsection

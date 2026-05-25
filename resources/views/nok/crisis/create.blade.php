@@ -1,7 +1,5 @@
 @extends('layouts.nok')
 @section('title', 'Report a Crisis')
-@section('page-title', 'Submit a Crisis Report')
-@section('page-subtitle', 'On behalf of ' . ($student->full_name ?? 'the student') . ' (' . ($student->student_id ?? '') . ')')
 
 @section('content')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />

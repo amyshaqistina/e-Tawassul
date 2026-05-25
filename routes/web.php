@@ -47,6 +47,7 @@ Route::post('/chatbot/ask', [ChatbotController::class, 'ask']);
 |--------------------------------------------------------------------------
 */
 Route::get('/', [CrisisController::class, 'index'])->name('home');
+Route::get('/dashboard', [CrisisController::class, 'index'])->name('public.dashboard');
 Route::get('/crisis/{crisis}', [CrisisController::class, 'show'])->name('crisis.show');
 Route::get('/donate/{crisis}', [DonationController::class, 'create'])->name('donate.create');
 Route::post('/donate/{crisis}', [DonationController::class, 'store'])->name('donate.store');
@@ -160,17 +161,18 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
 |--------------------------------------------------------------------------
 */
 Route::middleware(['role:nok', 'twofactor'])->prefix('nok')->name('nok.')->group(function () {
-
-    Route::get('/dashboard', [NOKController::class, 'dashboard'])->name('dashboard');
+Route::get('/dashboard', [NOKController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/crisis/create', [NokCrisisController::class, 'create'])->name('crisis.create');
     Route::post('/crisis', [NokCrisisController::class, 'store'])->name('crisis.store');
     Route::get('/crisis/{report}', [NokCrisisController::class, 'show'])->name('crisis.show');
+    Route::get('/crisis/{report}/edit',  [NokCrisisController::class, 'edit'])->name('crisis.edit');
+    Route::patch('/crisis/{report}',     [NokCrisisController::class, 'update'])->name('crisis.update');
+    Route::delete('/crisis/{report}',    [NokCrisisController::class, 'destroy'])->name('crisis.destroy');
     Route::get('/crisis-helpers/disaster-context', [\App\Http\Controllers\CrisisHelperController::class, 'disasterContext'])->name('crisis.helpers.disaster-context');
     Route::get('/death/create', [DeathConfirmationController::class, 'create'])->name('death.create');
     Route::post('/death',       [DeathConfirmationController::class, 'store'])->name('death.store');
     Route::get('/death/{confirmation}', [DeathConfirmationController::class, 'nokShow'])->name('death.show');
-
     // Death confirmation editing (pending + rejected only)
     Route::get('/death/{confirmation}/edit',  [DeathConfirmationController::class, 'nokEdit'])->name('death.edit');
     Route::patch('/death/{confirmation}',     [DeathConfirmationController::class, 'nokUpdate'])->name('death.update');

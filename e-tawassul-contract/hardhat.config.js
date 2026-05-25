@@ -40,7 +40,7 @@ module.exports = {
 
     // Our actual Besu QBFT network (running in Docker via besu-network/)
     besu: {
-      url: "http://172.17.0.1:8545",
+      url: "http://127.0.0.1:8545",
       chainId: 1337,
       accounts: [readDeployerKey()],
       // QBFT block time is ~5s; give transactions room to be mined

@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Admin Dashboard')
-@section('page-title', 'Administrator Dashboard')
 
 @section('content')
 <div class="container-fluid py-3">
@@ -83,10 +82,10 @@
     </div>
 
     <div class="row g-3">
-        <div class="col-lg-7">
+        <div class="col-lg-6">
             <div class="content-card">
                 <div class="d-flex justify-content-between mb-3">
-                    <h5 class="mb-0">Pending crisis reports</h5>
+                    <h5 class="mb-0">Crisis reports</h5>
                     <a href="{{ route('admin.crisis.index') }}" class="btn btn-link btn-sm">View all</a>
                 </div>
                 @forelse($pendingReports as $r)
@@ -123,8 +122,26 @@
             </div>
         </div>
 
-        <div class="col-lg-5">
+        <div class="col-lg-6">
             <div class="content-card">
+                <div class="d-flex justify-content-between mb-3">
+                    <h5 class="mb-0">Death reports</h5>
+                    <a href="{{ route('admin.death.index') }}" class="btn btn-link btn-sm">View all</a>
+                </div>
+                @forelse($pendingDeaths as $d)
+                    <div class="list-row">
+                        <div>
+                            <div class="fw-semibold">{{ $d->student?->full_name ?? '—' }} ({{ $d->student_id }})</div>
+                            <small class="text-muted">{{ $d->nextOfKin?->name ?? 'NOK' }} &middot; {{ $d->date_triggered?->diffForHumans() }}</small>
+                        </div>
+                        <a href="{{ route('admin.death.show', $d->confirmation_id) }}" class="btn btn-sm btn-primary">Review</a>
+                    </div>
+                @empty
+                    <p class="text-muted text-center my-4 small">No pending death reports. All caught up.</p>
+                @endforelse
+            </div>
+
+            <div class="content-card mt-3">
                 <h5 class="mb-3">Recent activity</h5>
                 <ul class="activity-feed">
                     @foreach($recentActivity as $a)

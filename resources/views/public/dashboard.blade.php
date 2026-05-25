@@ -16,7 +16,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
 @push('head')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800;900&family=Dancing+Script:wght@600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -38,7 +38,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
             --border: #e2e8f0;
             --border-soft: #f1f5f9;
             --bg-deep: #0f172a;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             color: var(--ink);
             line-height: 1.6;
         }
@@ -231,7 +231,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-headline h1 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: clamp(28px, 3.2vw, 42px);
             font-weight: 800;
             line-height: 1.05;
@@ -310,7 +310,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-stat .n {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: 20px;
             font-weight: 800;
             color: var(--primary);
@@ -341,7 +341,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-progress-wrap h2 {
-            font-family: 'Dancing Script', cursive;
+            font-family: 'Inter', sans-serif;
             font-size: 20px;
             font-weight: 700;
             color: var(--primary);
@@ -372,7 +372,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-progress-counter .big {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: 22px;
             font-weight: 800;
             color: var(--primary);
@@ -386,7 +386,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-progress-pct {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: 13px;
             font-weight: 700;
             color: var(--success);
@@ -436,7 +436,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-progress-cell .v {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: 13px;
             font-weight: 800;
         }
@@ -634,7 +634,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-block-head h2 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: clamp(28px, 3.4vw, 40px);
             font-weight: 800;
             line-height: 1.15;
@@ -689,7 +689,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: 22px;
             font-weight: 800;
             margin-bottom: 20px;
@@ -766,7 +766,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-impact-card .v {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: 42px;
             font-weight: 800;
             color: white;
@@ -807,7 +807,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
             right: 22px;
             font-size: 42px;
             color: var(--primary-light);
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             line-height: 1;
         }
 
@@ -949,7 +949,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-donate h2 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: clamp(28px, 3.2vw, 38px);
             font-weight: 800;
             margin-bottom: 14px;
@@ -1014,7 +1014,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-amt .a {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: 22px;
             font-weight: 800;
         }
@@ -1327,7 +1327,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-story-title {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: 22px;
             font-weight: 800;
             line-height: 1.25;
@@ -1358,7 +1358,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-story-stat .v {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: 18px;
             font-weight: 800;
             color: var(--primary);
@@ -1922,8 +1922,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'Heavy rainfall in Gombak left several student rentals submerged. e-Tawassul activated emergency relocation, providing temporary mahallah housing, replacement essentials, and academic deferment letters within 6 hours of verification.',
                 slides: [
                     '/images/tawassul/flood.jpg',
-                    '/images/tawassul/flood2.jpg',
-                    '/images/tawassul/flood3.jpg'
+                    'https://images.unsplash.com/photo-1583244532610-2a234c44d2c6?w=900&q=80',
+                    'https://images.unsplash.com/photo-1574788175366-15db8e0d0915?w=900&q=80'
                 ],
                 stats: [{
                     v: '47',
@@ -1943,8 +1943,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'A Kulliyyah of Engineering student needed emergency cardiac surgery beyond family means. e-Tawassul verified the case with IIUMMC, opened a transparent fund, and donors fully covered RM 42,300 within 48 hours — surgery proceeded on time.',
                 slides: [
                     '/images/tawassul/ilness.jpg',
-                    '/images/tawassul/ilness2.jpg',
-                    '/images/tawassul/ilness3.jpg'
+                    'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=900&q=80',
+                    'https://images.unsplash.com/photo-1666214280557-f1b5022eb634?w=900&q=80'
                 ],
                 stats: [{
                     v: '48h',
@@ -1964,8 +1964,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'A house fire destroyed the family home of a Kulliyyah of Laws student, including textbooks, devices, and personal documents. e-Tawassul coordinated with the Mahallah office for a replacement laptop, free textbook loans, and replacement-document support so finals could proceed without delay.',
                 slides: [
                     '/images/tawassul/housefire.jpg',
-                    '/images/tawassul/housefire2.jpg',
-                    '/images/tawassul/housefires3.jpg'
+                    'https://images.unsplash.com/photo-1574870111867-089730e5a72b?w=900&q=80',
+                    'https://images.unsplash.com/photo-1583936232743-1be91040548d?w=900&q=80'
                 ],
                 stats: [{
                     v: '1',
@@ -1985,8 +1985,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'A second-year student commuting from Gombak was severely injured. e-Tawassul activated next-of-kin protocols within the hour, arranged hospital liaison with IIUMMC, transport for family from Terengganu, and an academic hold so credits weren\'t lost during recovery.',
                 slides: [
                     '/images/tawassul/accident.jpg',
-                    '/images/tawassul/accident2.jpg',
-                    '/images/tawassul/aciident3.jpg'
+                    'https://images.unsplash.com/photo-1612831455540-fcbe1f7e3739?w=900&q=80',
+                    'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=900&q=80'
                 ],
                 stats: [{
                     v: '<1h',
@@ -2006,8 +2006,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'Beyond emergencies, e-Tawassul runs continuous welfare programs: monthly food assistance, mental-health connections through CHARIS, peer-mentoring, and emergency stipends for students whose families lost income — keeping degrees on track.',
                 slides: [
                     '/images/tawassul/Death.jpg',
-                    '/images/tawassul/death2.jpg',
-                    '/images/tawassul/death3.jpg'
+                    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80',
+                    'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=80'
                 ],
                 stats: [{
                     v: '612',
@@ -2027,8 +2027,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'e-Tawassul preserves voice notes, letters, and final wishes that students choose to share with their next-of-kin under specific conditions. End-to-end encrypted, blockchain-verified, released only when verified — giving every student peace of mind.',
                 slides: [
                     '/images/tawassul/Wasiat.jpg',
-                    '/images/tawassul/lastmessage2.jpg',
-                    '/images/tawassul/lastmessage3.jpg'
+                    'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900&q=80',
+                    'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=900&q=80'
                 ],
                 stats: [{
                     v: '892',

@@ -212,4 +212,228 @@ class NokCrisisController extends Controller
         $report->load('crisis', 'verifier', 'student');
         return view('nok.crisis.show', compact('report'));
     }
+
+    /**
+     * Show edit form. Mirrors student edit:
+     *   - pending  → editable
+     *   - rejected → editable + resubmit (status flips back to pending on save)
+     *   - verified → 403 (blockchain integrity)
+     */
+    public function edit(CrisisReport $report)
+    {
+        /** @var \App\Models\NextOfKin $nok */
+        $nok = Auth::guard('nok')->user();
+
+        // Only the NOK who submitted may edit
+        if (!$report->submitted_by_nok || $report->nok_id !== $nok->nok_id) {
+            abort(403);
+        }
+
+        // VERIFIED → cannot edit (blockchain immutability)
+        if ($report->report_status === 'verified') {
+            return redirect()
+                ->route('nok.crisis.show', $report->report_id)
+                ->with('error', 'Verified reports are locked by blockchain and cannot be edited. Contact welfare@iium.edu.my if something has changed.');
+        }
+
+        $report->load('crisis', 'verifier', 'student');
+
+        // Decode crisis_details JSON for prefilling the form
+        $details = [];
+        if ($report->crisis && $report->crisis->crisis_details) {
+            $decoded = json_decode($report->crisis->crisis_details, true);
+            if (is_array($decoded)) {
+                $details = $decoded;
+            }
+        }
+
+        return view('nok.crisis.edit', compact('report', 'details'));
+    }
+
+    /**
+     * Persist edits. Rejected reports flip back to pending on save so admin
+     * re-reviews; pending reports stay pending. Verified reports are blocked.
+     */
+    public function update(Request $request, CrisisReport $report)
+    {
+        /** @var \App\Models\NextOfKin $nok */
+        $nok = Auth::guard('nok')->user();
+
+        if (!$report->submitted_by_nok || $report->nok_id !== $nok->nok_id) {
+            abort(403);
+        }
+
+        // Defense in depth — same lock check as edit()
+        if ($report->report_status === 'verified') {
+            return redirect()
+                ->route('nok.crisis.show', $report->report_id)
+                ->with('error', 'Verified reports are locked and cannot be edited.');
+        }
+
+        $validated = $request->validate([
+            'crisis_type'           => 'required|in:medical,accident,natural_disaster,death',
+            'sub_category'          => 'required|string|max:100',
+            'location'              => 'required|string|max:500',
+            'incident_date'         => 'required|date|before_or_equal:today',
+            'incident_time'         => 'required|date_format:H:i',
+            'crisis_description'    => 'required|string|min:10|max:2000',
+            'impact_level'          => 'required|in:low,medium,high,critical',
+            'immediate_actions'     => 'nullable|string|max:1000',
+            'supporting_evidence'   => 'nullable|array|max:5',
+            'supporting_evidence.*' => 'file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
+        ], [
+            'crisis_description.min'        => 'Description must be at least 10 characters.',
+            'incident_date.before_or_equal' => 'The incident date cannot be in the future.',
+            'supporting_evidence.*.mimes'   => 'Each file must be PDF, JPG, PNG, or DOC.',
+            'supporting_evidence.*.max'     => 'Each file must be smaller than 5MB.',
+        ]);
+
+        $incidentDateTime = Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $validated['incident_date'] . ' ' . $validated['incident_time']
+        );
+
+        // Append new uploaded evidence to existing — never replace
+        $evidencePaths = (array) ($report->supporting_evidence_path ?? []);
+        if ($request->hasFile('supporting_evidence')) {
+            foreach ($request->file('supporting_evidence') as $file) {
+                $evidencePaths[] = $file->store('crisis-evidence', 'local');
+            }
+        }
+
+        $wasRejected = $report->report_status === 'rejected';
+
+        // Merge into existing crisis_details JSON (preserves original sub_category etc.
+        // we don't know about) plus update the editable fields and bookkeeping.
+        $existingDetails = [];
+        if ($report->crisis && $report->crisis->crisis_details) {
+            $decoded = json_decode($report->crisis->crisis_details, true);
+            if (is_array($decoded)) {
+                $existingDetails = $decoded;
+            }
+        }
+        $updatedDetails = array_merge($existingDetails, [
+            'sub_category'      => $validated['sub_category'],
+            'incident_at'       => $incidentDateTime->toIso8601String(),
+            'immediate_actions' => $validated['immediate_actions'] ?? null,
+            'last_edited_at'    => now()->toIso8601String(),
+            'last_edited_by'    => 'nok:' . $nok->nok_id,
+        ]);
+        $internalDetails = json_encode($updatedDetails, JSON_UNESCAPED_UNICODE);
+
+        DB::transaction(function () use ($report, $validated, $evidencePaths, $internalDetails, $incidentDateTime, $wasRejected) {
+            if ($report->crisis) {
+                $report->crisis->update([
+                    'crisis_type'        => $validated['crisis_type'],
+                    'crisis_description' => $validated['crisis_description'],
+                    'crisis_details'     => $internalDetails,
+                    'impact_level'       => $validated['impact_level'],
+                    'location'           => $validated['location'],
+                    'sub_category'       => $validated['sub_category'],
+                    'incident_at'        => $incidentDateTime,
+                    'status'             => $wasRejected ? 'pending' : $report->crisis->status,
+                ]);
+            }
+
+            $updates = [
+                'report_description'       => $validated['crisis_description'],
+                'supporting_evidence_path' => $evidencePaths ?: null,
+            ];
+
+            // RESUBMISSION — rejected → back to pending, clear previous admin decision
+            // so admin re-reviews fresh. Activity log preserves the audit trail.
+            if ($wasRejected) {
+                $updates['report_status']      = 'pending';
+                $updates['admin_verification'] = null;
+                $updates['verified_at']        = null;
+                $updates['admin_remarks']      = null;
+            }
+
+            $report->update($updates);
+        });
+
+        ActivityLog::record(
+            'nok',
+            (string) $nok->nok_id,
+            $wasRejected ? 'nok_crisis_report_resubmitted' : 'nok_crisis_report_edited',
+            $wasRejected
+                ? "NOK resubmitted report #{$report->report_id} after rejection — back in pending queue."
+                : "NOK edited pending report #{$report->report_id}."
+        );
+
+        // Notify admins on resubmission (matches student behavior)
+        if ($wasRejected) {
+            try {
+                $admins = Admin::where('active', true)->get();
+                foreach ($admins as $admin) {
+                    $perms = (array) ($admin->permissions ?? []);
+                    if (in_array('verify_crisis', $perms, true) || $admin->role === 'super_admin') {
+                        $this->notifications->logOnly(
+                            recipientType: 'admin',
+                            recipientId:   (string) $admin->admin_id,
+                            notificationType: 'crisis_report_resubmitted',
+                            subject:       'NOK has resubmitted a rejected crisis report',
+                            message:       "NOK {$nok->nok_id} has resubmitted report #{$report->report_id} for re-review.",
+                            link:          route('admin.crisis.show', $report->report_id),
+                            studentId:     $report->student_id,
+                        );
+                    }
+                }
+            } catch (\Throwable $e) {
+                // never block the resubmission on a notification failure
+            }
+        }
+
+        $message = $wasRejected
+            ? 'Your report has been resubmitted and is now awaiting admin review again. Thank you for addressing the feedback.'
+            : 'Your report has been updated.';
+
+        return redirect()
+            ->route('nok.crisis.show', $report->report_id)
+            ->with('status', $message);
+    }
+
+    /**
+     * Delete a pending NOK-submitted report. Verified and rejected reports
+     * cannot be deleted (verified = blockchain locked, rejected = preserves
+     * audit trail so admin can see fraud patterns).
+     */
+    public function destroy(CrisisReport $report)
+    {
+        /** @var \App\Models\NextOfKin $nok */
+        $nok = Auth::guard('nok')->user();
+
+        if (!$report->submitted_by_nok || $report->nok_id !== $nok->nok_id) {
+            abort(403);
+        }
+
+        if ($report->report_status !== 'pending') {
+            return redirect()
+                ->route('nok.crisis.show', $report->report_id)
+                ->with('error', 'Only pending reports can be deleted.');
+        }
+
+        $reportId = $report->report_id;
+        $studentId = $report->student_id;
+
+        DB::transaction(function () use ($report) {
+            // Delete the attached crisis row first (FK cascade should also do this,
+            // but be explicit to keep activity_log accurate)
+            if ($report->crisis) {
+                $report->crisis->delete();
+            }
+            $report->delete();
+        });
+
+        ActivityLog::record(
+            'nok',
+            (string) $nok->nok_id,
+            'nok_crisis_report_deleted',
+            "NOK deleted pending report #{$reportId} (for student {$studentId})."
+        );
+
+        return redirect()
+            ->route('nok.submissions.index')
+            ->with('status', 'Report deleted.');
+    }
 }
