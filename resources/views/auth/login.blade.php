@@ -7,6 +7,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Sign In - e-Tawassul</title>
 
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/tawassul/etawassul-favicon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/tawassul/etawassul-icon.svg') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
@@ -879,7 +882,7 @@
             <div class="scene-overlay-top">
                 <div class="brand-block">
                     <div class="brand-logo">
-                        <i class="bi bi-life-preserver"></i>
+                        <img src="{{ asset('images/tawassul/etawassul-icon.svg') }}" alt="e-Tawassul" width="28" height="28">
                     </div>
                     <div>
                         <div class="brand-title">e-Tawassul</div>

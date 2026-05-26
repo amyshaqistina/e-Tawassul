@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="e-Tawassul">
+  <path d="M 50 10 L 78 20 L 78 44 Q 78 68 50 84 Q 22 68 22 44 L 22 20 Z" fill="#1e5fa8"/>
+  <circle cx="50" cy="42" r="6" fill="none" stroke="#ffffff" stroke-width="3.5"/>
+  <circle cx="50" cy="42" r="2" fill="#ffd66e"/>
+  <path d="M 50 48 L 50 62" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+</svg>
