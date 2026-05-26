@@ -1,7 +1,5 @@
 @extends('layouts.student')
 @section('title', 'My Last Digital Messages')
-@section('page-title', 'Last Digital Messages')
-@section('page-subtitle', 'Encrypted messages for your next of kin')
 
 @push('styles')
 <style>

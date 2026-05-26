@@ -1,6 +1,6 @@
 @extends('layouts.student')
 @section('title', 'Report #' . $report->report_id)
-@section('page-title', 'Crisis Report #' . $report->report_id)
+{{-- @section('page-title', 'Crisis Report #' . $report->report_id) --}}
 
 @php
     $status = $report->report_status; // pending | verified | rejected
@@ -23,7 +23,7 @@
 @endphp
 
 @push('head')
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
     .crsh-wrap {
         --bg:#f5f6fa; --card:#fff; --ink:#1a2238; --ink-soft:#5b6479; --ink-faint:#8a92a6;
@@ -69,7 +69,7 @@
     .crsh-hero.pending::before{background:linear-gradient(90deg,var(--amber),#f59e0b)}
     .crsh-hero.rejected::before{background:linear-gradient(90deg,var(--danger),#ef4444)}
     .crsh-hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    .crsh-hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:30px;letter-spacing:-.018em;margin:0 0 10px;line-height:1.15;color:var(--ink)}
+    .crsh-hero h1{font-family:'Inter',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.018em;margin:0 0 10px;line-height:1.15;color:var(--ink)}
     .crsh-hero-meta{display:flex;flex-wrap:wrap;gap:10px 20px;color:var(--ink-soft);font-size:13px}
     .crsh-hero-meta span{display:inline-flex;align-items:center;gap:5px}
     .crsh-hero-meta i{font-size:13px;color:var(--ink-faint)}
@@ -118,14 +118,14 @@
     .crsh-btn-sm{padding:6px 12px;font-size:12.5px}
     .crsh-btn-block{width:100%}
 
-    .crsh-funding-amount{font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1;color:var(--ink)}
+    .crsh-funding-amount{font-family:'Inter',sans-serif;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1;color:var(--ink)}
     .crsh-funding-target{font-size:13px;color:var(--ink-soft);margin:4px 0 12px}
     .crsh-funding-target strong{color:var(--ink);font-weight:600}
     .crsh-funding-bar{height:10px;background:var(--border);border-radius:999px;overflow:hidden}
     .crsh-funding-fill{height:100%;background:linear-gradient(90deg,var(--success),#22c55e);border-radius:999px;transition:width 1s cubic-bezier(.22,.61,.36,1)}
     .crsh-funding-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
     .crsh-funding-stat{text-align:center;background:var(--bg);border:1px solid var(--border-soft);border-radius:12px;padding:12px}
-    .crsh-funding-stat-num{font-family:'Fraunces',serif;font-size:20px;font-weight:600;color:var(--ink)}
+    .crsh-funding-stat-num{font-family:'Inter',sans-serif;font-size:20px;font-weight:600;color:var(--ink)}
     .crsh-funding-stat-label{font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
 
     .crsh-blockchain{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;background:var(--success-tint);border:1px solid #BBF7D0;border-radius:10px}

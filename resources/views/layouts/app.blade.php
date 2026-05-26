@@ -52,7 +52,7 @@
         }
         .et-brand:hover { color: #14567f; }
         .et-brand-mark {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', serif;
             font-size: 1.3rem;
             font-weight: 800;
             letter-spacing: -0.5px;

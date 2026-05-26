@@ -135,6 +135,9 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
     Route::get('/crisis/{report}/evidence/{index}',        [CrisisReportController::class, 'downloadEvidence'])->name('crisis.evidence.download');
     Route::post('/crisis/{report}/verify',                 [CrisisReportController::class, 'verify'])->name('crisis.verify');
     Route::post('/crisis/{report}/reject',                 [CrisisReportController::class, 'reject'])->name('crisis.reject');
+// Donation control (added 2026-05-24) — open/close & set cap per crisis
+    Route::post('/crisis/{crisis}/donation-cap',           [AdminCrisisController::class, 'updateDonationCap'])->name('crisis.donation-cap');
+    Route::post('/crisis/{crisis}/toggle-donation',        [AdminCrisisController::class, 'toggleDonation'])->name('crisis.toggle-donation');
 
     Route::get('/death',                                  [DeathConfirmationController::class, 'adminIndex'])->name('death.index');
     Route::get('/death/{confirmation}',                   [DeathConfirmationController::class, 'adminShow'])->name('death.show');
@@ -151,6 +154,8 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
     Route::get('/donations',         [AdminController::class, 'donations'])->name('donations.index');
     Route::get('/donations/create',  [DonationController::class, 'adminCreate'])->name('donations.create');
     Route::post('/donations',        [DonationController::class, 'adminStore'])->name('donations.store');
+
+
 
     Route::get('/pdf/audit', [BlockchainController::class, 'pdfAuditLog'])->name('pdf.audit');
 });

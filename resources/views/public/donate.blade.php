@@ -81,7 +81,7 @@
     .d-badge.closed   { background: #e5e7eb; color: #374151; }
 
     .header-card h1 {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'Inter', Georgia, serif;
         font-weight: 600; font-size: 34px;
         letter-spacing: -.02em;
         margin: 0 0 10px;
@@ -112,7 +112,7 @@
         text-transform: uppercase; letter-spacing: .08em;
     }
     .progress-amount-line {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'Inter', Georgia, serif;
         font-size: 14px; color: var(--d-ink-soft);
     }
     .progress-amount-line strong {
@@ -145,7 +145,7 @@
     .pay-tabs-wrap { margin-bottom: 18px; }
     .pay-tabs-header { padding: 22px 28px 0; }
     .pay-tabs-title {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'Inter', Georgia, serif;
         font-size: 22px; font-weight: 600;
         margin: 0 0 4px; letter-spacing: -.01em;
     }
@@ -246,7 +246,7 @@
         margin-bottom: 5px;
     }
     .bank-field-value {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'Inter', Georgia, serif;
         font-size: 17px; font-weight: 600; color: var(--d-ink);
         display: flex; align-items: center; justify-content: space-between;
         gap: 8px; letter-spacing: -.005em;
@@ -413,7 +413,7 @@
         font-size: 22px;
     }
     .form-title {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'Inter', Georgia, serif;
         font-size: 22px; font-weight: 600; margin: 0 0 3px; letter-spacing: -.01em;
     }
     .form-desc { color: var(--d-ink-soft); font-size: 14px; margin: 0; }
@@ -560,7 +560,7 @@
     .closed-icon.neutral { background: #f3f4f6; color: #6b7280; }
 
     .closed-card h3 {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'Inter', Georgia, serif;
         font-size: 26px; font-weight: 600;
         color: var(--d-ink); margin: 0 0 10px;
         letter-spacing: -.015em;
@@ -576,7 +576,7 @@
         max-width: 540px;
     }
     .closed-stat-num {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'Inter', Georgia, serif;
         font-size: 26px; font-weight: 600; color: var(--d-ink);
         line-height: 1;
     }
