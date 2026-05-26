@@ -80,7 +80,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
             margin: 0 auto;
             position: relative;
             z-index: 2;
-            min-height: 450px;
+            min-height: 520px;
         }
 
         .etw-arc {
@@ -227,15 +227,15 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
             margin: 0 auto;
             position: relative;
             z-index: 5;
-            padding: 4px 0 0;
+            padding: 30px 0 0;
         }
 
         .etw-headline h1 {
             font-family: 'Inter', sans-serif;
-            font-size: clamp(28px, 3.2vw, 42px);
+            font-size: clamp(24px, 2.8vw, 36px);
             font-weight: 800;
-            line-height: 1.05;
-            letter-spacing: -0.02em;
+            line-height: 1.15;
+            letter-spacing: -0.025em;
             color: var(--ink);
             margin: 0;
         }
@@ -243,8 +243,19 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         .etw-headline h1 em {
             font-style: normal;
             color: var(--primary);
-            background: linear-gradient(180deg, transparent 65%, rgba(29, 78, 216, 0.14) 65%);
-            padding: 0 4px;
+            padding: 0;
+            position: relative;
+            display: inline-block;
+        }
+        .etw-headline h1 em::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(29, 78, 216, 0.5), transparent);
+            border-radius: 2px;
         }
 
         .etw-headline .lead {
@@ -333,8 +344,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-progress-wrap {
-            margin: 8px auto 0;
-            max-width: 380px;
+            margin: 14px auto 0;
+            max-width: 420px;
             position: relative;
             z-index: 5;
             text-align: center;
@@ -342,16 +353,18 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
 
         .etw-progress-wrap h2 {
             font-family: 'Inter', sans-serif;
-            font-size: 20px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 8px;
         }
 
         .etw-progress-card {
             background: white;
-            border-radius: 12px;
-            padding: 8px 14px 6px;
+            border-radius: 14px;
+            padding: 14px 18px 12px;
             box-shadow: 0 12px 28px -14px rgba(29, 78, 216, 0.25), 0 2px 6px rgba(15, 23, 42, 0.04);
             border: 1px solid #e6ecff;
         }
@@ -360,7 +373,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
             display: flex;
             align-items: baseline;
             justify-content: space-between;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
             flex-wrap: wrap;
             gap: 6px;
         }
@@ -373,21 +386,22 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
 
         .etw-progress-counter .big {
             font-family: 'Inter', sans-serif;
-            font-size: 22px;
+            font-size: 28px;
             font-weight: 800;
             color: var(--primary);
             line-height: 1;
+            letter-spacing: -0.02em;
         }
 
         .etw-progress-counter .of {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--muted-soft);
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .etw-progress-pct {
             font-family: 'Inter', sans-serif;
-            font-size: 13px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--success);
         }
@@ -413,8 +427,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         .etw-progress-meta {
             display: flex;
             justify-content: space-between;
-            margin-top: 4px;
-            font-size: 9px;
+            margin-top: 8px;
+            font-size: 11px;
             color: var(--muted);
         }
 
@@ -426,8 +440,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         .etw-progress-row {
             display: grid;
             grid-template-columns: 1fr;
-            margin-top: 4px;
-            padding-top: 4px;
+            margin-top: 10px;
+            padding-top: 10px;
             border-top: 1px solid var(--border-soft);
         }
 
@@ -437,8 +451,9 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
 
         .etw-progress-cell .v {
             font-family: 'Inter', sans-serif;
-            font-size: 13px;
+            font-size: 18px;
             font-weight: 800;
+            letter-spacing: -0.01em;
         }
 
         .etw-progress-cell .v.success {
@@ -450,16 +465,19 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-progress-cell .k {
-            font-size: 8px;
+            font-size: 10px;
             color: var(--muted);
-            margin-top: 1px;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
         }
 
         .etw-cta-row {
             display: flex;
             justify-content: center;
             gap: 14px;
-            margin-top: 36px;
+            margin-top: 14px;
             flex-wrap: wrap;
             position: relative;
             z-index: 5;
@@ -557,55 +575,73 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         }
 
         .etw-trust-section {
-            padding: 4px 24px 8px;
-            background: white;
+            padding: 5px 24px 24px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
         }
 
         .etw-trust {
             margin: 0 auto;
             max-width: 1180px;
-            background: white;
-            border-radius: 10px;
-            border: 1px solid var(--border-soft);
-            box-shadow: 0 6px 16px -12px rgba(29, 78, 216, 0.15);
-            padding: 5px 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f9ff 50%, #eef3ff 100%);
+            border-radius: 16px;
+            border: 1px solid #dbe7ff;
+            box-shadow: 0 8px 24px -16px rgba(29, 78, 216, 0.18), 0 1px 3px rgba(15, 23, 42, 0.04);
+            padding: 18px 32px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 0;
+            align-items: center;
         }
 
         .etw-trust-item {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 14px;
+            padding: 0 24px;
+            position: relative;
         }
+        .etw-trust-item:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 32px;
+            background: linear-gradient(180deg, transparent, rgba(29, 78, 216, 0.18), transparent);
+        }
+        .etw-trust-item:first-child { padding-left: 8px; }
+        .etw-trust-item:last-child { padding-right: 8px; }
 
         .etw-trust-icon {
-            width: 20px;
-            height: 20px;
+            width: 38px;
+            height: 38px;
             flex-shrink: 0;
-            border-radius: 5px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--primary-tint);
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
             color: var(--primary);
-            font-size: 9px;
+            font-size: 15px;
+            border: 1px solid #c7dcfe;
+            box-shadow: 0 2px 6px -2px rgba(29, 78, 216, 0.18);
         }
 
         .etw-trust-item h4 {
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 700;
             margin: 0;
             color: var(--ink);
-            line-height: 1.15;
+            line-height: 1.25;
+            letter-spacing: -0.01em;
         }
 
         .etw-trust-item p {
-            font-size: 8px;
+            font-size: 11.5px;
             color: var(--muted);
-            margin: 0;
-            line-height: 1.15;
+            margin: 2px 0 0;
+            line-height: 1.3;
         }
 
         .etw-block {
@@ -1078,8 +1114,22 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
             }
 
             .etw-trust {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(4, 1fr);
+                padding: 14px 16px;
             }
+            .etw-trust-item {
+                padding: 0 10px;
+                gap: 10px;
+            }
+            .etw-trust-item:first-child { padding-left: 4px; }
+            .etw-trust-item:last-child { padding-right: 4px; }
+            .etw-trust-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+            .etw-trust-item h4 { font-size: 12px; }
+            .etw-trust-item p { font-size: 10.5px; }
 
             .etw-steps,
             .etw-tgrid {
@@ -1110,7 +1160,28 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 font-size: 32px;
             }
 
-            .etw-trust,
+            .etw-trust {
+                grid-template-columns: repeat(4, 1fr);
+                padding: 10px 8px;
+                gap: 0;
+            }
+            .etw-trust-item {
+                padding: 0 6px;
+                gap: 6px;
+                flex-direction: column;
+                text-align: center;
+            }
+            .etw-trust-item:first-child { padding-left: 4px; }
+            .etw-trust-item:last-child { padding-right: 4px; }
+            .etw-trust-item:not(:last-child)::after { display: none; }
+            .etw-trust-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+            .etw-trust-item h4 { font-size: 10.5px; line-height: 1.2; }
+            .etw-trust-item p { font-size: 9px; line-height: 1.2; }
+
             .etw-impact-grid {
                 grid-template-columns: 1fr;
             }
@@ -1606,7 +1677,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                             </div>
                         </div>
                     </div>
-                    <div class="etw-clock" style="margin: 14px auto 0; display: flex; width: fit-content;"><span class="dot"></span> Live · <span id="etwTime">--:--:--</span> · <span id="etwDate">--</span></div>
+                    <div class="etw-clock" style="margin: 8px auto 0; display: flex; width: fit-content;"><span class="dot"></span> Live · <span id="etwTime">--:--:--</span> · <span id="etwDate">--</span></div>
                 </div>
 
                 <div class="etw-cta-row">
@@ -1922,8 +1993,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'Heavy rainfall in Gombak left several student rentals submerged. e-Tawassul activated emergency relocation, providing temporary mahallah housing, replacement essentials, and academic deferment letters within 6 hours of verification.',
                 slides: [
                     '/images/tawassul/flood.jpg',
-                    'https://images.unsplash.com/photo-1583244532610-2a234c44d2c6?w=900&q=80',
-                    'https://images.unsplash.com/photo-1574788175366-15db8e0d0915?w=900&q=80'
+                    '/images/tawassul/flood2.jpg',
+                    '/images/tawassul/flood3.jpg'
                 ],
                 stats: [{
                     v: '47',
@@ -1943,8 +2014,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'A Kulliyyah of Engineering student needed emergency cardiac surgery beyond family means. e-Tawassul verified the case with IIUMMC, opened a transparent fund, and donors fully covered RM 42,300 within 48 hours — surgery proceeded on time.',
                 slides: [
                     '/images/tawassul/ilness.jpg',
-                    'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=900&q=80',
-                    'https://images.unsplash.com/photo-1666214280557-f1b5022eb634?w=900&q=80'
+                    '/images/tawassul/ilness2.jpg',
+                    '/images/tawassul/ilness3.jpg'
                 ],
                 stats: [{
                     v: '48h',
@@ -1964,8 +2035,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'A house fire destroyed the family home of a Kulliyyah of Laws student, including textbooks, devices, and personal documents. e-Tawassul coordinated with the Mahallah office for a replacement laptop, free textbook loans, and replacement-document support so finals could proceed without delay.',
                 slides: [
                     '/images/tawassul/housefire.jpg',
-                    'https://images.unsplash.com/photo-1574870111867-089730e5a72b?w=900&q=80',
-                    'https://images.unsplash.com/photo-1583936232743-1be91040548d?w=900&q=80'
+                    '/images/tawassul/housefire2.jpg',
+                    '/images/tawassul/housefires3.jpg'
                 ],
                 stats: [{
                     v: '1',
@@ -1985,8 +2056,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'A second-year student commuting from Gombak was severely injured. e-Tawassul activated next-of-kin protocols within the hour, arranged hospital liaison with IIUMMC, transport for family from Terengganu, and an academic hold so credits weren\'t lost during recovery.',
                 slides: [
                     '/images/tawassul/accident.jpg',
-                    'https://images.unsplash.com/photo-1612831455540-fcbe1f7e3739?w=900&q=80',
-                    'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=900&q=80'
+                    '/images/tawassul/accident2.jpg',
+                    '/images/tawassul/aciident3.jpg'
                 ],
                 stats: [{
                     v: '<1h',
@@ -2006,8 +2077,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'Beyond emergencies, e-Tawassul runs continuous welfare programs: monthly food assistance, mental-health connections through CHARIS, peer-mentoring, and emergency stipends for students whose families lost income — keeping degrees on track.',
                 slides: [
                     '/images/tawassul/Death.jpg',
-                    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&q=80',
-                    'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=80'
+                    '/images/tawassul/death2.jpg',
+                    '/images/tawassul/death3.jpg'
                 ],
                 stats: [{
                     v: '612',
@@ -2027,8 +2098,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 lead: 'e-Tawassul preserves voice notes, letters, and final wishes that students choose to share with their next-of-kin under specific conditions. End-to-end encrypted, blockchain-verified, released only when verified — giving every student peace of mind.',
                 slides: [
                     '/images/tawassul/Wasiat.jpg',
-                    'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=900&q=80',
-                    'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=900&q=80'
+                    '/images/tawassul/lastmessage2.jpg',
+                    '/images/tawassul/lastmessage3.jpg'
                 ],
                 stats: [{
                     v: '892',
