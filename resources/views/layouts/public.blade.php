@@ -11,6 +11,37 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/chatbot.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
+
+    {{-- Brand (logo) styles + phone scaling --}}
+    <style>
+        .etw-brand-logo {
+            height: 50px;
+            width: auto;
+            display: block;
+            flex-shrink: 0;
+        }
+        .etw-tagline {
+            width: 100%;
+            margin-top: 5px;
+            font-size: 8px;
+            font-weight: 600;
+            letter-spacing: .3px;
+            color: #5b6b86;
+            text-transform: uppercase;
+        }
+
+        /* Phones */
+        @media (max-width: 575.98px) {
+            .etw-brand-logo { height: 38px; }
+            .navbar-public .brand-mark { font-size: 1.15rem; }
+            .etw-tagline { font-size: 7px; letter-spacing: .2px; margin-top: 4px; }
+        }
+        @media (max-width: 380px) {
+            .etw-brand-logo { height: 32px; }
+            .navbar-public .brand-mark { font-size: 1rem; }
+            .etw-tagline { font-size: 6.5px; }
+        }
+    </style>
     @stack('head')
 </head>
 
@@ -19,8 +50,18 @@
     <nav class="navbar navbar-expand-lg navbar-public sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
-                <span class="brand-mark">e-Tawassul</span>
-                <small class="brand-sub d-none d-md-inline">IIUM Crisis Response</small>
+                <img src="{{ asset('images/tawassul/etawassul-shield.svg') }}" alt="e-Tawassul"
+                     class="me-2 etw-brand-logo">
+                <span class="d-flex flex-column justify-content-center" style="line-height:1;">
+                    <span class="brand-mark" style="line-height:1;color:#2563eb;">e-Tawassul</span>
+                    <span class="etw-tagline d-flex align-items-center justify-content-between">
+                        <span style="border-bottom:2px solid #f5a623;padding-bottom:2px;">Crisis</span>
+                        <span style="color:#f5a623;">&middot;</span>
+                        <span style="border-bottom:2px solid #f5a623;padding-bottom:2px;">Support</span>
+                        <span style="color:#f5a623;">&middot;</span>
+                        <span style="border-bottom:2px solid #f5a623;padding-bottom:2px;">Legacy</span>
+                    </span>
+                </span>
             </a>
             <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#topnav">
                 <span class="navbar-toggler-icon"></span>
