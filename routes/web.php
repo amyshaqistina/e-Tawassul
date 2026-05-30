@@ -65,6 +65,7 @@ Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout',[AuthController::class, 'logout'])->name('logout');
 
+
 Route::get('/twofactor',         [AuthController::class, 'showTwoFactor'])->name('nok.twofactor.show');
 Route::post('/twofactor',        [AuthController::class, 'verifyTwoFactor'])->name('nok.twofactor.verify');
 Route::post('/twofactor/resend', [AuthController::class, 'resendOtp'])->name('nok.twofactor.resend');

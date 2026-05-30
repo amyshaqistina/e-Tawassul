@@ -243,7 +243,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         .etw-headline h1 em {
             font-style: normal;
             color: var(--primary);
-            padding: 0;
+            padding: 0 0 10px;
             position: relative;
             display: inline-block;
         }
@@ -254,6 +254,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
             right: 0;
             bottom: -2px;
             height: 3px;
+            /* padding: 10px 0; */
             background: linear-gradient(90deg, transparent, rgba(29, 78, 216, 0.5), transparent);
             border-radius: 2px;
         }

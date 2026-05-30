@@ -80,7 +80,7 @@
     .crsh-hero.pending::before{background:linear-gradient(90deg,var(--amber),#f59e0b)}
     .crsh-hero.rejected::before{background:linear-gradient(90deg,var(--danger),#ef4444)}
     .crsh-hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    .crsh-hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:30px;letter-spacing:-.018em;margin:0 0 10px;line-height:1.15;color:var(--ink)}
+    .crsh-hero h1{font-family:'Inter',Georgia,serif;font-weight:600;font-size:30px;letter-spacing:-.018em;margin:0 0 10px;line-height:1.15;color:var(--ink)}
     .crsh-hero-meta{display:flex;flex-wrap:wrap;gap:10px 20px;color:var(--ink-soft);font-size:13px}
     .crsh-hero-meta span{display:inline-flex;align-items:center;gap:5px}
     .crsh-hero-meta i{font-size:13px;color:var(--ink-faint)}
@@ -114,7 +114,7 @@
         display:flex;align-items:center;justify-content:center;
         font-weight:700;font-size:18px;
         flex-shrink:0;
-        font-family:'Fraunces',serif;
+        font-family:'Inter',serif;
     }
     .crsh-student-info{flex:1;min-width:0}
     .crsh-student-label{font-size:11px;font-weight:700;color:#9a3412;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}

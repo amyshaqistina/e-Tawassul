@@ -476,7 +476,10 @@ class CrisisReportController extends Controller
 
     public function adminShow(CrisisReport $report)
     {
-        $report->load('student', 'crisis', 'verifier');
+        // Eager-load 'nok' too so the "Reported By" row can show NOK details
+        // (name, relationship, email) without an extra query when a kin filed
+        // the report on behalf of the student.
+        $report->load('student', 'crisis', 'verifier', 'nok');
 
         // Look up the student's current-semester courses and matched lecturers
         // from student_courses (populated during their iMaalum login).

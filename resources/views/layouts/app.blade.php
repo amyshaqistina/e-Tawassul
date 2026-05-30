@@ -8,6 +8,9 @@
     <title>@yield('title', 'e-Tawassul')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/chatbot.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
@@ -52,13 +55,13 @@
         }
         .et-brand:hover { color: #14567f; }
         .et-brand-mark {
-            font-family: 'Inter', serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 1.3rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             line-height: 1;
             color: #1a6fa8;
-        }
+    }
         .et-brand-sub {
             font-size: 0.65rem;
             font-weight: 500;
@@ -450,7 +453,7 @@
             gap: 16px;
         }
         .et-page-head h1 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 26px;
             font-weight: 800;
             color: #0f172a;

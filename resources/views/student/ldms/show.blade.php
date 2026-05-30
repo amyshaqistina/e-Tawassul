@@ -18,7 +18,7 @@
 @endphp
 
 @push('head')
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+{{-- <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"> --}}
 <style>
     .ldsh-wrap {
         --bg:#f5f6fa; --card:#fff; --ink:#1a2238; --ink-soft:#5b6479; --ink-faint:#8a92a6;
@@ -57,7 +57,7 @@
     .ldsh-hero::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--amber),#f59e0b)}
     .ldsh-hero.released::before{background:linear-gradient(90deg,var(--success),#22c55e)}
     .ldsh-hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    .ldsh-hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:30px;letter-spacing:-.018em;margin:0 0 10px;line-height:1.15;color:var(--ink)}
+    .ldsh-hero h1{font-family:'Inter',Georgia,serif;font-weight:600;font-size:30px;letter-spacing:-.018em;margin:0 0 10px;line-height:1.15;color:var(--ink)}
     .ldsh-hero-meta{display:flex;flex-wrap:wrap;gap:10px 20px;color:var(--ink-soft);font-size:13px}
     .ldsh-hero-meta span{display:inline-flex;align-items:center;gap:5px}
     .ldsh-hero-meta i{font-size:13px;color:var(--ink-faint)}
@@ -81,7 +81,7 @@
         border:1px solid #fde68a;
         border-radius:12px;
         padding:22px 26px;
-        font-family:'Fraunces',Georgia,serif;
+        font-family:'Inter',Georgia,serif;
         font-size:17px;line-height:1.7;
         color:#1a2238;
         white-space:pre-wrap;
@@ -90,14 +90,14 @@
     .ldsh-message-body::before{
         content:"\201C";
         position:absolute;top:-10px;left:14px;
-        font-family:'Fraunces',serif;
+        font-family:'Inter',serif;
         font-size:60px;color:#fcd34d;
         line-height:1;
     }
     .ldsh-message-body::after{
         content:"\201D";
         position:absolute;bottom:-30px;right:14px;
-        font-family:'Fraunces',serif;
+        font-family:'Inter',serif;
         font-size:60px;color:#fcd34d;
         line-height:1;
     }

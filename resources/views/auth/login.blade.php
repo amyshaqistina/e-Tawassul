@@ -7,6 +7,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Sign In - e-Tawassul</title>
 
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/tawassul/etawassul-favicon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/tawassul/etawassul-icon.svg') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
@@ -125,7 +128,21 @@
             justify-content: space-between;
             gap: 10px;
         }
-        .brand-block { display: flex; align-items: center; gap: 10px; }
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+        .brand-block:hover {
+            transform: translateY(-1px);
+            opacity: 0.92;
+        }
+        .brand-block:hover .brand-logo {
+            box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+        }
         .brand-logo {
             width: 42px; height: 42px;
             border-radius: 12px;
@@ -877,15 +894,15 @@
 
             {{-- Logo + time badge --}}
             <div class="scene-overlay-top">
-                <div class="brand-block">
+                <a href="{{ route('public.dashboard') }}" class="brand-block" title="Back to public dashboard">
                     <div class="brand-logo">
-                        <i class="bi bi-life-preserver"></i>
+                        <img src="{{ asset('images/tawassul/etawassul-icon.svg') }}" alt="e-Tawassul" width="28" height="28">
                     </div>
                     <div>
                         <div class="brand-title">e-Tawassul</div>
                         <div class="brand-sub">IIUM Crisis &amp; Legacy</div>
                     </div>
-                </div>
+                </a>
                 <button type="button" class="time-badge" id="timeBadge" title="Cycle scene">
                     <i class="bi bi-sun" id="timeIcon"></i>
                     <span id="timeLabel">Dawn</span>

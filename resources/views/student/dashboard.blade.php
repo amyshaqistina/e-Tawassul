@@ -20,7 +20,7 @@
         }
 
         .welcome-banner {
-            background: linear-gradient(135deg, #1a56db, #06b6d4) !important;
+            background: linear-gradient(135deg, #4076eb, #0fccee) !important;
             border-radius: 14px !important; padding: 18px 22px !important;
             display: flex !important; align-items: center !important; justify-content: space-between !important;
             position: relative !important; overflow: hidden !important; color: #fff !important; min-width: 0 !important;

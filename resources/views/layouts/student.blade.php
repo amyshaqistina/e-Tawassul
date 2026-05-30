@@ -73,11 +73,11 @@
         </div>
     </li>
 
-    <li>
+    {{-- <li>
         <a href="{{ route('notifications.index') }}"
            class="et-nav-link {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
             <i class="bi bi-bell"></i>
             <span class="label">Notifications</span>
         </a>
-    </li>
+    </li> --}}
 @endsection
