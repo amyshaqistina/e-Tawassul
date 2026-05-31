@@ -129,6 +129,8 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/students',  [AdminController::class, 'students'])->name('students.index');
     Route::get('/students/{student}', [AdminStudentController::class, 'show'])->name('students.show');
+    // Admin edit of student-provided fields (programme, mahallah, phone, bank, status, etc.)
+    Route::patch('/students/{student}', [AdminStudentController::class, 'update'])->name('students.update');
     Route::post('/students/{student}/kin', [AdminStudentController::class, 'storeKin'])->name('students.kin.store');
 
     Route::get('/crisis',                                  [AdminCrisisController::class, 'index'])->name('crisis.index');
