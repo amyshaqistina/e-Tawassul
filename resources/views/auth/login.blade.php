@@ -371,7 +371,7 @@
             padding: 32px 30px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;   /* top-aligned — removes the empty gap above the secure pill */
             overflow-y: auto;
             position: relative;
         }
