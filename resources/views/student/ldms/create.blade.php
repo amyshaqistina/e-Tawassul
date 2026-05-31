@@ -142,7 +142,7 @@
 @endpush
 
 @section('content')
-<div class="container-fluid py-3">
+<div class="container-fluid pb-3">
     <div class="row g-3">
 
         {{-- ========================================

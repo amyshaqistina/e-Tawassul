@@ -859,7 +859,7 @@
 @endpush
 
 @section('content')
-    <div class="container-fluid py-3">
+    <div class="container-fluid pb-3">
 
         <div class="d-flex justify-content-between align-items-center mb-3 no-print">
             <a href="{{ route('admin.crisis.index') }}" class="back-link">
@@ -1363,7 +1363,19 @@
                 </form>
             </div>
         @endif
-    </div>
+
+        {{-- ============================================================
+             DONATION CONTROL — verified reports only (the partial self-gates
+             on report_status === 'verified', so it renders nothing for
+             pending/rejected). Placed INSIDE the container, right after the
+             decision bar, so it lines up with the same left/right spacing as
+             the "Ready to decide?" card above.
+             ============================================================ --}}
+        <div class="mt-4">
+            @include('admin.crisis._donation_control', ['report' => $report])
+        </div>
+
+    </div>  {{-- closes .container-fluid py-3 --}}
 
     @push('scripts')
         <script>

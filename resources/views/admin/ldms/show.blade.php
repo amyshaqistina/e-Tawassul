@@ -108,7 +108,7 @@
 @endpush
 
 @section('content')
-<div class="container-fluid py-3">
+<div class="container-fluid pb-3">
 
     <a href="{{ route('admin.ldms.index') }}" class="back-link">
         <i class="bi bi-arrow-left"></i> Back to LDMS list

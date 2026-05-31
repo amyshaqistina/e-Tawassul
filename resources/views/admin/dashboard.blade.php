@@ -119,7 +119,7 @@
 @endpush
 
 @section('content')
-<div class="container-fluid py-3">
+<div class="container-fluid pb-3">
 
     @if (!empty($suspiciousStudents) && $suspiciousStudents->count() > 0)
         <div class="fraud-alert-card">

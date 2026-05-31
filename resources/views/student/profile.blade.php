@@ -304,7 +304,7 @@
         }
     </style>
 
-    <div class="profile-wrap container-fluid py-3">
+    <div class="profile-wrap container-fluid pb-3">
 
         {{-- ===== TOP: Profile Hero (horizontal banner) ===== --}}
         <div class="profile-hero">

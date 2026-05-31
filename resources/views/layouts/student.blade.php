@@ -45,7 +45,7 @@
         </div>
     </li>
 
-    {{-- Legacy Messages dropdown --}}
+    {{-- Legacy Messages dropdown — New Message first, My Messages second --}}
     <li class="et-nav-dropdown {{ request()->routeIs('student.ldms.*') ? 'open' : '' }}">
         <a href="#"
            class="et-nav-link {{ request()->routeIs('student.ldms.*') ? 'active' : '' }}">
@@ -54,20 +54,20 @@
             <i class="bi bi-chevron-down chev"></i>
         </a>
         <div class="et-dropdown-panel">
-            <a href="{{ route('student.ldms.index') }}"
-               class="et-dropdown-item {{ request()->routeIs('student.ldms.index') ? 'active' : '' }}">
-                <i class="bi bi-inbox"></i>
-                <span>
-                    My Messages
-                    <span class="et-dropdown-item-sub">View your saved messages</span>
-                </span>
-            </a>
             <a href="{{ route('student.ldms.create') }}"
                class="et-dropdown-item {{ request()->routeIs('student.ldms.create') ? 'active' : '' }}">
                 <i class="bi bi-plus-square"></i>
                 <span>
                     New Message
                     <span class="et-dropdown-item-sub">Create a new digital legacy</span>
+                </span>
+            </a>
+            <a href="{{ route('student.ldms.index') }}"
+               class="et-dropdown-item {{ request()->routeIs('student.ldms.index') ? 'active' : '' }}">
+                <i class="bi bi-inbox"></i>
+                <span>
+                    My Messages
+                    <span class="et-dropdown-item-sub">View your saved messages</span>
                 </span>
             </a>
         </div>

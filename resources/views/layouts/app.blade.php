@@ -67,13 +67,13 @@
             line-height: 1;
         }
         .et-brand-mark {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.3rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             line-height: 1;
-            color: #1a6fa8;
-    }
+            color: #2563eb;
+        }
         .et-brand-sub {
             display: block;
             width: 100%;
@@ -470,7 +470,7 @@
         }
 
         /* Make app-content full-width once sidebar is gone */
-        .app-content { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .app-content { max-width: 1400px; margin: 0 auto; padding: 12px 24px 24px; 
         .app-topbar { display: none !important; } /* hide old topbar */
 
         /* Page header (replaces the old topbar's page-title section) */
@@ -484,7 +484,7 @@
             gap: 16px;
         }
         .et-page-head h1 {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-size: 26px;
             font-weight: 800;
             color: #0f172a;
