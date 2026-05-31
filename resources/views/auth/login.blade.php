@@ -256,8 +256,7 @@
         @keyframes starTwinkle { 0%,100% { opacity: 0.3; transform: scale(0.7); } 50% { opacity: 1; transform: scale(1.5); } }
         .star { animation: starTwinkle 2.5s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
 
-        /* === LIGHTHOUSE BEAM — FIXED === */
-        /* Wrap beam inside a <g> with transform="translate(80 296)" so origin becomes 0,0 of the inner group */
+        /* === LIGHTHOUSE BEAM === */
         @keyframes beamSweep {
             0%   { transform: rotate(-28deg); }
             50%  { transform: rotate(28deg);  }
@@ -284,7 +283,7 @@
         @keyframes sparkle { 0%,100% { opacity: 0; transform: scale(0.4); } 50% { opacity: 1; transform: scale(1.6); } }
         .sparkle-dot { animation: sparkle 2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
 
-        /* Birds flying across (V formation) — single group translates, individual birds flap */
+        /* Birds flying across (V formation) */
         @keyframes birdFly {
             0%   { transform: translate(-60px, 0); opacity: 0; }
             10%  { opacity: 1; }
@@ -575,12 +574,56 @@
             font-weight: 600;
         }
 
+        /* ============ MOBILE FIXES ============ */
         @media (max-width: 900px) {
+            /* Allow the page to scroll naturally */
+            html, body {
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            body {
+                align-items: flex-start;   /* stop centering the shell vertically */
+                padding: 14px;
+            }
+
             .scene-panel { display: none; }
-            .login-right { width: 100%; padding: 24px 24px; }
-            .login-shell { max-width: 460px; height: auto; max-height: calc(100vh - 28px); }
+
+            .login-shell {
+                max-width: 460px;
+                width: 100%;
+                height: auto;
+                max-height: none;          /* let the shell size to its content */
+                margin: 0 auto;
+            }
+
+            .login-right {
+                width: 100%;
+                padding: 24px 24px;
+                justify-content: flex-start; /* pin content to the top */
+                overflow-y: visible;
+            }
+
+            /* Shrink the decorative squiggle so it doesn't crowd the heading */
+            .decor-curve.top-right {
+                width: 80px;
+                height: 80px;
+                opacity: 0.3;
+            }
+            .decor-curve.bottom-left {
+                width: 70px;
+                height: 70px;
+                opacity: 0.3;
+            }
         }
-        @media (max-height: 640px) {
+
+        @media (max-width: 480px) {
+            .login-right { padding: 20px 18px; }
+            .login-right h2 { font-size: 21px; }
+        }
+
+        @media (max-height: 640px) and (min-width: 901px) {
             .login-right { padding: 16px 24px; }
             .scene-tagline .line1, .scene-tagline .line2 { font-size: 18px; }
         }

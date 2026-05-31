@@ -1101,7 +1101,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
 
         @media (max-width: 1024px) {
 
-            .etw-circle,
+            /* Hide the dashed arcs; the circles become a horizontal carousel */
             .etw-arc {
                 display: none;
             }
@@ -1112,7 +1112,81 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
 
             .etw-stage__inner {
                 min-height: auto;
+                display: flex;
+                flex-direction: column;
             }
+
+            /* Order: headline → circles strip → progress → CTA */
+            .etw-headline      { order: 1; }
+            .etw-circles       { order: 2; }
+            .etw-progress-wrap { order: 3; }
+            .etw-cta-row       { order: 4; }
+
+            /* Horizontal scroll strip wrapping all six circles */
+            .etw-circles {
+                display: flex;
+                gap: 22px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                padding: 14px 18px 24px;
+                margin: 6px -18px 14px;          /* bleed to screen edges */
+                /* subtle fade hint on the right edge */
+                -webkit-mask-image: linear-gradient(90deg, black 0, black 88%, transparent 100%);
+                        mask-image: linear-gradient(90deg, black 0, black 88%, transparent 100%);
+            }
+            .etw-circles::-webkit-scrollbar { display: none; }
+
+            /* Each circle: break out of absolute positioning, flow as a column */
+            .etw-circle {
+                position: static;
+                top: auto; left: auto; right: auto; bottom: auto;
+                flex: 0 0 auto;
+                width: 96px;
+                height: auto;
+                scroll-snap-align: center;
+                animation: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .etw-circle .photo {
+                position: relative;
+                inset: auto;
+                width: 96px;
+                height: 96px;
+                border-width: 3px;
+                box-shadow: 0 10px 22px -12px rgba(15, 23, 42, 0.38);
+            }
+
+            .etw-circle .ring {
+                inset: -6px;
+                width: auto;
+                height: auto;
+                border-width: 1.5px;
+            }
+
+            /* Chip moves from beside the circle to below it */
+            .etw-circle .chip,
+            .etw-circle.l .chip,
+            .etw-circle.r .chip {
+                position: static;
+                transform: none;
+                margin-top: 10px;
+                background: transparent;
+                border: 0;
+                box-shadow: none;
+                padding: 0;
+                font-size: 12.5px;
+                font-weight: 600;
+                color: var(--ink);
+                white-space: nowrap;
+            }
+            .etw-circle.l:hover .chip,
+            .etw-circle.r:hover .chip { transform: none; }
 
             .etw-trust {
                 grid-template-columns: repeat(4, 1fr);
@@ -1149,6 +1223,28 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
             .etw-donate {
                 grid-template-columns: 1fr;
                 padding: 36px 28px;
+            }
+        }
+
+        /* Phone-only refinement: tighter circles, smaller gap */
+        @media (max-width: 540px) {
+            .etw-circles {
+                gap: 16px;
+                padding: 12px 16px 20px;
+                margin: 4px -16px 12px;
+            }
+            .etw-circle,
+            .etw-circle .photo {
+                width: 84px;
+            }
+            .etw-circle .photo {
+                height: 84px;
+            }
+            .etw-circle .chip,
+            .etw-circle.l .chip,
+            .etw-circle.r .chip {
+                font-size: 11.5px;
+                margin-top: 8px;
             }
         }
 
@@ -1615,6 +1711,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                     <path d="M 180 540 Q 640 700, 1100 540" />
                 </svg>
 
+                {{-- Six circles: free-floating on desktop, horizontal carousel on tablet/phone --}}
+                <div class="etw-circles">
                 <div class="etw-circle l c1" data-modal="flood" role="button" tabindex="0"><span class="ring"></span>
                     <div class="photo"
                         style="background-image:url('/images/tawassul/flood.jpg')">
@@ -1647,6 +1745,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                         style="background-image:url('/images/tawassul/Wasiat.jpg')">
                     </div><span class="chip"><i class="fas fa-envelope"></i>Last Message</span>
                 </div>
+                </div>
+                {{-- /etw-circles --}}
 
                 <div class="etw-headline">
                     <h1>When crisis strikes,<br><em>support is already here</em></h1>
