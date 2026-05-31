@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 122" width="100" height="122" role="img" aria-label="e-Tawassul shield">
+  <defs>
+    <linearGradient id="etwOuter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4f93e0"/>
+      <stop offset="1" stop-color="#2563c9"/>
+    </linearGradient>
+    <linearGradient id="etwInner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#eaf2fd"/>
+    </linearGradient>
+    <radialGradient id="etwGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe9a8"/>
+      <stop offset="0.55" stop-color="#ffd166" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffd166" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="etwBeam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffe9a8" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ffe9a8" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- small dot above the shield -->
+  <circle cx="50" cy="7" r="4.4" fill="url(#etwOuter)"/>
+  <circle cx="50" cy="7" r="1.9" fill="#ffd166"/>
+
+  <!-- outer shield -->
+  <path d="M50 15
+           C 66 22, 78 24, 86 25
+           C 86 60, 80 90, 50 110
+           C 20 90, 14 60, 14 25
+           C 22 24, 34 22, 50 15 Z"
+        fill="url(#etwOuter)"/>
+
+  <!-- thin inner outline (double-border look) -->
+  <path d="M50 21
+           C 64 27, 74 29, 81 30
+           C 81 59, 76 86, 50 104
+           C 24 86, 19 59, 19 30
+           C 26 29, 36 27, 50 21 Z"
+        fill="none" stroke="#bcd6f5" stroke-width="1.4" opacity="0.85"/>
+
+  <!-- inner white shield -->
+  <path d="M50 26
+           C 62 31, 71 33, 77 34
+           C 77 59, 73 83, 50 99
+           C 27 83, 23 59, 23 34
+           C 29 33, 38 31, 50 26 Z"
+        fill="url(#etwInner)"/>
+
+  <!-- horizontal light beam through the beacon -->
+  <rect x="26" y="55" width="48" height="6" rx="3" fill="url(#etwBeam)"/>
+
+  <!-- beacon glow -->
+  <circle cx="50" cy="58" r="15" fill="url(#etwGlow)"/>
+
+  <!-- key shaft -->
+  <rect x="48.4" y="63" width="3.2" height="22" rx="1.6" fill="#1e5fa8"/>
+  <!-- shaft tip -->
+  <path d="M50 90 L46 84 L54 84 Z" fill="#1e5fa8"/>
+
+  <!-- beacon ring + core -->
+  <circle cx="50" cy="58" r="7.2" fill="none" stroke="#f5a623" stroke-width="3"/>
+  <circle cx="50" cy="58" r="3.1" fill="#1e5fa8"/>
+
+  <!-- waves near the base -->
+  <path d="M33 90 Q41 86 50 90 T67 90" fill="none" stroke="#34d3c0" stroke-width="2" stroke-linecap="round"/>
+  <path d="M35 95 Q42.5 91.5 50 95 T65 95" fill="none" stroke="#7fe3d6" stroke-width="1.7" stroke-linecap="round" opacity="0.8"/>
+</svg>

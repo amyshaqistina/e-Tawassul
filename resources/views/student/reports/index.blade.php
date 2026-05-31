@@ -17,7 +17,7 @@
     .mrep-wrap *,.mrep-wrap *::before,.mrep-wrap *::after{box-sizing:border-box}
 
     .mrep-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:14px;flex-wrap:wrap}
-    .mrep-header h1{font-family:'Fraunces',serif;font-weight:600;font-size:28px;margin:0;letter-spacing:-.015em;color:var(--ink)}
+    .mrep-header h1{font-family:'Inter',serif;font-weight:600;font-size:28px;margin:0;letter-spacing:-.015em;color:var(--ink)}
     .mrep-header p{color:var(--ink-soft);font-size:14px;margin:4px 0 0}
 
     .mrep-tabs{display:flex;gap:6px;margin-bottom:16px;background:#fff;padding:6px;border-radius:12px;border:1px solid var(--border-soft);box-shadow:var(--shadow);width:fit-content;max-width:100%;overflow-x:auto;flex-wrap:wrap}

@@ -1,5 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Report #' . $report->report_id)
+{{-- @section('page-title', 'Crisis Report Review') --}}
 
 @php
     $typeLabels = [
@@ -576,6 +577,94 @@
             font-size: 13px;
         }
 
+        /* ===== Full-width decision bar (NEW) — sits at bottom of page =====
+           Visually anchors the bottom of the report. Wider layout gives form
+           breathing room compared to the sidebar version. */
+        .decision-card-fullwidth {
+            background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+            border: 1px solid #dbe7ff;
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-top: 24px;
+            box-shadow: 0 8px 32px -16px rgba(29, 78, 216, 0.18);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .decision-card-fullwidth-intro {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding-bottom: 18px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid #e6edff;
+        }
+
+        .decision-card-fullwidth-intro > i {
+            font-size: 26px;
+            color: #1d4ed8;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .decision-card-fullwidth-intro h4 {
+            margin: 0 0 4px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .decision-card-fullwidth-intro p {
+            margin: 0;
+            font-size: 13.5px;
+            color: #5b6479;
+            line-height: 1.55;
+        }
+
+        .decision-card-fullwidth .dec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .decision-card-fullwidth .dec-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+        }
+
+        .decision-card-fullwidth .dec-field label,
+        .decision-card-fullwidth .dec-notes label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .decision-card-fullwidth .dec-field .form-control,
+        .decision-card-fullwidth .dec-notes .form-control {
+            font-size: 13.5px;
+            padding: 9px 12px;
+        }
+
+        .decision-card-fullwidth .dec-notes {
+            margin-bottom: 18px;
+        }
+
+        .decision-card-fullwidth .help-text {
+            font-size: 11.5px;
+            color: #8a92a6;
+            margin-top: 5px;
+        }
+
+        .decision-card-fullwidth .btn-decision {
+            font-size: 14px;
+            padding: 12px 24px;
+            font-weight: 600;
+        }
+
         .outcome-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -766,6 +855,50 @@
                 border: 1px solid #E5E7EB !important;
             }
         }
+
+        /* ===== Layout improvements ===== */
+        /* Sticky sidebar — stays in view while the long Crisis Information card
+           scrolls. align-self keeps the column its natural height so it has room
+           to stick instead of being stretched to full row height. */
+        .sidebar-col {
+            position: sticky;
+            top: 16px;
+            align-self: flex-start;
+        }
+
+        /* Student contact line (folded in from the removed profile card) */
+        .student-contact {
+            display: flex; flex-wrap: wrap; gap: 6px 16px;
+            margin-top: 8px; padding-top: 8px;
+            border-top: 1px dashed #E5E7EB;
+            font-size: 12px; color: #6B7280;
+        }
+        .student-contact a, .student-contact span {
+            display: inline-flex; align-items: center; gap: 5px;
+            color: #6B7280; text-decoration: none; white-space: nowrap;
+        }
+        .student-contact a:hover { color: #1E40AF; text-decoration: underline; }
+        .student-status-dot {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10.5px; font-weight: 700; color: #047857;
+            background: #ECFDF5; padding: 2px 8px; border-radius: 999px;
+            margin-left: 6px; text-transform: uppercase; letter-spacing: .03em;
+        }
+        .student-status-dot i { font-size: 6px; }
+
+        /* Lecturers — capped height + scroll so 4 or 14 subjects take the same
+           space and never stretch the column. */
+        .lect-scroll { max-height: 300px; overflow-y: auto; margin: 0 -4px; padding: 0 4px; }
+        .lect-scroll::-webkit-scrollbar { width: 8px; }
+        .lect-scroll::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 8px; }
+        .lect-scroll::-webkit-scrollbar-track { background: transparent; }
+        .lect-scroll-hint {
+            text-align: center; font-size: 11px; color: #94A3B8; padding: 8px 0 2px;
+        }
+
+        @media (max-width: 991px) {
+            .sidebar-col { position: static; }   /* no sticky once columns stack */
+        }
     </style>
 @endpush
 
@@ -825,9 +958,28 @@
                         <div class="value">
                             <strong>{{ $report->student?->full_name ?? '—' }}</strong>
                             <span class="text-muted">({{ $report->student_id }})</span>
+                            @if ($report->student?->status)
+                                <span class="student-status-dot" title="{{ ucfirst($report->student->status) }} student">
+                                    <i class="bi bi-circle-fill"></i> {{ ucfirst($report->student->status) }}
+                                </span>
+                            @endif
                             @if ($report->student?->faculty)
                                 <span class="sub">{{ $report->student->faculty }}</span>
                             @endif
+
+                            {{-- Contact line — folded in from the old Student Profile card so
+                                 admins can still reach the student during review. --}}
+                            <div class="student-contact">
+                                @if ($report->student?->email)
+                                    <a href="mailto:{{ $report->student->email }}"><i class="bi bi-envelope"></i> {{ $report->student->email }}</a>
+                                @endif
+                                @if ($report->student?->phone)
+                                    <span><i class="bi bi-telephone"></i> {{ $report->student->phone }}</span>
+                                @endif
+                                @if ($report->student?->programme)
+                                    <span><i class="bi bi-mortarboard"></i> {{ $report->student->programme }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
@@ -837,9 +989,27 @@
                             Reported By
                         </div>
                         <div class="value">
-                            {{ $report->student?->full_name ?? '—' }}
-                            <span class="sub">Student self-report •
-                                {{ $report->date_reported?->format('d M Y, H:i') }}</span>
+                            @if ($report->submitted_by_nok && $report->nok)
+                                {{-- NOK-submitted report: show NOK details + relationship --}}
+                                {{ trim(($report->nok->first_name ?? '') . ' ' . ($report->nok->last_name ?? '')) }}
+                                <span style="display:inline-block; background:#FEF3C7; color:#92400E; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:4px; margin-left:6px; text-transform:uppercase; letter-spacing:0.04em;">
+                                    <i class="bi bi-person-check-fill"></i> Submitted by Next-of-Kin
+                                </span>
+                                <span class="sub">
+                                    @if ($report->nok->relationship_to_student)
+                                        {{ ucfirst($report->nok->relationship_to_student) }} ·
+                                    @endif
+                                    @if ($report->nok->email)
+                                        {{ $report->nok->email }} ·
+                                    @endif
+                                    {{ $report->date_reported?->format('d M Y, H:i') }}
+                                </span>
+                            @else
+                                {{-- Student self-report (unchanged) --}}
+                                {{ $report->student?->full_name ?? '—' }}
+                                <span class="sub">Student self-report •
+                                    {{ $report->date_reported?->format('d M Y, H:i') }}</span>
+                            @endif
                         </div>
                     </div>
 
@@ -1066,64 +1236,12 @@
                     @endif
                 </div>
 
-                {{-- DECISION CARD — moved here to inherit Crisis Information width (col-lg-8).
-                     Only renders for pending reports. Verified/rejected reports show a
-                     compact verdict banner in the sidebar instead. --}}
-                @if ($statusKey === 'pending')
-                    <div class="decision-card no-print" style="margin-top:18px">
-                        <div class="decision-card-header">
-                            <h5><i class="bi bi-shield-check"></i> Verify Report</h5>
-                        </div>
-                        <div class="decision-card-body">
-                            <form id="verificationForm" method="POST" action="">
-                                @csrf
-
-                                <div class="mb-3">
-                                    <label>Staff ID</label>
-                                    <input type="text" name="staff_id" class="form-control"
-                                        value="{{ $currentAdmin?->admin_id ? 'STAFF' . str_pad($currentAdmin->admin_id, 3, '0', STR_PAD_LEFT) : '' }}"
-                                        placeholder="e.g. STAFF001" required>
-                                    @if ($currentAdmin)
-                                        <div class="help-text">Logged in as
-                                            <strong>{{ $currentAdmin->admin_name }}</strong></div>
-                                    @endif
-                                </div>
-
-                                <div class="mb-3">
-                                    <label>Decision <span style="color:#EF4444;">*</span></label>
-                                    <div class="outcome-grid">
-                                        <label class="outcome-option" id="opt-verify" onclick="setOutcome('verify')">
-                                            <input type="radio" name="outcome" value="verify" required>
-                                            <i class="bi bi-check-circle"></i>
-                                            <div class="label-text">Verify</div>
-                                        </label>
-                                        <label class="outcome-option" id="opt-reject" onclick="setOutcome('reject')">
-                                            <input type="radio" name="outcome" value="reject" required>
-                                            <i class="bi bi-x-circle"></i>
-                                            <div class="label-text">Reject</div>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label id="notesLabel">Notes (Optional)</label>
-                                    <textarea name="admin_remarks" id="admin_remarks" rows="3" class="form-control" maxlength="2000"
-                                        placeholder="Add any notes..."></textarea>
-                                    <div class="help-text" id="notesHelp">Optional notes for the audit trail.</div>
-                                </div>
-
-                                <button type="submit" id="submitBtn" class="btn-decision" disabled
-                                    onclick="return confirmSubmit(event);">
-                                    <i class="bi bi-arrow-right-circle"></i> Choose a decision first
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @endif
+                {{-- DECISION (only when pending) — moved to full-width bottom of page
+                     so admin reviews ALL information first, then decides at the bottom. --}}
             </div>
 
             {{-- =================== RIGHT SIDEBAR =================== --}}
-            <div class="col-lg-4">
+            <div class="col-lg-4 sidebar-col">
 
                 {{-- Decision banner (only when verified/rejected) --}}
                 @if ($statusKey === 'verified')
@@ -1156,39 +1274,9 @@
                     </div>
                 @endif
 
-                {{-- Student profile --}}
-                <div class="profile-card">
-                    <div class="profile-card-header">
-                        <i class="bi bi-person-circle"></i>
-                        <h5>Student Profile</h5>
-                    </div>
-                    <div class="profile-body">
-                        <div class="profile-avatar">
-                            {{ strtoupper(substr($report->student?->full_name ?? '?', 0, 1)) }}
-                        </div>
-                        <div class="name">{{ $report->student?->full_name ?? '—' }}</div>
-                        <div class="matric">{{ $report->student_id }}</div>
-
-                        <div class="profile-meta">
-                            @if ($report->student?->email)
-                                <div><i class="bi bi-envelope"></i> <span>{{ $report->student->email }}</span></div>
-                            @endif
-                            @if ($report->student?->phone)
-                                <div><i class="bi bi-telephone"></i> <span>{{ $report->student->phone }}</span></div>
-                            @endif
-                            @if ($report->student?->programme)
-                                <div><i class="bi bi-mortarboard"></i> <span>{{ $report->student->programme }}</span>
-                                </div>
-                            @endif
-                            @if ($report->student?->status)
-                                <div><i class="bi bi-circle-fill"
-                                        style="font-size:7px; color:#10B981; margin-top:5px;"></i>
-                                    <span>{{ ucfirst($report->student->status) }} student</span>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
+                {{-- Student Profile card removed — name/matric already shown in
+                     Crisis Information, and email/phone/programme were folded into
+                     the Student row there. Keeps the sidebar lean. --}}
 
                 {{-- Lecturers who will be notified on verify --}}
                 <div class="lect-card">
@@ -1209,25 +1297,30 @@
                                 email when this report is verified.
                             </p>
 
-                            @foreach($studentCourses as $row)
-                                <div class="lect-row">
-                                    <div class="course">{{ $row->course_code }}{{ $row->course_name ? ' — ' . \Illuminate\Support\Str::limit($row->course_name, 40) : '' }}</div>
-                                    @if($row->lecturer_id)
-                                        <div class="lname">
-                                            {{ trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? '')) }}
-                                        </div>
-                                        <div class="lemail">
-                                            <i class="bi bi-envelope"></i> {{ $row->email }}
-                                        </div>
-                                    @else
-                                        <div class="lname">{{ $row->lecturer_name_raw ?: 'Unknown lecturer' }}</div>
-                                        <div class="nomatch">
-                                            <i class="bi bi-exclamation-triangle"></i>
-                                            Not in directory — will not be notified
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
+                            <div class="lect-scroll">
+                                @foreach($studentCourses as $row)
+                                    <div class="lect-row">
+                                        <div class="course">{{ $row->course_code }}{{ $row->course_name ? ' — ' . \Illuminate\Support\Str::limit($row->course_name, 40) : '' }}</div>
+                                        @if($row->lecturer_id)
+                                            <div class="lname">
+                                                {{ trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? '')) }}
+                                            </div>
+                                            <div class="lemail">
+                                                <i class="bi bi-envelope"></i> {{ $row->email }}
+                                            </div>
+                                        @else
+                                            <div class="lname">{{ $row->lecturer_name_raw ?: 'Unknown lecturer' }}</div>
+                                            <div class="nomatch">
+                                                <i class="bi bi-exclamation-triangle"></i>
+                                                Not in directory — will not be notified
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                            @if(count($studentCourses) > 4)
+                                <div class="lect-scroll-hint"><i class="bi bi-chevron-down"></i> scroll to see all {{ count($studentCourses) }}</div>
+                            @endif
 
                             @if(env('TESTING_MODE_REDIRECT_LECTURER_EMAILS', false))
                                 <div class="lect-test-banner">
@@ -1246,7 +1339,81 @@
                      is now reserved for verdict banners on already-decided reports. --}}
             </div>
         </div>
-    </div>
+
+        {{-- ============================================================
+             FULL-WIDTH DECISION BAR — sits at the very bottom of the page
+             so admin reviews ALL information above before taking action.
+             Only renders for pending reports. Spans full container width
+             to give the form proper breathing room.
+             ============================================================ --}}
+        @if ($statusKey === 'pending')
+            <div class="decision-card-fullwidth no-print">
+                <div class="decision-card-fullwidth-intro">
+                    <i class="bi bi-shield-check"></i>
+                    <div>
+                        <h4>Ready to decide?</h4>
+                        <p>You've reviewed the case information, supporting documents, and system checks above. Take action below.</p>
+                    </div>
+                </div>
+
+                <form id="verificationForm" method="POST" action="">
+                    @csrf
+
+                    <div class="dec-grid">
+                        <div class="dec-field">
+                            <label>Staff ID</label>
+                            <input type="text" name="staff_id" class="form-control"
+                                value="{{ $currentAdmin?->admin_id ? 'STAFF' . str_pad($currentAdmin->admin_id, 3, '0', STR_PAD_LEFT) : '' }}"
+                                placeholder="e.g. STAFF001" required>
+                            @if ($currentAdmin)
+                                <div class="help-text">Logged in as <strong>{{ $currentAdmin->admin_name }}</strong></div>
+                            @endif
+                        </div>
+
+                        <div class="dec-field">
+                            <label>Decision <span style="color:#EF4444;">*</span></label>
+                            <div class="outcome-grid">
+                                <label class="outcome-option" id="opt-verify" onclick="setOutcome('verify')">
+                                    <input type="radio" name="outcome" value="verify" required>
+                                    <i class="bi bi-check-circle"></i>
+                                    <div class="label-text">Verify</div>
+                                </label>
+                                <label class="outcome-option" id="opt-reject" onclick="setOutcome('reject')">
+                                    <input type="radio" name="outcome" value="reject" required>
+                                    <i class="bi bi-x-circle"></i>
+                                    <div class="label-text">Reject</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dec-notes">
+                        <label id="notesLabel">Notes (Optional)</label>
+                        <textarea name="admin_remarks" id="admin_remarks" rows="3" class="form-control" maxlength="2000"
+                            placeholder="Add any notes for the audit trail..."></textarea>
+                        <div class="help-text" id="notesHelp">Optional notes for the audit trail.</div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-decision" disabled
+                        onclick="return confirmSubmit(event);">
+                        <i class="bi bi-arrow-right-circle"></i> Choose a decision first
+                    </button>
+                </form>
+            </div>
+        @endif
+
+        {{-- ============================================================
+             DONATION CONTROL — verified reports only (the partial self-gates
+             on report_status === 'verified', so it renders nothing for
+             pending/rejected). Placed INSIDE the container, right after the
+             decision bar, so it lines up with the same left/right spacing as
+             the "Ready to decide?" card above.
+             ============================================================ --}}
+        <div class="mt-4">
+            @include('admin.crisis._donation_control', ['report' => $report])
+        </div>
+
+    </div>  {{-- closes .container-fluid py-3 --}}
 
     @push('scripts')
         <script>

@@ -68,7 +68,7 @@
     }
     .cc-time i { font-size: 11px; }
     .cc-title {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'inter', Georgia, serif;
         font-size: 18px; font-weight: 600;
         color: #1a2238;
         margin: 0 0 5px;
@@ -111,7 +111,7 @@
         text-transform: uppercase; letter-spacing: .05em;
     }
     .cc-raised-amt {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'inter', Georgia, serif;
         font-size: 11.5px; color: #5b6479;
     }
     .cc-raised-amt strong {

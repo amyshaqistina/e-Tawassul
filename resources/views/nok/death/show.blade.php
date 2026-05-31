@@ -48,7 +48,7 @@
     .dcsh-hero.pending::before{background:linear-gradient(90deg,var(--amber),#f59e0b)}
     .dcsh-hero.rejected::before{background:linear-gradient(90deg,var(--danger),#ef4444)}
     .dcsh-hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-    .dcsh-hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:28px;letter-spacing:-.018em;margin:0 0 8px;color:var(--ink)}
+    .dcsh-hero h1{font-family:'Inter',Georgia,sans-serif;font-weight:600;font-size:28px;letter-spacing:-.018em;margin:0 0 8px;color:var(--ink)}
     .dcsh-hero p{color:var(--ink-soft);font-size:14px;margin:0}
 
     .dcsh-info-row{display:flex;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border-soft)}

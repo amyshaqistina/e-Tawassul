@@ -11,6 +11,7 @@ use App\Models\Ldms;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * AdminController
@@ -46,8 +47,11 @@ class AdminController extends Controller
 
         $recentActivity = ActivityLog::orderByDesc('timestamp')->limit(15)->get();
 
-        $recentCrises = Crisis::with('student')
-            ->orderByDesc('date_reported')
+        $recentCrises = Crisis::with(['student', 'reports' => function ($q) {
+                $q->orderByDesc('report_id');
+            }])
+            ->whereIn('status', ['active', 'resolved', 'closed'])
+            ->orderByDesc('updated_at')
             ->limit(6)
             ->get();
 
@@ -57,14 +61,55 @@ class AdminController extends Controller
             ->limit(5)
             ->get();
 
-        $pendingDeaths = DeathConfirmation::with('student')
-            ->where('status', 'pending')
-            ->orderByDesc('date_triggered')
-            ->limit(5)
-            ->get();
+        // FRAUD DETECTION — surface students who show concerning patterns:
+        //   • 3+ rejected reports total (repeated bad submissions)
+        //   • 5+ reports in the last 24 hours (rapid-fire spam)
+        //   • 2+ resubmissions of the same report (gaming the system)
+        // Admins should review these students individually to decide
+        // whether to flag the account or follow up by phone/email.
+
+        $rejectionsByStudent = CrisisReport::select('student_id', DB::raw('COUNT(*) as total'))
+            ->where('report_status', 'rejected')
+            ->whereNotNull('student_id')
+            ->groupBy('student_id')
+            ->havingRaw('COUNT(*) >= 3')
+            ->get()
+            ->keyBy('student_id');
+
+        $rapidByStudent = CrisisReport::select('student_id', DB::raw('COUNT(*) as total'))
+            ->where('date_reported', '>=', now()->subDay())
+            ->whereNotNull('student_id')
+            ->groupBy('student_id')
+            ->havingRaw('COUNT(*) >= 5')
+            ->get()
+            ->keyBy('student_id');
+
+        // Build a unified suspicious list with reason text
+        $suspiciousStudentIds = $rejectionsByStudent->keys()->merge($rapidByStudent->keys())->unique();
+        $suspiciousStudents = collect();
+        if ($suspiciousStudentIds->isNotEmpty()) {
+            $studentsMap = Student::whereIn('student_id', $suspiciousStudentIds)->get()->keyBy('student_id');
+            $suspiciousStudents = $suspiciousStudentIds->map(function ($sid) use ($rejectionsByStudent, $rapidByStudent, $studentsMap) {
+                $student = $studentsMap->get($sid);
+                if (!$student) return null;
+                $reasons = [];
+                if (isset($rejectionsByStudent[$sid])) {
+                    $reasons[] = ['type' => 'rejection', 'text' => $rejectionsByStudent[$sid]->total . ' rejected reports'];
+                }
+                if (isset($rapidByStudent[$sid])) {
+                    $reasons[] = ['type' => 'rapid', 'text' => $rapidByStudent[$sid]->total . ' reports in 24h'];
+                }
+                return [
+                    'student'     => $student,
+                    'reasons'     => $reasons,
+                    'rejection_count' => $rejectionsByStudent[$sid]->total ?? 0,
+                    'rapid_count'     => $rapidByStudent[$sid]->total ?? 0,
+                ];
+            })->filter()->values();
+        }
 
         return view('admin.dashboard', compact(
-            'stats', 'recentActivity', 'recentCrises', 'pendingReports', 'pendingDeaths'
+            'stats', 'recentActivity', 'recentCrises', 'pendingReports', 'suspiciousStudents'
         ));
     }
 

@@ -1,5 +1,6 @@
 @extends('layouts.student')
 @section('title', 'My Profile')
+
 @section('content')
     <style>
         .profile-wrap {
@@ -12,16 +13,19 @@
             min-width: 0 !important;
         }
 
-        /* ===== Profile Hero Card (left) ===== */
+        /* ===== Profile Hero Card (horizontal banner at top) ===== */
         .profile-hero {
             background: linear-gradient(135deg, #1a56db, #06b6d4) !important;
             border-radius: 16px !important;
-            padding: 32px 24px !important;
-            text-align: center !important;
+            padding: 22px 28px !important;
             color: #fff !important;
             position: relative !important;
             overflow: hidden !important;
             box-shadow: 0 8px 24px rgba(26, 86, 219, 0.18) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 20px !important;
+            margin-bottom: 16px !important;
         }
 
         .profile-hero::before {
@@ -46,24 +50,30 @@
             background: rgba(255, 255, 255, 0.06);
         }
 
-        .profile-hero>* {
+        .profile-hero > * {
             position: relative;
             z-index: 1;
         }
 
         .profile-avatar-lg {
-            width: 96px !important;
-            height: 96px !important;
+            width: 72px !important;
+            height: 72px !important;
             border-radius: 50% !important;
             background: rgba(255, 255, 255, 0.18) !important;
             border: 3px solid rgba(255, 255, 255, 0.3) !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            font-size: 36px !important;
+            font-size: 26px !important;
             font-weight: 800 !important;
             color: #fff !important;
-            margin: 0 auto 16px !important;
+            margin: 0 !important;
+            flex-shrink: 0 !important;
+        }
+
+        .profile-hero-info {
+            flex: 1 !important;
+            min-width: 0 !important;
         }
 
         .profile-hero h3 {
@@ -71,12 +81,14 @@
             font-size: 20px !important;
             font-weight: 800 !important;
             margin: 0 0 4px 0 !important;
+            line-height: 1.25 !important;
+            letter-spacing: -0.01em !important;
         }
 
         .profile-hero-id {
-            color: rgba(255, 255, 255, 0.85) !important;
+            color: rgba(255, 255, 255, 0.88) !important;
             font-size: 13px !important;
-            margin: 0 0 14px 0 !important;
+            margin: 0 0 10px 0 !important;
         }
 
         .profile-status-badge {
@@ -90,6 +102,18 @@
             border-radius: 20px !important;
             font-size: 12px !important;
             font-weight: 600 !important;
+            flex-shrink: 0 !important;
+        }
+
+        @media (max-width: 640px) {
+            .profile-hero {
+                flex-wrap: wrap !important;
+                gap: 14px !important;
+                padding: 20px !important;
+            }
+            .profile-status-badge {
+                width: auto !important;
+            }
         }
 
         /* ===== Info Cards ===== */
@@ -280,37 +304,37 @@
         }
     </style>
 
-    <div class="profile-wrap container-fluid py-3">
-        <div class="row g-3">
-            {{-- ===== Left: Profile Hero Card ===== --}}
-            <div class="col-lg-4">
-                <div class="profile-hero">
-                    <div class="profile-avatar-lg">
-                        {{ strtoupper(substr($student->first_name, 0, 1) . substr($student->last_name, 0, 1)) }}
-                    </div>
-                    <h3>{{ $student->full_name }}</h3>
-                    <p class="profile-hero-id">
-                        <i class="bi bi-person-vcard"></i> {{ $student->student_id }}
-                    </p>
-                    <span class="profile-status-badge">
-                        <i class="bi bi-check-circle-fill"></i> {{ ucfirst($student->status) }}
-                    </span>
-                </div>
-            </div>
+    <div class="profile-wrap container-fluid pb-3">
 
-            {{-- ===== Right: Info Cards ===== --}}
-            <div class="col-lg-8">
-                {{-- Flash + errors --}}
-                @if(session('status'))
-                    <div class="alert alert-success py-2 small mb-3">
-                        <i class="bi bi-check-circle-fill"></i> {{ session('status') }}
-                    </div>
-                @endif
-                @if($errors->any())
-                    <div class="alert alert-danger py-2 small mb-3">
-                        @foreach($errors->all() as $err)<div><i class="bi bi-exclamation-triangle-fill"></i> {{ $err }}</div>@endforeach
-                    </div>
-                @endif
+        {{-- ===== TOP: Profile Hero (horizontal banner) ===== --}}
+        <div class="profile-hero">
+            <div class="profile-avatar-lg">
+                {{ strtoupper(substr($student->first_name, 0, 1) . substr($student->last_name, 0, 1)) }}
+            </div>
+            <div class="profile-hero-info">
+                <h3>{{ $student->full_name }}</h3>
+                <p class="profile-hero-id">
+                    <i class="bi bi-person-vcard"></i> {{ $student->student_id }}
+                </p>
+                <span class="profile-status-badge">
+                    <i class="bi bi-check-circle-fill"></i> {{ ucfirst($student->status) }}
+                </span>
+            </div>
+        </div>
+
+        {{-- ===== BELOW: Info Cards (full width) ===== --}}
+        <div>
+            {{-- Flash + errors --}}
+            @if(session('status'))
+                <div class="alert alert-success py-2 small mb-3">
+                    <i class="bi bi-check-circle-fill"></i> {{ session('status') }}
+                </div>
+            @endif
+            @if($errors->any())
+                <div class="alert alert-danger py-2 small mb-3">
+                    @foreach($errors->all() as $err)<div><i class="bi bi-exclamation-triangle-fill"></i> {{ $err }}</div>@endforeach
+                </div>
+            @endif
 
                 {{-- Academic Info --}}
                 <div class="info-card">
@@ -810,7 +834,6 @@
                         </form>
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 

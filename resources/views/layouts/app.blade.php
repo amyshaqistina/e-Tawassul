@@ -8,6 +8,9 @@
     <title>@yield('title', 'e-Tawassul')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/chatbot.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
@@ -43,32 +46,46 @@
         /* Brand */
         .et-brand {
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0px;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
             text-decoration: none;
-            color: #1a6fa8;
+            color: #2563eb;
             flex-shrink: 0;
         }
-        .et-brand:hover { color: #14567f; }
+        .et-brand:hover { color: #1d4ed8; }
+        .et-brand-logo {
+            height: 42px;
+            width: auto;
+            display: block;
+            flex-shrink: 0;
+        }
+        .et-brand-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1;
+        }
         .et-brand-mark {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.3rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             line-height: 1;
-            color: #1a6fa8;
+            color: #2563eb;
         }
         .et-brand-sub {
-            font-size: 0.65rem;
-            font-weight: 500;
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 0.6rem;
+            font-weight: 600;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 0px;
-            background: transparent;
-            border-radius: 0px;
+            letter-spacing: 0.12em;
             line-height: 1.2;
+            margin-top: 5px;
+            white-space: nowrap;
         }
 
         /* Nav items wrapper */
@@ -433,10 +450,27 @@
             }
             .et-nav-dropdown.open .et-dropdown-panel { display: block; }
             .et-user-meta { display: none !important; }
+            .et-topnav-inner { gap: 12px; padding: 10px 16px; }
+        }
+
+        /* Phones: scale the brand down and tighten the header */
+        @media (max-width: 560px) {
+            .et-topnav-inner { gap: 8px; padding: 9px 12px; }
+            .et-brand { gap: 7px; }
+            .et-brand-logo { height: 34px; }
+            .et-brand-mark { font-size: 1.05rem; }
+            .et-brand-sub { font-size: 0.5rem; letter-spacing: 0.14em; margin-top: 3px; }
+            .et-nav-right { gap: 6px; }
+        }
+
+        @media (max-width: 380px) {
+            .et-brand-logo { height: 30px; }
+            .et-brand-mark { font-size: 0.95rem; }
+            .et-brand-sub { letter-spacing: 0.1em; }
         }
 
         /* Make app-content full-width once sidebar is gone */
-        .app-content { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .app-content { max-width: 1400px; margin: 0 auto; padding: 12px 24px 24px; 
         .app-topbar { display: none !important; } /* hide old topbar */
 
         /* Page header (replaces the old topbar's page-title section) */
@@ -472,8 +506,11 @@
         <div class="et-topnav-inner">
             {{-- Brand --}}
             <a href="{{ route('public.dashboard') }}" class="et-brand">
-                <span class="et-brand-mark">e-Tawassul</span>
-                <span class="et-brand-sub">{{ $roleLabel ?? 'User' }}</span>
+                <img src="{{ asset('images/tawassul/etawassul-shield.svg') }}" alt="e-Tawassul" class="et-brand-logo">
+                <span class="et-brand-text">
+                    <span class="et-brand-mark">e-Tawassul</span>
+                    <span class="et-brand-sub">{{ $roleLabel ?? 'User' }}</span>
+                </span>
             </a>
 
             {{-- Nav items (provided per role layout) --}}

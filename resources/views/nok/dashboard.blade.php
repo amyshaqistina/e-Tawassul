@@ -195,6 +195,42 @@
     .stat-tile p {
         margin: 4px 0 0 0; font-size: 12px; color: #64748b;
     }
+
+    /* ===== NOK Linked Student card — Option A: pastel blue (matches student dashboard) ===== */
+    .nok-linked-card {
+        background: linear-gradient(135deg, #dbeafe, #cffafe) !important;
+        border: 1px solid #bfdbfe !important;
+        border-radius: 14px !important;
+        padding: 18px 22px !important;
+        position: relative;
+        overflow: hidden;
+    }
+    .nok-linked-card::before {
+        content: ''; position: absolute; right: -40px; top: -40px;
+        width: 140px; height: 140px; border-radius: 50%; background: rgba(29,78,216,0.06);
+    }
+    .nok-linked-card > * { position: relative; z-index: 1; }
+    .nok-linked-card .linked-label {
+        font-size: 11px; font-weight: 700; color: #1d4ed8;
+        text-transform: uppercase; letter-spacing: 0.08em;
+        margin: 0 0 4px 0;
+    }
+    .nok-linked-card .linked-name {
+        font-size: 18px; font-weight: 700; color: #0c2d6b;
+        margin: 0;
+        line-height: 1.25;
+    }
+    .nok-linked-card .linked-meta {
+        font-size: 12.5px; color: #1e40af; opacity: 0.88;
+        margin: 4px 0 0 0;
+    }
+    .nok-linked-card .linked-badge {
+        font-size: 11px; font-weight: 700;
+        padding: 5px 12px; border-radius: 999px;
+        display: inline-flex; align-items: center; gap: 5px;
+    }
+    .nok-linked-card .linked-badge.active   { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+    .nok-linked-card .linked-badge.deceased { background: #1f2937; color: #fff; }
 </style>
 @endpush
 
@@ -203,17 +239,17 @@
 
     {{-- ===== Linked student card ===== --}}
     @if($student)
-        <div class="content-card mb-3">
-            <h6 class="text-uppercase text-muted small">Linked student</h6>
-            <div class="d-flex align-items-center justify-content-between">
+        <div class="nok-linked-card mb-3">
+            <p class="linked-label">Linked student</p>
+            <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
                 <div>
-                    <h5 class="mb-0">{{ $student->full_name }}</h5>
-                    <p class="text-muted small mb-0">{{ $student->student_id }} &middot; {{ $student->kulliyyah }}</p>
+                    <h5 class="linked-name">{{ $student->full_name }}</h5>
+                    <p class="linked-meta">{{ $student->student_id }} &middot; {{ $student->kulliyyah }}</p>
                 </div>
                 @if($student->status === 'deceased')
-                    <span class="badge bg-dark">Deceased</span>
+                    <span class="linked-badge deceased">Deceased</span>
                 @else
-                    <span class="badge bg-success">{{ ucfirst($student->status ?? 'Active') }}</span>
+                    <span class="linked-badge active">{{ ucfirst($student->status ?? 'Active') }}</span>
                 @endif
             </div>
         </div>

@@ -2,7 +2,7 @@
 @section('title', 'Submit Death Confirmation')
 
 @push('head')
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
     .dcc-wrap {
         --bg:#f5f6fa; --card:#fff; --ink:#1a2238; --ink-soft:#5b6479; --ink-faint:#8a92a6;
@@ -36,12 +36,6 @@
         margin-bottom:20px;
         display:flex;gap:14px;align-items:flex-start;
     }
-    .dcc-condolence-icon{
-        width:38px;height:38px;border-radius:50%;
-        background:#fcd34d;color:#78350f;
-        display:flex;align-items:center;justify-content:center;
-        flex-shrink:0;font-size:18px;
-    }
     .dcc-condolence-text{flex:1;min-width:0}
     .dcc-condolence-arabic{
         font-weight:600;font-size:14px;
@@ -69,11 +63,11 @@
         display:flex;align-items:center;justify-content:center;
         font-weight:700;font-size:18px;
         flex-shrink:0;
-        font-family:'Fraunces',serif;
+        font-family:'Inter',sans-serif;
     }
     .dcc-student-info{flex:1;min-width:0}
     .dcc-student-label{font-size:11px;font-weight:700;color:var(--serenity);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
-    .dcc-student-name{font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;font-family:'Fraunces',serif}
+    .dcc-student-name{font-size:17px;font-weight:700;color:var(--ink);line-height:1.3;font-family:'Inter',sans-serif;letter-spacing:-0.01em}
     .dcc-student-meta{font-size:12.5px;color:#1e3a8a;margin-top:3px}
 
     /* Form fields */

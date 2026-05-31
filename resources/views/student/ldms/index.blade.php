@@ -1,7 +1,5 @@
 @extends('layouts.student')
 @section('title', 'My Last Digital Messages')
-@section('page-title', 'Last Digital Messages')
-@section('page-subtitle', 'Encrypted messages for your next of kin')
 
 @push('styles')
 <style>
@@ -202,7 +200,7 @@
 @endpush
 
 @section('content')
-<div class="container-fluid py-3">
+<div class="container-fluid pb-3">
 
     {{-- Intro + New Message --}}
     <div class="ldms-intro-row">

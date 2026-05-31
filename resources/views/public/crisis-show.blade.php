@@ -101,7 +101,7 @@
     .cs-pill-low      { background: #e0e7ff; color: #3730a3; }
 
     .cs-hero h1 {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family:'Inter', Georgia, serif;
         font-weight: 600; font-size: 32px;
         letter-spacing: -.018em;
         margin: 0 0 12px;
@@ -190,9 +190,9 @@
     }
     .cs-blockchain-copy:hover { background: var(--cs-success); color: #fff; }
 
-    .cs-side-funding { position: sticky; top: 16px; }
+    .cs-side-funding { position: top: 16px; }
     .cs-funding-amount {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'Inter', Georgia, serif;
         font-size: 30px; font-weight: 600;
         color: var(--cs-ink); line-height: 1;
         letter-spacing: -.02em;
@@ -241,7 +241,7 @@
         padding: 14px;
     }
     .cs-funding-stat-num {
-        font-family: 'Fraunces', Georgia, serif;
+        font-family: 'Inter', Georgia, serif;
         font-size: 24px; font-weight: 600;
         color: var(--cs-ink); line-height: 1;
     }
@@ -284,7 +284,7 @@
         background: linear-gradient(135deg, var(--cs-primary), #3b82f6);
         color: #fff; font-weight: 600; font-size: 13px;
         display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0; font-family: 'Fraunces', serif;
+        flex-shrink: 0; font-family: 'Inter', Georgia, serif;
     }
     .cs-donor-avatar.anon {
         background: var(--cs-bg); color: var(--cs-ink-faint);
@@ -297,7 +297,7 @@
     }
     .cs-donor-time { font-size: 11.5px; color: var(--cs-ink-faint); }
     .cs-donor-amount {
-        font-family: 'Fraunces', serif;
+        font-family: 'Inter', Georgia, serif;
         font-weight: 600; font-size: 15px;
         color: var(--cs-success);
         flex-shrink: 0;

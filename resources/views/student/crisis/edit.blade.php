@@ -47,7 +47,7 @@
     .crsh-hero{padding:26px 30px;position:relative}
     .crsh-hero::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--amber),#f59e0b)}
     .crsh-hero.rejected::before{background:linear-gradient(90deg,var(--danger),#ef4444)}
-    .crsh-hero h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:28px;letter-spacing:-.018em;margin:0 0 6px;color:var(--ink)}
+    .crsh-hero h1{font-family:'Inter',Georgia,serif;font-weight:600;font-size:28px;letter-spacing:-.018em;margin:0 0 6px;color:var(--ink)}
     .crsh-hero p{color:var(--ink-soft);font-size:14px;margin:0}
 
     .crsh-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
