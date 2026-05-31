@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Last Digital Messages')
-@section('page-title', 'Last Digital Messages')
 
 @php
     $mediaLabels = [

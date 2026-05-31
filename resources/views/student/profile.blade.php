@@ -1,8 +1,5 @@
 @extends('layouts.student')
 @section('title', 'My Profile')
-@section('page-title', 'My Profile')
-@section('page-subtitle', 'Your personal and academic details')
-
 @section('content')
     <style>
         .profile-wrap {

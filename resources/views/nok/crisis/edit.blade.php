@@ -1,4 +1,4 @@
-@extends('layouts.student')
+@extends('layouts.nok')
 @section('title', 'Edit Report #' . $report->report_id)
 
 @php
@@ -59,6 +59,14 @@
     .crsh-reject .reason{background:#fff;border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.55;color:var(--ink);border-left:3px solid var(--danger)}
     .crsh-reject .reason strong{color:var(--danger)}
 
+    /* "Filed on behalf of" card for NOK */
+    .crsh-student-card{background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+    .crsh-student-avatar{width:42px;height:42px;border-radius:50%;background:#c2410c;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;font-family:'Fraunces',serif}
+    .crsh-student-info{flex:1;min-width:0}
+    .crsh-student-label{font-size:11px;font-weight:700;color:#9a3412;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+    .crsh-student-name{font-size:14px;font-weight:600;color:#1a2238;line-height:1.3}
+    .crsh-student-meta{font-size:11.5px;color:#7c2d12;margin-top:2px}
+
     .crsh-form-group{margin-bottom:18px}
     .crsh-form-label{display:block;font-weight:600;font-size:13px;margin-bottom:6px;color:var(--ink)}
     .crsh-form-label .req{color:var(--danger);margin-left:2px}
@@ -102,7 +110,7 @@
 @section('content')
 <div class="crsh-wrap">
 
-    <a href="{{ route('student.crisis.show', $report->report_id) }}" class="crsh-back">
+    <a href="{{ route('nok.crisis.show', $report->report_id) }}" class="crsh-back">
         <i class="bi bi-arrow-left"></i> Back to report
     </a>
 
@@ -115,6 +123,26 @@
         <h1>{{ $isRejected ? 'Edit & Resubmit Report' : 'Edit Pending Report' }}</h1>
         <p>{{ $isRejected ? 'Update your report based on admin feedback below. Once submitted, it goes back to pending review.' : 'Make changes to your pending report. You can keep editing until an admin starts the review.' }}</p>
     </section>
+
+    {{-- Filed on behalf of - reminder for NOK --}}
+    @if ($report->student)
+        @php
+            $studentInitials = strtoupper(substr($report->student->first_name ?? '', 0, 1) . substr($report->student->last_name ?? '', 0, 1));
+            if (empty($studentInitials)) {
+                $studentInitials = strtoupper(substr($report->student->full_name ?? 'S', 0, 1));
+            }
+        @endphp
+        <div class="crsh-student-card">
+            <div class="crsh-student-avatar">{{ $studentInitials }}</div>
+            <div class="crsh-student-info">
+                <div class="crsh-student-label">Filed on behalf of</div>
+                <div class="crsh-student-name">{{ $report->student->full_name ?? 'Student' }}</div>
+                @if ($report->student->student_id)
+                    <div class="crsh-student-meta">Matric: {{ $report->student->student_id }}</div>
+                @endif
+            </div>
+        </div>
+    @endif
 
     {{-- Admin feedback reminder (rejected only) --}}
     @if ($isRejected && $report->admin_remarks)
@@ -136,7 +164,7 @@
         </div>
     @endif
 
-    <form action="{{ route('student.crisis.update', $report->report_id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('nok.crisis.update', $report->report_id) }}" method="POST" enctype="multipart/form-data">
         @csrf @method('PATCH')
 
         <section class="crsh-card">
@@ -210,7 +238,7 @@
                             @foreach ($evidence as $i => $path)
                                 <span class="crsh-file-chip">
                                     <i class="bi bi-file-earmark-check" style="color:var(--success)"></i>
-                                    <a href="{{ route('student.crisis.evidence.download', ['report' => $report->report_id, 'index' => $i]) }}" style="color:var(--ink);text-decoration:none">Document {{ $i + 1 }}</a>
+                                    <span style="color:var(--ink)">Document {{ $i + 1 }}</span>
                                 </span>
                             @endforeach
                             <p class="crsh-form-hint">Existing files are kept. Upload below to add more.</p>
@@ -261,7 +289,7 @@
                 </div>
 
                 <div class="crsh-form-actions">
-                    <a href="{{ route('student.crisis.show', $report->report_id) }}" class="crsh-btn crsh-btn-ghost">Cancel</a>
+                    <a href="{{ route('nok.crisis.show', $report->report_id) }}" class="crsh-btn crsh-btn-ghost">Cancel</a>
                     <button type="submit" class="crsh-btn crsh-btn-primary">
                         <i class="bi bi-send"></i>
                         {{ $isRejected ? 'Submit for Re-review' : 'Save Changes' }}

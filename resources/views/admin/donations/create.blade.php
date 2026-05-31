@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Add Donation Manually')
-@section('page-title', 'Record a Donation Manually')
 
 @push('styles')
 <style>

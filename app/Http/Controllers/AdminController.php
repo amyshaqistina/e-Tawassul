@@ -57,8 +57,14 @@ class AdminController extends Controller
             ->limit(5)
             ->get();
 
+        $pendingDeaths = DeathConfirmation::with('student')
+            ->where('status', 'pending')
+            ->orderByDesc('date_triggered')
+            ->limit(5)
+            ->get();
+
         return view('admin.dashboard', compact(
-            'stats', 'recentActivity', 'recentCrises', 'pendingReports'
+            'stats', 'recentActivity', 'recentCrises', 'pendingReports', 'pendingDeaths'
         ));
     }
 

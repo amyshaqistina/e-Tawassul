@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Student ' . $student->student_id)
-@section('page-title', 'Student Detail')
+
 
 @push('styles')
 <style>

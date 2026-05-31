@@ -54,3 +54,7 @@ e-tawassul-contract/coverage.json
 e-tawassul-contract/deployments/
 e-tawassul-contract/.env
 "@ | Add-Content -Encoding ascii .gitignore
+
+# Local Besu network artifacts (regenerated per machine by setup.ps1)
+besu-network/config/genesis.json
+besu-network/config/static-nodes.json

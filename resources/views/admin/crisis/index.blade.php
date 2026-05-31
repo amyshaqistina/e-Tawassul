@@ -1,6 +1,5 @@
 @extends('layouts.admin')
 @section('title', 'Crisis Reports')
-@section('page-title', 'Crisis Reports')
 
 @php
     $typeLabels = [

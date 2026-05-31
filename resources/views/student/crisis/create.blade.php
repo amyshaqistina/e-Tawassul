@@ -1,7 +1,5 @@
 @extends('layouts.student')
 @section('title', 'Submit Crisis Report')
-@section('page-title', 'Submit a Crisis Report')
-@section('page-subtitle', 'Step-by-step crisis reporting')
 
 @section('content')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
