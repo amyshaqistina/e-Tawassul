@@ -10,6 +10,57 @@
         display: flex; align-items: center; gap: 20px; margin-bottom: 18px;
         position: relative; overflow: hidden;
     }
+    .sp-hero-body { 
+        z-index: 1; 
+        flex: 1; 
+        min-width: 0; 
+    }
+    .sp-hero h3 { 
+        margin: 0 0 6px; 
+        font-size: 24px; 
+        font-weight: 800; 
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+    @media (max-width: 575px) {
+        .sp-hero {
+            flex-direction: column;
+            text-align: center;
+            padding: 40px 20px;
+            gap: 20px;
+            align-items: center;
+        }
+        .sp-hero .avatar {
+            margin: 0 auto;
+        }
+        .sp-hero-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+        .sp-hero h3 { 
+            margin: 0 0 8px; 
+            line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            font-size: 22px;
+        }
+        .sp-hero .meta {
+            flex-direction: column;
+            gap: 6px;
+            justify-content: center;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        .sp-hero .status-pill {
+            margin-top: 16px;
+            justify-content: center;
+        }
+    }
     .sp-hero::after {
         content: ""; position: absolute; right: -40px; top: -40px;
         width: 220px; height: 220px; border-radius: 50%;

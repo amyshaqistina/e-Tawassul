@@ -50,6 +50,17 @@
         align-items: center;
         gap: 12px;
     }
+    @media (max-width: 768px) {
+        .fraud-row {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        .fraud-row-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
     .fraud-row:last-child { margin-bottom: 0; }
     .fraud-row-avatar {
         width: 38px; height: 38px;

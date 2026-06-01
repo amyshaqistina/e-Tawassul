@@ -1136,6 +1136,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 /* subtle fade hint on the right edge */
                 -webkit-mask-image: linear-gradient(90deg, black 0, black 88%, transparent 100%);
                         mask-image: linear-gradient(90deg, black 0, black 88%, transparent 100%);
+                justify-content: flex-start;
             }
             .etw-circles::-webkit-scrollbar { display: none; }
 

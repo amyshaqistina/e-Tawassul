@@ -138,6 +138,9 @@
     .status-card .latest-badge.rejected { background: #fee2e2; color: #991b1b; }
 
     .timeline-mini { position: relative; padding-left: 24px; }
+    @media (max-width: 560px) {
+        .timeline-mini { padding-left: 18px; }
+    }
     .timeline-mini::before {
         content: '';
         position: absolute;
@@ -178,6 +181,17 @@
         display: flex;
         align-items: center;
         gap: 14px;
+    }
+    @media (max-width: 768px) {
+        .stat-tile {
+            flex-direction: column;
+            text-align: center;
+            justify-content: center;
+            padding: 20px 15px;
+        }
+        .stat-tile-icon {
+            margin-bottom: 8px;
+        }
     }
     .stat-tile-icon {
         width: 42px; height: 42px;

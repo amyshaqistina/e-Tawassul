@@ -83,6 +83,9 @@
             margin: 0 0 4px 0 !important;
             line-height: 1.25 !important;
             letter-spacing: -0.01em !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            white-space: normal !important;
         }
 
         .profile-hero-id {
