@@ -57,4 +57,9 @@ e-tawassul-contract/.env
 
 # Local Besu network artifacts (regenerated per machine by setup.ps1)
 besu-network/config/genesis.json
-besu-network/config/static-nodes.json
+besu-network/config/static-nodes.json\n# --- Email Testing Files ---
+mailtrap_test.php
+public/check-email.php
+routes/test_mail.php
+app/Http/Controllers/MailpitProxyController.php
+resources/views/admin/mailpit-viewer.blade.php

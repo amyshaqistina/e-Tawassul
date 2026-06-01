@@ -1,14 +1,136 @@
 @extends('layouts.admin')
 @section('title', 'Admin Dashboard')
 
-@section('content')
+@push('head')
 <style>
+    .fraud-alert-card {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        border: 1px solid #fecaca;
+        border-left: 4px solid #dc2626;
+        border-radius: 14px;
+        padding: 18px 22px;
+        margin-bottom: 20px;
+    }
+    .fraud-alert-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    .fraud-alert-header i {
+        color: #dc2626;
+        font-size: 22px;
+    }
+    .fraud-alert-header h5 {
+        margin: 0;
+        color: #991b1b;
+        font-weight: 700;
+        font-size: 16px;
+    }
+    .fraud-alert-count {
+        background: #dc2626;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 9px;
+        border-radius: 99px;
+    }
+    .fraud-alert-sub {
+        margin: 0 0 14px;
+        color: #7f1d1d;
+        font-size: 13px;
+    }
+    .fraud-row {
+        background: #fff;
+        border: 1px solid #fecaca;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    @media (max-width: 768px) {
+        .fraud-row {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        .fraud-row-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
     .fraud-row:last-child { margin-bottom: 0; }
-    .fraud-row-btn:hover { background: #fee2e2; color: #7f1d1d; border-color: #f87171; }
-    .list-row-link:hover { background: #f1f5f9; transform: translateX(2px); }
-    .list-row-link:hover .fw-semibold { color: #1d4ed8; }
+    .fraud-row-avatar {
+        width: 38px; height: 38px;
+        border-radius: 50%;
+        background: #dc2626;
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 14px;
+        flex-shrink: 0;
+    }
+    .fraud-row-main { flex: 1; min-width: 0; }
+    .fraud-row-name {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+    .fraud-row-reasons {
+        display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .fraud-reason-chip {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+    .fraud-reason-chip.rejection { background: #fee2e2; color: #991b1b; }
+    .fraud-reason-chip.rapid     { background: #fef3c7; color: #92400e; }
+    .fraud-row-btn {
+        background: #fff;
+        color: #991b1b;
+        border: 1.5px solid #fecaca;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 12px;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .fraud-row-btn:hover {
+        background: #fee2e2;
+        color: #7f1d1d;
+        border-color: #f87171;
+    }
+
+    /* Make recent-crises rows clickable with hover affordance */
+    .list-row-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-decoration: none !important;
+        color: inherit !important;
+        cursor: pointer;
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin: 0 -12px;
+        transition: background .15s ease, transform .12s ease;
+    }
+    .list-row-link:hover {
+        background: #f1f5f9;
+        transform: translateX(2px);
+    }
+    .list-row-link:hover .fw-semibold {
+        color: #1d4ed8;
+    }
 </style>
-<div class="container-fluid py-3">
+@endpush
+
+@section('content')
+<div class="container-fluid pb-3">
 
     @if (!empty($suspiciousStudents) && $suspiciousStudents->count() > 0)
         <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 1px solid #fecaca; border-left: 4px solid #dc2626; border-radius: 14px; padding: 18px 22px; margin-bottom: 20px;">

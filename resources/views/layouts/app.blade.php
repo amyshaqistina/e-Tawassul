@@ -67,13 +67,13 @@
             line-height: 1;
         }
         .et-brand-mark {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.3rem;
             font-weight: 800;
             letter-spacing: -0.5px;
             line-height: 1;
-            color: #1a6fa8;
-    }
+            color: #2563eb;
+        }
         .et-brand-sub {
             display: block;
             width: 100%;
@@ -411,57 +411,79 @@
             font-size: 18px;
         }
 
-        @media (max-width: 1024px) {
-            .et-nav-link span.label,
-            .et-nav-link span.full { display: none; }
+    @media (max-width: 880px) {
+        .et-mobile-toggle { display: inline-flex; align-items: center; }
+        .et-nav-items {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            flex-direction: column;
+            gap: 4px;
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+            align-items: center;
         }
+        .et-nav-items.open { display: flex; }
+        .et-nav-items .et-nav-link { 
+            width: 100%; 
+            justify-content: center; 
+            text-align: center;
+        }
+        .et-nav-items .et-nav-link span.label,
+        .et-nav-items .et-nav-link span.full { display: inline; }
+        .et-nav-dropdown { width: 100%; }
+        .et-dropdown-panel {
+            position: static;
+            opacity: 1;
+            visibility: visible;
+            transform: none;
+            box-shadow: none;
+            border: none;
+            background: #f8fafc;
+            padding-left: 38px;
+            margin-top: 2px;
+            display: none;
+            text-align: center;
+        }
+        .et-nav-dropdown.open .et-dropdown-panel { display: block; }
+        .et-user-meta { display: none !important; }
+        .et-topnav-inner { gap: 12px; padding: 10px 16px; }
+    }
 
-        @media (max-width: 880px) {
-            .et-mobile-toggle { display: inline-flex; align-items: center; }
-            .et-nav-items {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                flex-direction: column;
-                gap: 4px;
-                padding: 14px;
-                border-bottom: 1px solid #e2e8f0;
-                box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-            }
-            .et-nav-items.open { display: flex; }
-            .et-nav-items .et-nav-link { width: 100%; justify-content: flex-start; }
-            .et-nav-items .et-nav-link span.label,
-            .et-nav-items .et-nav-link span.full { display: inline; }
-            .et-nav-dropdown { width: 100%; }
-            .et-dropdown-panel {
-                position: static;
-                opacity: 1;
-                visibility: visible;
-                transform: none;
-                box-shadow: none;
-                border: none;
-                background: #f8fafc;
-                padding-left: 38px;
-                margin-top: 2px;
-                display: none;
-            }
-            .et-nav-dropdown.open .et-dropdown-panel { display: block; }
-            .et-user-meta { display: none !important; }
-            .et-topnav-inner { gap: 12px; padding: 10px 16px; }
+    /* ===== Tablet / iPad Optimization (576px - 1024px) ===== */
+    @media (min-width: 576px) and (max-width: 1024px) {
+        .et-topnav-inner {
+            padding: 10px 20px;
+            gap: 20px;
         }
+        .et-nav-link {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+        .app-content {
+            padding: 15px;
+        }
+        /* Center-align the navigation icons/circles for iPad */
+        .et-nav-items {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    }
 
-        /* Phones: scale the brand down and tighten the header */
-        @media (max-width: 560px) {
-            .et-topnav-inner { gap: 8px; padding: 9px 12px; }
-            .et-brand { gap: 7px; }
-            .et-brand-logo { height: 34px; }
-            .et-brand-mark { font-size: 1.05rem; }
-            .et-brand-sub { font-size: 0.5rem; letter-spacing: 0.14em; margin-top: 3px; }
-            .et-nav-right { gap: 6px; }
-        }
+    /* Phones: scale the brand down and tighten the header */
+    @media (max-width: 560px) {
+        .et-topnav-inner { gap: 8px; padding: 9px 12px; }
+        .et-brand { gap: 7px; }
+        .et-brand-logo { height: 34px; }
+        .et-brand-mark { font-size: 1.05rem; }
+        .et-brand-sub { font-size: 0.5rem; letter-spacing: 0.14em; margin-top: 3px; }
+        .et-nav-right { gap: 6px; }
+    }
 
         @media (max-width: 380px) {
             .et-brand-logo { height: 30px; }
@@ -470,7 +492,18 @@
         }
 
         /* Make app-content full-width once sidebar is gone */
-        .app-content { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .app-content { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 12px 24px 24px; 
+        }
+        
+        @media (max-width: 768px) {
+            .app-content {
+                padding: 12px 12px 24px;
+            }
+        }
+
         .app-topbar { display: none !important; } /* hide old topbar */
 
         /* Page header (replaces the old topbar's page-title section) */
@@ -484,7 +517,7 @@
             gap: 16px;
         }
         .et-page-head h1 {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-size: 26px;
             font-weight: 800;
             color: #0f172a;

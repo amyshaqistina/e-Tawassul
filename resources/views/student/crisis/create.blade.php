@@ -221,7 +221,7 @@
     <img id="lightbox-img" src="" alt="Preview">
 </div>
 
-<div class="crisis-wizard container-fluid py-3">
+<div class="crisis-wizard container-fluid pb-3">
 
     <div class="wizard-stepper">
         <div class="wizard-step active" data-step="1">

@@ -855,6 +855,50 @@
                 border: 1px solid #E5E7EB !important;
             }
         }
+
+        /* ===== Layout improvements ===== */
+        /* Sticky sidebar — stays in view while the long Crisis Information card
+           scrolls. align-self keeps the column its natural height so it has room
+           to stick instead of being stretched to full row height. */
+        .sidebar-col {
+            position: sticky;
+            top: 16px;
+            align-self: flex-start;
+        }
+
+        /* Student contact line (folded in from the removed profile card) */
+        .student-contact {
+            display: flex; flex-wrap: wrap; gap: 6px 16px;
+            margin-top: 8px; padding-top: 8px;
+            border-top: 1px dashed #E5E7EB;
+            font-size: 12px; color: #6B7280;
+        }
+        .student-contact a, .student-contact span {
+            display: inline-flex; align-items: center; gap: 5px;
+            color: #6B7280; text-decoration: none; white-space: nowrap;
+        }
+        .student-contact a:hover { color: #1E40AF; text-decoration: underline; }
+        .student-status-dot {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10.5px; font-weight: 700; color: #047857;
+            background: #ECFDF5; padding: 2px 8px; border-radius: 999px;
+            margin-left: 6px; text-transform: uppercase; letter-spacing: .03em;
+        }
+        .student-status-dot i { font-size: 6px; }
+
+        /* Lecturers — capped height + scroll so 4 or 14 subjects take the same
+           space and never stretch the column. */
+        .lect-scroll { max-height: 300px; overflow-y: auto; margin: 0 -4px; padding: 0 4px; }
+        .lect-scroll::-webkit-scrollbar { width: 8px; }
+        .lect-scroll::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 8px; }
+        .lect-scroll::-webkit-scrollbar-track { background: transparent; }
+        .lect-scroll-hint {
+            text-align: center; font-size: 11px; color: #94A3B8; padding: 8px 0 2px;
+        }
+
+        @media (max-width: 991px) {
+            .sidebar-col { position: static; }   /* no sticky once columns stack */
+        }
     </style>
 @endpush
 
@@ -914,9 +958,28 @@
                         <div class="value">
                             <strong>{{ $report->student?->full_name ?? '—' }}</strong>
                             <span class="text-muted">({{ $report->student_id }})</span>
+                            @if ($report->student?->status)
+                                <span class="student-status-dot" title="{{ ucfirst($report->student->status) }} student">
+                                    <i class="bi bi-circle-fill"></i> {{ ucfirst($report->student->status) }}
+                                </span>
+                            @endif
                             @if ($report->student?->faculty)
                                 <span class="sub">{{ $report->student->faculty }}</span>
                             @endif
+
+                            {{-- Contact line — folded in from the old Student Profile card so
+                                 admins can still reach the student during review. --}}
+                            <div class="student-contact">
+                                @if ($report->student?->email)
+                                    <a href="mailto:{{ $report->student->email }}"><i class="bi bi-envelope"></i> {{ $report->student->email }}</a>
+                                @endif
+                                @if ($report->student?->phone)
+                                    <span><i class="bi bi-telephone"></i> {{ $report->student->phone }}</span>
+                                @endif
+                                @if ($report->student?->programme)
+                                    <span><i class="bi bi-mortarboard"></i> {{ $report->student->programme }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
@@ -1178,7 +1241,7 @@
             </div>
 
             {{-- =================== RIGHT SIDEBAR =================== --}}
-            <div class="col-lg-4">
+            <div class="col-lg-4 sidebar-col">
 
                 {{-- Decision banner (only when verified/rejected) --}}
                 @if ($statusKey === 'verified')
@@ -1211,39 +1274,9 @@
                     </div>
                 @endif
 
-                {{-- Student profile --}}
-                <div class="profile-card">
-                    <div class="profile-card-header">
-                        <i class="bi bi-person-circle"></i>
-                        <h5>Student Profile</h5>
-                    </div>
-                    <div class="profile-body">
-                        <div class="profile-avatar">
-                            {{ strtoupper(substr($report->student?->full_name ?? '?', 0, 1)) }}
-                        </div>
-                        <div class="name">{{ $report->student?->full_name ?? '—' }}</div>
-                        <div class="matric">{{ $report->student_id }}</div>
-
-                        <div class="profile-meta">
-                            @if ($report->student?->email)
-                                <div><i class="bi bi-envelope"></i> <span>{{ $report->student->email }}</span></div>
-                            @endif
-                            @if ($report->student?->phone)
-                                <div><i class="bi bi-telephone"></i> <span>{{ $report->student->phone }}</span></div>
-                            @endif
-                            @if ($report->student?->programme)
-                                <div><i class="bi bi-mortarboard"></i> <span>{{ $report->student->programme }}</span>
-                                </div>
-                            @endif
-                            @if ($report->student?->status)
-                                <div><i class="bi bi-circle-fill"
-                                        style="font-size:7px; color:#10B981; margin-top:5px;"></i>
-                                    <span>{{ ucfirst($report->student->status) }} student</span>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
+                {{-- Student Profile card removed — name/matric already shown in
+                     Crisis Information, and email/phone/programme were folded into
+                     the Student row there. Keeps the sidebar lean. --}}
 
                 {{-- Lecturers who will be notified on verify --}}
                 <div class="lect-card">
@@ -1264,25 +1297,30 @@
                                 email when this report is verified.
                             </p>
 
-                            @foreach($studentCourses as $row)
-                                <div class="lect-row">
-                                    <div class="course">{{ $row->course_code }}{{ $row->course_name ? ' — ' . \Illuminate\Support\Str::limit($row->course_name, 40) : '' }}</div>
-                                    @if($row->lecturer_id)
-                                        <div class="lname">
-                                            {{ trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? '')) }}
-                                        </div>
-                                        <div class="lemail">
-                                            <i class="bi bi-envelope"></i> {{ $row->email }}
-                                        </div>
-                                    @else
-                                        <div class="lname">{{ $row->lecturer_name_raw ?: 'Unknown lecturer' }}</div>
-                                        <div class="nomatch">
-                                            <i class="bi bi-exclamation-triangle"></i>
-                                            Not in directory — will not be notified
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
+                            <div class="lect-scroll">
+                                @foreach($studentCourses as $row)
+                                    <div class="lect-row">
+                                        <div class="course">{{ $row->course_code }}{{ $row->course_name ? ' — ' . \Illuminate\Support\Str::limit($row->course_name, 40) : '' }}</div>
+                                        @if($row->lecturer_id)
+                                            <div class="lname">
+                                                {{ trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? '')) }}
+                                            </div>
+                                            <div class="lemail">
+                                                <i class="bi bi-envelope"></i> {{ $row->email }}
+                                            </div>
+                                        @else
+                                            <div class="lname">{{ $row->lecturer_name_raw ?: 'Unknown lecturer' }}</div>
+                                            <div class="nomatch">
+                                                <i class="bi bi-exclamation-triangle"></i>
+                                                Not in directory — will not be notified
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                            @if(count($studentCourses) > 4)
+                                <div class="lect-scroll-hint"><i class="bi bi-chevron-down"></i> scroll to see all {{ count($studentCourses) }}</div>
+                            @endif
 
                             @if(env('TESTING_MODE_REDIRECT_LECTURER_EMAILS', false))
                                 <div class="lect-test-banner">
@@ -1363,7 +1401,19 @@
                 </form>
             </div>
         @endif
-    </div>
+
+        {{-- ============================================================
+             DONATION CONTROL — verified reports only (the partial self-gates
+             on report_status === 'verified', so it renders nothing for
+             pending/rejected). Placed INSIDE the container, right after the
+             decision bar, so it lines up with the same left/right spacing as
+             the "Ready to decide?" card above.
+             ============================================================ --}}
+        <div class="mt-4">
+            @include('admin.crisis._donation_control', ['report' => $report])
+        </div>
+
+    </div>  {{-- closes .container-fluid py-3 --}}
 
     @push('scripts')
         <script>

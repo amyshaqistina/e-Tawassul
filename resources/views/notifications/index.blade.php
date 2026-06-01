@@ -11,10 +11,20 @@
 
 @extends($layout)
 @section('title', 'Notifications')
-@section('page-title', 'All Notifications')
 
 @section('content')
-<div class="container-fluid py-3">
+<div class="container-fluid pb-3">
+
+    {{-- Inline header — matches the Student Records / crisis pages
+         (no @section('page-title'), so the layout's big et-page-head H1
+         is intentionally not used here). --}}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-0">All Notifications</h4>
+            <small class="text-muted">Your recent alerts and updates</small>
+        </div>
+    </div>
+
     <div class="content-card">
         @if($notifications->isEmpty())
             <div class="text-muted text-center py-5">
@@ -39,6 +49,7 @@
                     </div>
                 </a>
             @endforeach
+
             {{ $notifications->links() }}
         @endif
     </div>

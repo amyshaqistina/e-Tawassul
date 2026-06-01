@@ -35,6 +35,54 @@ class AdminStudentController extends Controller
         return view('admin.students.show', compact('student'));
     }
 
+    /**
+     * Update the admin-editable fields of a student record.
+     *
+     * iMaalum-sourced fields (kulliyyah, email, year_of_study,
+     * enrollment_status, name) are intentionally NOT editable here — they
+     * are owned by the sync and would be overwritten on the next pull.
+     * Admin may edit the student-provided fields (programme, mahallah,
+     * phone, emergency contact, bank details) and the account status.
+     *
+     * NOTE: the field names below must exist as columns on the `students`
+     * table AND be present in the Student model's $fillable array, otherwise
+     * the update will silently skip them (mass-assignment protection). If
+     * your bank columns are named differently, rename them here to match.
+     */
+    public function update(Request $request, Student $student)
+    {
+        /** @var \App\Models\Admin $admin */
+        $admin = Auth::guard('admin')->user();
+
+        $validated = $request->validate([
+            'programme'           => ['nullable', 'string', 'max:150'],
+            'mahallah'            => ['nullable', 'string', 'max:150'],
+            'phone'               => ['nullable', 'string', 'max:30'],
+            'emergency_contact'   => ['nullable', 'string', 'max:50'],
+            'status'              => ['required', Rule::in(['active', 'inactive', 'suspended', 'deceased'])],
+            'bank_name'           => ['nullable', 'string', 'max:100'],
+            'bank_account_number' => ['nullable', 'string', 'max:50'],
+            'bank_account_holder' => ['nullable', 'string', 'max:150'],
+        ]);
+
+        $student->fill($validated);
+        $changed = array_keys($student->getDirty()); // for the audit log
+        $student->save();
+
+        ActivityLog::record(
+            'admin',
+            (string) $admin->admin_id,
+            'student_record_updated',
+            count($changed)
+                ? "Admin updated student {$student->student_id} — changed: " . implode(', ', $changed)
+                : "Admin opened student {$student->student_id} edit but made no changes"
+        );
+
+        return redirect()
+            ->route('admin.students.show', $student->student_id)
+            ->with('status', 'Student record updated successfully.');
+    }
+
     public function storeKin(Request $request, Student $student)
     {
         /** @var \App\Models\Admin $admin */

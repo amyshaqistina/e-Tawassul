@@ -200,7 +200,7 @@
 @endpush
 
 @section('content')
-<div class="container-fluid py-3">
+<div class="container-fluid pb-3">
 
     {{-- Intro + New Message --}}
     <div class="ldms-intro-row">

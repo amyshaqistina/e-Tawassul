@@ -15,8 +15,11 @@
         /* ===== Hero Row ===== */
         .hero-row {
             display: grid !important;
-            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important;
+            grid-template-columns: 1fr !important;
             gap: 16px !important; margin-bottom: 20px !important; align-items: stretch !important;
+        }
+        @media (min-width: 992px) {
+            .hero-row { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important; }
         }
 
         .welcome-banner {
@@ -24,6 +27,10 @@
             border-radius: 14px !important; padding: 18px 22px !important;
             display: flex !important; align-items: center !important; justify-content: space-between !important;
             position: relative !important; overflow: hidden !important; color: #fff !important; min-width: 0 !important;
+            flex-direction: column; text-align: center;
+        }
+        @media (min-width: 768px) {
+            .welcome-banner { flex-direction: row; text-align: left; }
         }
         .welcome-banner::before {
             content: ''; position: absolute; right: -40px; top: -40px;
@@ -32,14 +39,20 @@
         .welcome-text { position: relative; z-index: 1; flex: 1; min-width: 0; }
         .welcome-text h2 { color: #fff !important; font-size: 17px !important; font-weight: 700 !important; margin: 0 0 4px 0 !important; }
         .welcome-text p { color: rgba(255,255,255,0.85) !important; font-size: 11.5px !important; line-height: 1.5 !important; margin: 0 !important; }
-        .welcome-badges { display: flex !important; gap: 6px !important; margin-top: 10px !important; flex-wrap: wrap !important; }
+        .welcome-badges { display: flex !important; gap: 6px !important; margin-top: 10px !important; flex-wrap: wrap !important; justify-content: center; }
+        @media (min-width: 768px) {
+            .welcome-badges { justify-content: flex-start; }
+        }
         .welcome-badge {
             display: inline-flex !important; align-items: center !important; gap: 5px !important;
             background: rgba(255,255,255,0.15) !important; border: 1px solid rgba(255,255,255,0.25) !important;
             border-radius: 14px !important; padding: 3px 10px !important; font-size: 10.5px !important;
             font-weight: 600 !important; color: #fff !important; white-space: nowrap !important;
         }
-        .welcome-icon { font-size: 40px !important; opacity: 0.18 !important; position: relative !important; z-index: 1 !important; line-height: 1 !important; flex-shrink: 0 !important; }
+        .welcome-icon { font-size: 40px !important; opacity: 0.18 !important; position: relative !important; z-index: 1 !important; line-height: 1 !important; flex-shrink: 0 !important; display: none; }
+        @media (min-width: 768px) {
+            .welcome-icon { display: block; }
+        }
 
         .privacy-notice {
             background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 14px !important;
@@ -63,14 +76,21 @@
 
         /* ===== Action Cards ===== */
         .action-cards-row {
-            display: grid !important; grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+            display: grid !important; grid-template-columns: 1fr !important;
             gap: 20px !important; margin-bottom: 28px !important;
+        }
+        @media (min-width: 768px) {
+            .action-cards-row { grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important; }
         }
         .action-card {
             background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 14px !important;
             padding: 22px 24px !important; transition: all 0.25s !important; display: flex !important;
             gap: 18px !important; align-items: flex-start !important; box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
             position: relative !important; overflow: hidden !important; min-width: 0 !important;
+            flex-direction: column;
+        }
+        @media (min-width: 768px) {
+            .action-card { flex-direction: row; }
         }
         .action-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
         .action-card.legacy::before { background: #1a56db; }
@@ -95,8 +115,14 @@
 
         /* ===== Stats Row ===== */
         .stats-row {
-            display: grid !important; grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+            display: grid !important; grid-template-columns: 1fr !important;
             gap: 16px !important; margin-bottom: 24px !important;
+        }
+        @media (min-width: 768px) {
+            .stats-row { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+        }
+        @media (min-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
         }
         .stat-tile {
             background: #ffffff !important; border: 1px solid #e2e8f0 !important;
@@ -141,67 +167,62 @@
         .status-timeline-card {
             padding: 18px 18px 18px 24px !important;
         }
+        /* The card stretches to match the reports list on the left, which left a
+           big gap under the timeline. Pin the action button to the bottom so the
+           space reads as an intentional card footer instead of dead space. */
+        .status-timeline-card .text-end.mt-3 { margin-top: auto; }
         .status-timeline-title {
             font-size: 11px; font-weight: 700; color: #64748b;
             text-transform: uppercase; letter-spacing: 0.6px;
             margin-bottom: 16px;
         }
 
-        .timeline-item {
-            display: flex; gap: 14px; align-items: stretch;
-            padding-bottom: 22px;
-        }
-        .timeline-item:last-child { padding-bottom: 0; }
+        /* ===== Status timeline — dots on a line, but the line is built from
+           segments drawn only BETWEEN dots (none after the last), so the final
+           dot caps the line as a clean closure. ===== */
+        .timeline-mini { position: relative; padding-left: 24px; }
 
-        /* The connecting line is drawn as a border on the LEFT of the dot-col,
-           offset so it lines up exactly with the dot's vertical center.
-           This is the most bulletproof method — no absolute positioning,
-           no flex gap interference. */
-        .timeline-dot-col {
-            flex-shrink: 0;
-            width: 14px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        .timeline-mini-item { position: relative; padding-bottom: 18px; }
+        .timeline-mini-item:last-child { padding-bottom: 0; }
 
-        .timeline-dot {
-            width: 14px; height: 14px; border-radius: 50%;
+        .timeline-mini-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 4px;
+            width: 14px; height: 14px;
+            border-radius: 50%;
             background: #cbd5e1;
-            display: block;
-            margin-top: 3px;
-            box-sizing: border-box;
-            position: relative;
-            z-index: 2;
+            border: 3px solid #fff;          /* white ring sits the dot cleanly on the line */
+            box-shadow: 0 0 0 1px #cbd5e1;
         }
-        .timeline-dot.done    { background: #1a56db; }
-        .timeline-dot.current { background: #1a56db; box-shadow: 0 0 0 4px rgba(26,86,219,0.15); }
-        .timeline-dot.success { background: #10b981; }
-        .timeline-dot.danger  { background: #dc2626; }
-        .timeline-dot.future  { background: #fff; border: 2px solid #cbd5e1; }
+        .timeline-mini-item.done::before    { background: #1a56db; box-shadow: 0 0 0 1px #1a56db; }
+        .timeline-mini-item.current::before { background: #1a56db; box-shadow: 0 0 0 1px #1a56db; }
+        .timeline-mini-item.success::before { background: #10b981; box-shadow: 0 0 0 1px #10b981; }
+        .timeline-mini-item.danger::before  { background: #dc2626; box-shadow: 0 0 0 1px #dc2626; }
 
-        /* Vertical line below the dot — sits inside the dot column so it's
-           always centered under the dot regardless of layout shifts */
-        .timeline-dot-col::after {
-            content: "";
-            flex: 1;
+        /* Connecting segment — drawn only BETWEEN dots (not on the last item),
+           centred on the dot (dot centre x = -15px), so the final dot caps the
+           line cleanly with nothing trailing below it. */
+        .timeline-mini-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: -16px;
+            top: 18px;          /* just below the 14px dot */
+            bottom: -8px;       /* tuck under the next dot */
             width: 2px;
             background: #e2e8f0;
-            margin-top: 4px;
-            min-height: 18px;
+            z-index: 0;
         }
-        .timeline-item:last-child .timeline-dot-col::after { display: none; }
-        .timeline-item.done-line .timeline-dot-col::after { background: #1a56db; }
 
-        /* Legacy class — no longer used */
-        .timeline-line { display: none; }
-
-        .timeline-content { flex: 1; padding-top: 0; min-width: 0; }
-        .timeline-label   { font-weight: 700; color: #0f172a; font-size: 14px; line-height: 1.2; }
-        .timeline-label.future { color: #94a3b8; font-weight: 600; }
-        .timeline-label.danger { color: #dc2626; }
-        .timeline-sub     { font-size: 12px; color: #64748b; margin-top: 3px; }
+        .timeline-mini-item h6 {
+            font-size: 13.5px; font-weight: 700; color: #0f172a;
+            margin: 0 0 2px 0;
+        }
+        .timeline-mini-item.muted h6 { color: #94a3b8; }
+        .timeline-mini-item p {
+            font-size: 12px; color: #64748b; margin: 0;
+        }
 
         .timeline-status-banner {
             display: inline-flex; align-items: center; gap: 6px;
@@ -225,7 +246,7 @@
         }
     </style>
 
-    <div class="dashboard-wrap container-fluid py-3">
+    <div class="dashboard-wrap container-fluid pb-3">
 
         {{-- NoK nag banner — shown if student hasn't added any kin --}}
         @if($student->nextOfKin->isEmpty())
@@ -420,55 +441,41 @@
                             <small class="text-muted">#{{ $latest->report_id }}</small>
                         </div>
 
-                        {{-- Step 1: Submitted (always done) --}}
-                        <div class="timeline-item done-line">
-                            <div class="timeline-dot-col">
-                                <span class="timeline-dot done"></span>
-                            </div>
-                            <div class="timeline-content">
-                                <div class="timeline-label">Submitted</div>
-                                <div class="timeline-sub">
-                                    {{ $latest->date_reported?->format('d M Y, h:i A') }}
-                                </div>
-                            </div>
-                        </div>
+                        {{-- Status timeline — single straight line, dots on it (NOK pattern) --}}
+                        <div class="timeline-mini mt-2">
 
-                        {{-- Step 2: Admin Review --}}
-                        <div class="timeline-item {{ ($isVerified || $isRejected) ? 'done-line' : '' }}">
-                            <div class="timeline-dot-col">
-                                <span class="timeline-dot {{ $stage > 1 ? 'done' : 'current' }}"></span>
+                            {{-- Step 1: Submitted (always done) --}}
+                            <div class="timeline-mini-item done">
+                                <h6>Submitted</h6>
+                                <p>{{ $latest->date_reported?->format('d M Y, h:i A') }}</p>
                             </div>
-                            <div class="timeline-content">
-                                <div class="timeline-label">Admin Review</div>
-                                <div class="timeline-sub">
+
+                            {{-- Step 2: Admin Review --}}
+                            <div class="timeline-mini-item {{ $stage > 1 ? ($isRejected ? 'danger' : 'done') : 'current' }}">
+                                <h6>Admin Review</h6>
+                                <p>
                                     @if($stage > 1)
                                         Reviewed {{ $latest->updated_at?->diffForHumans() }}
                                     @else
                                         Pending — awaiting verification
                                     @endif
-                                </div>
+                                </p>
                             </div>
-                        </div>
 
-                        {{-- Step 3: Final outcome (NO line — last item) --}}
-                        <div class="timeline-item">
-                            <div class="timeline-dot-col">
-                                <span class="timeline-dot
-                                    {{ $isVerified ? 'success' : ($isRejected ? 'danger' : 'future') }}"></span>
-                            </div>
-                            <div class="timeline-content">
-                                <div class="timeline-label {{ $isRejected ? 'danger' : ($stage < 2 ? 'future' : '') }}">
+                            {{-- Step 3: Final outcome --}}
+                            <div class="timeline-mini-item {{ $isVerified ? 'success' : ($isRejected ? 'danger' : 'muted') }}">
+                                <h6>
                                     @if($isVerified) Verified
                                     @elseif($isRejected) Rejected
                                     @else Final Decision
                                     @endif
-                                </div>
-                                <div class="timeline-sub">
+                                </h6>
+                                <p>
                                     @if($isVerified) Approved by administrator
                                     @elseif($isRejected) See admin notes on the report page
                                     @else Awaiting outcome
                                     @endif
-                                </div>
+                                </p>
                             </div>
                         </div>
 
