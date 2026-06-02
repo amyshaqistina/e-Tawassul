@@ -1,6 +1,5 @@
 /* ============================================
-   e-Tawassul Chatbot Widget Styles (Blue theme)
-   Matches the royal blue used in the homepage hero & Login button
+   e-Tawassul Chatbot Widget Styles (Blue theme, Draggable)
    ============================================ */
 
 [x-cloak] { display: none !important; }
@@ -14,9 +13,13 @@
 }
 
 .etw-chatbot--rtl {
+    direction: rtl;
+}
+
+/* When user has not dragged yet, RTL puts it bottom-left */
+.etw-chatbot--rtl:not([style*="left"]) {
     right: auto;
     left: 24px;
-    direction: rtl;
 }
 
 /* ---------- Launcher button ---------- */
@@ -31,14 +34,29 @@
     border-radius: 999px;
     box-shadow: 0 4px 16px rgba(30, 64, 175, 0.35);
     font-weight: 500;
-    cursor: pointer;
+    cursor: grab;
     transition: transform 0.2s, box-shadow 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
 }
 .etw-chatbot__launcher:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(30, 64, 175, 0.45);
 }
+.etw-chatbot__launcher:active,
+.etw-chatbot__launcher--dragging {
+    cursor: grabbing;
+}
 .etw-chatbot__launcher i { font-size: 1.2rem; }
+
+/* On mobile the launcher is just a regular tap target */
+@media (max-width: 480px) {
+    .etw-chatbot__launcher {
+        cursor: pointer;
+        touch-action: auto;
+    }
+}
 
 /* ---------- Window ---------- */
 .etw-chatbot__window {
@@ -54,7 +72,7 @@
     overflow: hidden;
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header (drag handle) ---------- */
 .etw-chatbot__header {
     background: linear-gradient(135deg, #1e40af, #3b82f6);
     color: #fff;
@@ -62,12 +80,42 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
 }
-.etw-chatbot__header small { opacity: 0.85; font-size: 0.75rem; }
+.etw-chatbot__header:active,
+.etw-chatbot__header--dragging {
+    cursor: grabbing;
+}
+.etw-chatbot__header small {
+    opacity: 0.85;
+    font-size: 0.75rem;
+}
+
+.etw-chatbot__header-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.etw-chatbot__drag-handle {
+    font-size: 1.1rem;
+    opacity: 0.7;
+    cursor: grab;
+}
+.etw-chatbot__header--dragging .etw-chatbot__drag-handle {
+    cursor: grabbing;
+    opacity: 1;
+}
+
 .etw-chatbot__header-actions {
     display: flex;
     align-items: center;
     gap: 8px;
+    /* These controls should NOT show drag cursor */
+    cursor: default;
 }
 .etw-chatbot__lang {
     background: rgba(255, 255, 255, 0.2);
@@ -89,6 +137,13 @@
     border-radius: 6px;
 }
 .etw-chatbot__close:hover { background: rgba(255, 255, 255, 0.15); }
+
+/* Disable text selection while dragging anywhere on the page */
+.etw-chatbot__header--dragging,
+.etw-chatbot__header--dragging * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
 
 /* ---------- Messages ---------- */
 .etw-chatbot__messages {
@@ -123,14 +178,12 @@
     border: 1px solid #e9ecef;
     border-bottom-left-radius: 4px;
 }
-/* Escalation (crisis hotline) message gets distinct styling */
 .etw-chatbot__msg--escalate .etw-chatbot__msg-bubble {
     background: #fff3cd;
     border: 1px solid #ffc107;
     color: #664d03;
 }
 
-/* RTL flips */
 .etw-chatbot--rtl .etw-chatbot__msg--user .etw-chatbot__msg-bubble {
     border-bottom-right-radius: 14px;
     border-bottom-left-radius: 4px;
@@ -227,12 +280,27 @@
     background: #fff;
 }
 
-/* ---------- Mobile responsive ---------- */
+/* ---------- Mobile: drag disabled, near-fullscreen window ---------- */
 @media (max-width: 480px) {
-    .etw-chatbot { bottom: 12px; right: 12px; }
-    .etw-chatbot--rtl { left: 12px; right: auto; }
+    .etw-chatbot {
+        bottom: 12px;
+        right: 12px;
+        /* Override any saved drag position on mobile */
+        top: auto !important;
+        left: auto !important;
+    }
+    .etw-chatbot--rtl {
+        left: 12px;
+        right: auto;
+    }
     .etw-chatbot__window {
         width: calc(100vw - 24px);
         height: calc(100vh - 100px);
+    }
+    .etw-chatbot__header {
+        cursor: default;
+    }
+    .etw-chatbot__drag-handle {
+        display: none;
     }
 }

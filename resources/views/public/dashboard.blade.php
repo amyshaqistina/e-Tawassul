@@ -1131,18 +1131,24 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 scroll-snap-type: x mandatory;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
-                padding: 14px 18px 24px;
-                margin: 6px -18px 14px;          /* bleed to screen edges */
-                /* subtle fade hint on the right edge */
-                -webkit-mask-image: linear-gradient(90deg, black 0, black 88%, transparent 100%);
-                        mask-image: linear-gradient(90deg, black 0, black 88%, transparent 100%);
-                justify-content: flex-start;
+                padding: 18px 18px 24px;          /* extra top so ring isn't clipped */
+                margin: 4px -18px 14px;           /* bleed to screen edges */
+                /* symmetric fade on both edges, so the strip looks centered */
+                -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
+                        mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
             }
             .etw-circles::-webkit-scrollbar { display: none; }
 
-            /* Each circle: break out of absolute positioning, flow as a column */
+            /* Centering trick: auto margins on first/last child
+               - When content fits (iPad landscape): margins consume free space → centered
+               - When content overflows (phones): margins compute to 0 → normal scroll */
+            .etw-circles > .etw-circle:first-child { margin-left: auto; }
+            .etw-circles > .etw-circle:last-child  { margin-right: auto; }
+            .etw-circles::-webkit-scrollbar { display: none; }
+
+            /* Each circle: keep position:relative so ring anchors to it (not the whole stage) */
             .etw-circle {
-                position: static;
+                position: relative;
                 top: auto; left: auto; right: auto; bottom: auto;
                 flex: 0 0 auto;
                 width: 96px;
@@ -1154,6 +1160,20 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 align-items: center;
             }
 
+            /* CRITICAL: neutralize the desktop position offsets (.c1–.c6 set top/left/right
+               which would otherwise stack all six circles on top of each other) */
+            .etw-circle.c1,
+            .etw-circle.c2,
+            .etw-circle.c3,
+            .etw-circle.c4,
+            .etw-circle.c5,
+            .etw-circle.c6 {
+                top: auto;
+                left: auto;
+                right: auto;
+                bottom: auto;
+            }
+
             .etw-circle .photo {
                 position: relative;
                 inset: auto;
@@ -1163,10 +1183,15 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
                 box-shadow: 0 10px 22px -12px rgba(15, 23, 42, 0.38);
             }
 
+            /* Ring explicitly sized as a circle around the photo only
+               (otherwise it stretches into an oval around photo + chip column) */
             .etw-circle .ring {
-                inset: -6px;
-                width: auto;
-                height: auto;
+                inset: auto;
+                top: -6px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 108px;          /* 96px photo + 6px on each side */
+                height: 108px;
                 border-width: 1.5px;
             }
 
@@ -1231,7 +1256,7 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
         @media (max-width: 540px) {
             .etw-circles {
                 gap: 16px;
-                padding: 12px 16px 20px;
+                padding: 16px 16px 20px;
                 margin: 4px -16px 12px;
             }
             .etw-circle,
@@ -1240,6 +1265,11 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
             }
             .etw-circle .photo {
                 height: 84px;
+            }
+            .etw-circle .ring {
+                width: 96px;           /* 84 + 6 on each side */
+                height: 96px;
+                top: -6px;
             }
             .etw-circle .chip,
             .etw-circle.l .chip,
@@ -1751,7 +1781,8 @@ $legacyMessages = $stats['legacy_messages'] ?? 892;
 
                 <div class="etw-headline">
                     <h1>When crisis strikes,<br><em>support is already here</em></h1>
-                    <p class="lead">e-Tawassul is IIUM's comprehensive platform for student crisis management and digital legacy preservation, where no student faces hardship alone.</p>
+                    <p class="lead">e-Tawassul is IIUM's comprehensive platform for student crisis management and digital
+                        legacy preservation — ensuring no student faces hardship alone.</p>
                 </div>
 
                 <div class="etw-progress-wrap">
