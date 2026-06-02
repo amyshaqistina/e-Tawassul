@@ -18,16 +18,34 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // ============================================================
-        // 1. DEMO ADMIN (login: admin@iium.edu.my / password)
+        // 1. DEMO ADMINS
+        //    - admin@iium.edu.my        / password  (official login)
+        //    - puffytiramisu@gmail.com  / password  (kept from before)
         // ============================================================
-        Admin::create([
-            'admin_name'  => 'Dr. Azmi',
-            'email'       => 'puffytiramisu@gmail.com',
-            'role'        => 'super_admin',
-            'active'      => true,
-            'permissions' => ['verify_crisis','verify_death','trigger_ldms','manage_donations','view_blockchain'],
-            'password'    => Hash::make('password'),
-        ]);
+
+        // Official admin — use this to log in and verify crisis reports
+        Admin::updateOrCreate(
+            ['email' => 'admin@iium.edu.my'],
+            [
+                'admin_name'  => 'Dr. Khairul',
+                'role'        => 'super_admin',
+                'active'      => true,
+                'permissions' => ['verify_crisis','verify_death','trigger_ldms','manage_donations','view_blockchain'],
+                'password'    => Hash::make('password'),
+            ]
+        );
+
+        // Kept from before
+        Admin::updateOrCreate(
+            ['email' => 'puffytiramisu@gmail.com'],
+            [
+                'admin_name'  => 'Dr. Azmi',
+                'role'        => 'super_admin',
+                'active'      => true,
+                'permissions' => ['verify_crisis','verify_death','trigger_ldms','manage_donations','view_blockchain'],
+                'password'    => Hash::make('password'),
+            ]
+        );
 
         Admin::factory(2)->create();
 
@@ -64,19 +82,19 @@ class DatabaseSeeder extends Seeder
         }
 
         // ============================================================
-        // 3. DEMO STUDENT (login: 2225498 / password)
+        // 3. DEMO STUDENT (login: 222222 / password)
         // ============================================================
         $demoStudent = Student::create([
-            'student_id'        => '2225998',
-            'first_name'        => 'Nabilah',
-            'last_name'         => 'Nordin',
-            'email'             => 'nabilahahmad.nordin@live.iium.edu.my',
+            'student_id'        => '222222',
+            'first_name'        => 'Ian',
+            'last_name'         => 'Yusuf',
+            'email'             => 'ianyusuf@live.iium.edu.my',
             'kulliyyah'         => 'Kulliyyah of Information & Communication Technology',
             'programme'         => 'Bachelor of Information Systems',
             'year_of_study'     => '4',
-            'mahallah'          => 'Mahallah Hafsah',
+            'mahallah'          => 'Mahallah Bilal',
             'phone'             => '+60196511239',
-            'gender'            => 'Female',
+            'gender'            => 'Male',
             'nationality'       => 'Malaysian',
             'date_of_birth'     => '2002-08-20',
             'enrollment_status' => 'Active',
